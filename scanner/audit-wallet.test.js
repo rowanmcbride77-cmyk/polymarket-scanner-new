@@ -33,12 +33,12 @@ test("full wallet audit joins activity, redemption, token payout and resolution 
   const activity = [
     {
       proxy_wallet: wallet, timestamp: 1794000000, type: "TRADE",
-      condition_id: condition, token_id: tokenId, side: "BUY", size: 10,
+      condition_id: condition, token_id: tokenId, side: "BUY", size: 10, usdc_size: 5, price: 0.5,
       transaction_hash: "0xtrade",
     },
     {
       proxy_wallet: wallet, timestamp: 1794916900, type: "REDEEM",
-      condition_id: condition, token_id: tokenId, size: 10, usdc_size: 10,
+      condition_id: condition, token_id: tokenId, side: "", price: 0, size: 10, usdc_size: 10,
       transaction_hash: "0xredeem",
     },
     {
