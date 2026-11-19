@@ -81,6 +81,9 @@ test("full wallet audit joins activity, redemption, token payout and resolution 
   assert.equal(result.qualification.qualified, true);
   assert.equal(result.tokenFacts, 1);
   assert.equal(result.resolutionFacts, 1);
+  const activityCall = calls.find((x) => x.path === "/v2/activity");
+  assert.equal(activityCall.params.type, "REDEEM");
+  assert.equal(activityCall.params.start, 1796000000 - 30 * 86400);
   assert.equal(calls.filter(x => x.path === "/v2/tokens").length, 1);
 });
 
