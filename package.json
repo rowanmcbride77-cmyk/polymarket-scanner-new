@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "test": "node --test",
-    "check": "node --check scanner/index.js",
-    "scan": "node scanner/index.js"
+    "check": "for f in scanner/*.js; do node --check \"$f\" || exit 1; done",
+    "scan": "node scanner/index.js",
+    "scan:discover": "node scanner/index.js"
   }
 }
