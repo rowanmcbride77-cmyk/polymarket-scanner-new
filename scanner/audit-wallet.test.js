@@ -70,7 +70,7 @@ test("full wallet audit classifies a closed position only when its last event fo
   const closedCall = calls.find((x) => x.path === "/v2/positions" && x.params.status === "CLOSED");
   assert.equal(closedCall.params.start, 1796000000 - 30 * 86400);
   assert.equal(closedCall.params.end, 1796000000);
-  assert.equal(calls.filter(x => x.path === "/v2/positions").length, 3);
+  assert.equal(calls.filter(x => x.path === "/v2/positions").length, 2);
 });
 
 test("wallet audit fails when either position snapshot is incomplete", async () => {
