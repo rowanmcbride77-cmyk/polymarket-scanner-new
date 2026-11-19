@@ -98,3 +98,19 @@ test("requires complete source snapshots", () => {
     ...base, closedPositionsComplete:false, closedPositions:[], currentPositions:[], tokenFacts:new Map(),
   }), /Complete closed-position/);
 });
+
+test("excludes ambiguous same-second close and token-resolution disagreement", () => {
+  const sameSecond = summarizeSettledEvidence({
+    ...base, closedPositions:[closed("101",1794916800)], currentPositions:[],
+    tokenFacts:new Map([["101",token("101",1)]]),
+  });
+  assert.equal(sameSecond.resolvedMarkets,0);
+  assert.equal(sameSecond.exclusions.same_second_as_resolution_ambiguous,1);
+
+  const mismatch = summarizeSettledEvidence({
+    ...base, closedPositions:[closed("101")], currentPositions:[],
+    tokenFacts:new Map([["101",{...token("101",1),resolved:false}]]),
+  });
+  assert.equal(mismatch.integrityPassed,false);
+  assert.equal(mismatch.exclusions.token_resolution_state_mismatch,1);
+});
