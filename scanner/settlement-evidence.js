@@ -40,6 +40,9 @@ export function summarizeSettledEvidence({
       exclude("malformed_closed_position");
       continue;
     }
+    const resolution = resolutions.get(conditionId);
+    if (resolution && Number.isInteger(resolution.resolvedAtSeconds) &&
+        resolution.resolvedAtSeconds < windowStartSeconds) continue;
     const token = tokenFacts.get(tokenId);
     if (!token) {
       exclude("missing_closed_position_token_fact");
@@ -49,7 +52,6 @@ export function summarizeSettledEvidence({
       exclude("token_condition_mismatch");
       continue;
     }
-    const resolution = resolutions.get(conditionId);
     if (token.resolved !== true) {
       if (resolution?.status === "resolved") exclude("token_resolution_state_mismatch");
       continue;
@@ -90,6 +92,9 @@ export function summarizeSettledEvidence({
       exclude("malformed_current_redeemable_position");
       continue;
     }
+    const resolution = resolutions.get(conditionId);
+    if (resolution && Number.isInteger(resolution.resolvedAtSeconds) &&
+        resolution.resolvedAtSeconds < windowStartSeconds) continue;
     const token = tokenFacts.get(tokenId);
     if (!token || token.resolved !== true || !Number.isFinite(token.final_price)) {
       exclude("missing_current_position_token_resolution");
@@ -99,7 +104,6 @@ export function summarizeSettledEvidence({
       exclude("token_condition_mismatch");
       continue;
     }
-    const resolution = resolutions.get(conditionId);
     if (!resolution || !Number.isInteger(resolution.resolvedAtSeconds)) {
       exclude("missing_resolution_timestamp");
       continue;
