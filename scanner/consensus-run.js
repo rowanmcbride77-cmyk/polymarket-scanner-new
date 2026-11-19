@@ -72,6 +72,7 @@ export async function runConsensus({
   }
 
   const wallets = qualifiedUniverse(qualification, weekly, monthly);
+  const walletByAddress = new Map(wallets.map((row) => [row.wallet.toLowerCase(), row]));
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
   process.stdout.write(`Checking the last 60 minutes of BUY activity for ${wallets.length} qualified wallets.\n`);
@@ -100,7 +101,7 @@ export async function runConsensus({
             : Number.isFinite(row.price) ? row.price * row.size : null,
           outcome: typeof row.outcome === "string" ? row.outcome : null,
         }));
-      const source = wallets.find((item) => item.wallet.toLowerCase() === wallet.toLowerCase());
+      const source = walletByAddress.get(wallet.toLowerCase());
       return {
         complete: recent.complete,
         qualification: { qualified: true, reason: "qualified_weekly_or_monthly_top100" },
