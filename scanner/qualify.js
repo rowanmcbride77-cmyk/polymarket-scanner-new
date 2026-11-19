@@ -4,6 +4,8 @@ import { pathToFileURL } from "node:url";
 import { createDataApiClient } from "./data-api.js";
 import { createWalletAuditor } from "./audit-wallet.js";
 import { auditCandidates, buildQualifiedLeaderboards } from "./qualification-runner.js";
+import { fetchGammaMarkets } from "./gamma-markets.js";
+import { buildConsensusSignals } from "./consensus.js";
 
 function createPacedFetch({
   fetchImpl = globalThis.fetch,
@@ -45,7 +47,8 @@ export async function runQualification({
     throw new Error("Candidate discovery input failed validation");
   }
 
-  const client = createDataApiClient({ fetchImpl: createPacedFetch() });
+  const pacedFetch = createPacedFetch();
+  const client = createDataApiClient({ fetchImpl: pacedFetch });
   const auditWallet = createWalletAuditor(client);
   process.stdout.write(`Auditing ${discovery.candidates.length} candidate wallets; 30-day settlement window; concurrency ${concurrency}.\n`);
   const batch = await auditCandidates(discovery.candidates, {
@@ -80,10 +83,22 @@ export async function runQualification({
   }
 
   const boards = buildQualifiedLeaderboards(discovery, batch, { topN: 100 });
+  const recentConditionIds = [...new Set(batch.results
+    .filter((row) => row.qualification.qualified)
+    .flatMap((row) => (row.recentBuys ?? []).map((buy) => buy.conditionId))
+    .filter(Boolean))];
+  const marketFacts = await fetchGammaMarkets(recentConditionIds, { fetchImpl: pacedFetch });
+  const consensus = buildConsensusSignals(batch, marketFacts, {
+    nowSeconds,
+    windowMinutes: 60,
+    maxResolutionHours: 24,
+    minWallets: 8,
+    minUsdPerWallet: 10,
+  });
   const payload = {
     schemaVersion: 1,
     generatedAt,
-    source: "Polymarket Data API v2 activity, positions, tokens and resolutions",
+    source: "Polymarket Data API v2 activity, positions, tokens and resolutions; Gamma market metadata",
     qualification: {
       minimumResolvedMarkets: 20,
       minimumWinRate: 0.9,
@@ -91,13 +106,22 @@ export async function runQualification({
       earlyExitsCounted: false,
       settlementIntegrityRequired: true,
     },
+    consensusThresholds: {
+      buyWindowMinutes: 60,
+      maxHoursToResolution: 24,
+      minimumQualifiedWallets: 8,
+      minimumUsdPerWallet: 10,
+      mixedOutcomesExcluded: true,
+    },
     validation: {
       passed: true,
       allWalletAuditsComplete: true,
+      marketMetadataComplete: true,
       discoveredWallets: discovery.candidates.length,
       auditedWallets: batch.completed,
       failedWalletAudits: 0,
       qualifiedWallets: boards.qualifiedWalletCount,
+      consensusSignals: consensus.signals.length,
     },
     weekly: boards.weekly,
     monthly: boards.monthly,
@@ -111,7 +135,28 @@ export async function runQualification({
     schemaVersion: 1, generatedAt, validation: { passed: true },
     count: boards.monthly.length, traders: boards.monthly,
   });
-  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; weekly Top ${boards.weekly.length}; monthly Top ${boards.monthly.length}.\n`);
+  await writeJsonAtomic("data/consensus.json", {
+    schemaVersion: 1, generatedAt,
+    validation: { passed: true, complete: true },
+    thresholds: consensus.thresholds,
+    signalCount: consensus.signals.length,
+    qualifiedWalletsConsidered: consensus.qualifiedWalletsConsidered,
+    marketsWithRecentQualifiedBuys: consensus.marketsWithRecentQualifiedBuys,
+    exclusions: consensus.exclusions,
+    signals: consensus.signals,
+  });
+  await writeJsonAtomic("data/status.json", {
+    schemaVersion: 1, generatedAt,
+    validation: { passed: true },
+    state: "complete",
+    discoveredWallets: discovery.candidates.length,
+    auditedWallets: batch.completed,
+    qualifiedWallets: boards.qualifiedWalletCount,
+    weeklyCount: boards.weekly.length,
+    monthlyCount: boards.monthly.length,
+    consensusCount: consensus.signals.length,
+  });
+  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; weekly Top ${boards.weekly.length}; monthly Top ${boards.monthly.length}; consensus signals ${consensus.signals.length}.\n`);
   process.stdout.write(`Output: ${target}\n`);
   return payload;
 }
