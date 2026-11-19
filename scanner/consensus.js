@@ -20,7 +20,7 @@ function tagText(tag) {
 function marketCategory(market) {
   const category = String(market.category ?? "").toLowerCase();
   const tags = (market.tags ?? []).map(tagText);
-  const all = [category, ...tags].join(" ");
+  const all = [category, market.title ?? "", ...tags].join(" ");
   if (/politic|election|government|congress|senate/.test(all)) return null;
   if (/esport/.test(all)) return "esports";
   if (/crypto|bitcoin|ethereum|solana/.test(all)) return "crypto";
