@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fetchCompleteWalletActivity } from "./activity.js";
+import { fetchCompleteWalletActivity, fetchRecentWalletActivity } from "./activity.js";
 
 const wallet = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const event = (timestamp, overrides = {}) => ({
@@ -51,4 +51,20 @@ test("malformed activity fails closed", async () => {
 
 test("invalid wallet is rejected", async () => {
   await assert.rejects(fetchCompleteWalletActivity({}, "bad"), /valid proxy wallet/);
+});
+
+test("fetches recent wallet activity with explicit 60-minute bounds", async () => {
+  let call;
+  const client = { async collectPages(path, params, options) {
+    call = { path, params, options };
+    return { rows: [event(100)], pages: 1, complete: true };
+  }};
+  const result = await fetchRecentWalletActivity(client, wallet, {
+    startSeconds: 50, endSeconds: 150,
+  });
+  assert.equal(call.path, "/v2/activity");
+  assert.equal(call.params.start, 50);
+  assert.equal(call.params.end, 150);
+  assert.equal(call.params.sort_direction, "DESC");
+  assert.equal(result.complete, true);
 });
