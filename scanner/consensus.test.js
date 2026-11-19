@@ -6,7 +6,7 @@ const now = 1796000000;
 const condition = "0x" + "a".repeat(64);
 const market = (overrides = {}) => ({
   conditionId: condition, title:"Team vs Team", slug:"team-vs-team",
-  active:true, closed:false, endDate:new Date((now+12*3600)*1000).toISOString(),
+  active:true, enableOrderBook:true, closed:false, endDate:new Date((now+12*3600)*1000).toISOString(),
   category:"Sports", tags:["NBA"],
   clobTokenIds:["yes-token","no-token"], outcomes:["Yes","No"],
   ...overrides,
