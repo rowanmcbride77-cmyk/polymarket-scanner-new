@@ -31,6 +31,7 @@ export async function fetchGammaMarkets(conditionIds, {
     const url = new URL("/markets", baseUrl);
     url.searchParams.set("condition_ids", batch.join(","));
     url.searchParams.set("limit", String(batch.length));
+    url.searchParams.set("include_tag", "true");
     let response;
     for (let attempt = 0; ; attempt += 1) {
       response = await fetchImpl(url, { method: "GET", headers: { accept: "application/json" } });
@@ -53,6 +54,7 @@ export async function fetchGammaMarkets(conditionIds, {
         eventId: market.eventId ?? market.event_id ?? null,
         endDate: market.endDate ?? market.end_date ?? market.endDateIso ?? null,
         active: market.active === true,
+        enableOrderBook: market.enableOrderBook === true,
         closed: typeof market.closed === "boolean" ? market.closed : null,
         category: market.category ?? "",
         tags: Array.isArray(market.tags) ? market.tags : [],
