@@ -1,0 +1,65 @@
+import { createDataApiClient } from "./data-api.js";
+import { fetchTokenFacts } from "./tokens.js";
+import { summarizeSettledPositions } from "./settlement.js";
+
+const WALLET_RE = /^0x[a-fA-F0-9]{40}$/;
+
+export async function fetchRedeemablePositionSnapshot(client, wallet, {
+  limit = 1000,
+  maxPages = 100,
+} = {}) {
+  if (!WALLET_RE.test(wallet ?? "")) throw new TypeError("A valid proxy wallet address is required");
+  const records = [];
+  const partitions = [];
+  for (const sourceStatusFilter of ["REDEEMABLE", "REDEEMABLE_LOST"]) {
+    const result = await client.collectPages("/v2/positions", {
+      user: wallet,
+      status: sourceStatusFilter,
+      limit,
+      sort_by: "TIMESTAMP",
+      sort_direction: "DESC",
+    }, { maxPages });
+    partitions.push({
+      sourceStatusFilter,
+      pages: result.pages,
+      count: result.rows.length,
+      complete: result.complete,
+    });
+    for (const position of result.rows) records.push({ position, sourceStatusFilter });
+  }
+  const tokenIds = records.map(({ position }) => position?.token_id).filter(Boolean);
+  const tokenFacts = await fetchTokenFacts(client, tokenIds);
+  const joined = records.map((record) => ({
+    ...record,
+    tokenFact: tokenFacts.get(String(record.position.token_id)) ?? null,
+  }));
+  return {
+    wallet: wallet.toLowerCase(),
+    records: joined,
+    partitions,
+    complete: partitions.every((partition) => partition.complete),
+    coverage: "CURRENT_UNREDEEMED_REDEEMABLE_POSITIONS_ONLY",
+  };
+}
+
+/**
+ * This is a snapshot diagnostic, not the historical 30-day win-rate metric.
+ * Redeemed positions are no longer in this current-position view; the scanner
+ * must not use this result alone to qualify a trader.
+ */
+export async function auditCurrentRedeemableSnapshot(client, wallet, options = {}) {
+  const snapshot = await fetchRedeemablePositionSnapshot(client, wallet, options);
+  const summary = summarizeSettledPositions(snapshot.records, {
+    historyComplete: snapshot.complete,
+  });
+  return { ...snapshot, summary, qualificationEligible: false };
+}
+
+export function createWalletPositionService(client = createDataApiClient()) {
+  return {
+    fetchRedeemablePositionSnapshot: (wallet, options) =>
+      fetchRedeemablePositionSnapshot(client, wallet, options),
+    auditCurrentRedeemableSnapshot: (wallet, options) =>
+      auditCurrentRedeemableSnapshot(client, wallet, options),
+  };
+}
