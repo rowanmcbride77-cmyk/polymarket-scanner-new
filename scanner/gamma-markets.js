@@ -53,7 +53,7 @@ export async function fetchGammaMarkets(conditionIds, {
         eventId: market.eventId ?? market.event_id ?? null,
         endDate: market.endDate ?? market.end_date ?? market.endDateIso ?? null,
         active: market.active === true,
-        closed: market.closed === true,
+        closed: typeof market.closed === "boolean" ? market.closed : null,
         category: market.category ?? "",
         tags: Array.isArray(market.tags) ? market.tags : [],
         clobTokenIds: market.clobTokenIds ?? market.clob_token_ids ?? [],
