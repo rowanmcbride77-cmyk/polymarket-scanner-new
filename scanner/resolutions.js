@@ -13,8 +13,9 @@ export async function fetchMarketResolutions(client, conditionIds, { batchSize =
     if (body.data !== null && !Array.isArray(body.data)) throw new Error("Resolution lookup returned malformed data envelope");
     for (const row of (body.data ?? [])) {
       const conditionId = row.condition_id ?? row.conditionId;
-      const resolvedAt = row.resolved_at ?? row.resolvedAt;
       const status = String(row.status ?? "").toLowerCase();
+      if (status !== "resolved") continue;
+      const resolvedAt = row.resolved_at ?? row.resolvedAt;
       const timestamp = resolvedAt ? Date.parse(resolvedAt) : NaN;
       if (typeof conditionId !== "string" || !Number.isFinite(timestamp)) {
         throw new Error("Resolution lookup returned malformed condition or resolved_at");
