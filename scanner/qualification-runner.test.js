@@ -10,7 +10,7 @@ test("audits candidates with bounded concurrency and preserves every result", as
       return {
         complete: true,
         qualification: { qualified: wallet.endsWith("0"), reason: "test" },
-        summary: { wins: 20, losses: 0, resolvedMarkets: 20, winRate: 1 },
+        summary: { wins: 20, losses: 0, resolvedMarkets: 20, winRate: 1, integrityPassed: true },
       };
     },
   });
@@ -25,7 +25,7 @@ test("one failed wallet makes the batch incomplete", async () => {
     concurrency: 2,
     async auditWallet(wallet) {
       if (wallet === "bad") throw new Error("upstream unavailable");
-      return { complete:true, qualification:{qualified:true}, summary:{winRate:1,resolvedMarkets:20,wins:20,losses:0} };
+      return { complete:true, qualification:{qualified:true}, summary:{winRate:1,resolvedMarkets:20,wins:20,losses:0,integrityPassed:true} };
     },
   });
   assert.equal(result.complete, false);
@@ -49,8 +49,8 @@ test("weekly and monthly leaderboards contain only fully audited qualified walle
   const auditBatch = {
     complete:true,
     results:[
-      {wallet:"w1",complete:true,qualification:{qualified:true},summary:{wins:19,losses:1,winRate:.95,resolvedMarkets:20}},
-      {wallet:"w2",complete:true,qualification:{qualified:false},summary:{wins:10,losses:10,winRate:.5,resolvedMarkets:20}},
+      {wallet:"w1",complete:true,qualification:{qualified:true},summary:{wins:19,losses:1,winRate:.95,resolvedMarkets:20,integrityPassed:true}},
+      {wallet:"w2",complete:true,qualification:{qualified:false},summary:{wins:10,losses:10,winRate:.5,resolvedMarkets:20,integrityPassed:true}},
     ],
   };
   const result = buildQualifiedLeaderboards(discovery,auditBatch);
