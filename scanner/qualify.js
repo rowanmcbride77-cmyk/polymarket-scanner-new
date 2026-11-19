@@ -57,8 +57,14 @@ export async function runQualification({
       minimumResolvedMarkets: 20,
       minimumWinRate: 0.9,
     }),
-    onProgress: ({ completed, total, failed }) => {
+    onProgress: ({ completed, total, failed, commonErrors = [], errorSamples = [] }) => {
       process.stdout.write(`Wallet audits: ${completed}/${total}; failures: ${failed}.\n`);
+      for (const item of commonErrors) {
+        process.stdout.write(`  Failure ${item.count}x: ${item.error}\n`);
+      }
+      for (const sample of errorSamples) {
+        process.stdout.write(`  Sample wallet ${sample.wallet}: [${sample.stage}] ${sample.message}\n`);
+      }
     },
   });
 
@@ -73,6 +79,8 @@ export async function runQualification({
         discoveredWallets: discovery.candidates.length,
         auditedWallets: batch.completed,
         failedWalletAudits: batch.failed,
+        errorCounts: batch.errorCounts,
+        errorSamples: batch.errorSamples,
       },
       results: batch.results,
     };
