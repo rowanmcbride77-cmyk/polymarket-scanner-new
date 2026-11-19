@@ -21,7 +21,7 @@ function fixtures() {
   };
   const consensus = {
     schemaVersion:1,validation:{passed:true},signalCount:1,
-    thresholds:{windowMinutes:60,maxResolutionHours:24,minWallets:8,minUsdPerWallet:10},
+    thresholds:{windowMinutes:60,maxResolutionHours:24,minWallets:8,minUsdPerWallet:10,requireCurrentHoldings:true,sameSideOnly:true,excludeDuplicateRepresentations:true},
     signals:[{
       category:"sports",conditionId:"0xcondition",tokenId:"token-1",outcome:"Yes",
       minutesToResolution:60,endDate:"2026-11-19T06:00:00.000Z",
