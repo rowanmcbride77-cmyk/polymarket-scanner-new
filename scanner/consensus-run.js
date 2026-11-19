@@ -1,5 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { createDataApiClient } from "./data-api.js";
 import { fetchRecentWalletActivity } from "./activity.js";
 import { fetchGammaMarkets } from "./gamma-markets.js";
@@ -175,7 +176,7 @@ export async function runConsensus({
   return consensus;
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${resolve(process.argv[1])}`).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   runConsensus().catch((error) => {
     process.stderr.write(`Consensus failed: ${error.message}\n`);
     process.exitCode = 1;
