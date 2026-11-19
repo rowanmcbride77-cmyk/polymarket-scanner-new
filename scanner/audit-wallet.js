@@ -4,6 +4,13 @@ import { fetchTokenFacts } from "./tokens.js";
 import { fetchMarketResolutions } from "./resolutions.js";
 import { summarizeSettledEvidence } from "./settlement-evidence.js";
 
+function atStage(stage, promise) {
+  return promise.catch((error) => {
+    error.auditStage = stage;
+    throw error;
+  });
+}
+
 export function qualifyWalletAudit(audit, {
   minimumResolvedMarkets = 20,
   minimumWinRate = 0.9,
@@ -32,15 +39,17 @@ export async function auditWallet(client, wallet, {
   }
   const windowStartSeconds = nowSeconds - lookbackDays * 86400;
   const [positionSnapshot, closedSnapshot] = await Promise.all([
-    fetchRedeemablePositionSnapshot(client, wallet),
-    fetchClosedPositionSnapshot(client, wallet, {
+    atStage("redeemable_positions", fetchRedeemablePositionSnapshot(client, wallet)),
+    atStage("closed_positions", fetchClosedPositionSnapshot(client, wallet, {
       startSeconds: windowStartSeconds,
       endSeconds: nowSeconds,
       maxPages: 20,
-    }),
+    })),
   ]);
   if (!positionSnapshot.complete || !closedSnapshot.complete) {
-    throw new Error("Wallet audit position snapshots are incomplete");
+    const error = new Error("Wallet audit position snapshots are incomplete");
+    error.auditStage = "position_snapshot_validation";
+    throw error;
   }
 
   const tokenFacts = new Map();
@@ -50,14 +59,16 @@ export async function auditWallet(client, wallet, {
   const missingClosedTokenIds = closedSnapshot.records
     .map((record) => record.position.token_id)
     .filter((tokenId) => !tokenFacts.has(String(tokenId)));
-  const closedTokenFacts = await fetchTokenFacts(client, missingClosedTokenIds);
+  const closedTokenFacts = await atStage("closed_position_token_facts",
+    fetchTokenFacts(client, missingClosedTokenIds));
   for (const [tokenId, fact] of closedTokenFacts) tokenFacts.set(tokenId, fact);
 
   const conditionIds = [
     ...closedSnapshot.records.map((record) => record.position.condition_id),
     ...positionSnapshot.records.map((record) => record.position.condition_id),
   ];
-  const resolutions = await fetchMarketResolutions(client, conditionIds);
+  const resolutions = await atStage("market_resolutions",
+    fetchMarketResolutions(client, conditionIds));
   const summary = summarizeSettledEvidence({
     closedPositions: closedSnapshot.records,
     currentPositions: positionSnapshot.records,
