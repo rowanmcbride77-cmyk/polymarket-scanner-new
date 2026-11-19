@@ -19,13 +19,15 @@ export async function fetchRedeemablePositionSnapshot(client, wallet, {
     sort_by: "TIMESTAMP",
     sort_direction: "DESC",
   }, { maxPages });
-  const malformed = result.rows.filter((row) =>
-    !row || typeof row !== "object" ||
-    String(row.proxy_wallet ?? "").toLowerCase() !== wallet.toLowerCase() ||
-    typeof row.condition_id !== "string" || !row.condition_id ||
-    typeof row.token_id !== "string" || !/^\d+$/.test(row.token_id) ||
-    !Number.isFinite(row.current_size) || row.current_size < 0 ||
-    typeof row.redeemable !== "boolean");
+  const malformed = result.rows.filter((row) => {
+    if (!row || typeof row !== "object" ||
+        String(row.proxy_wallet ?? "").toLowerCase() !== wallet.toLowerCase() ||
+        !Number.isFinite(row.current_size) || row.current_size < 0 ||
+        typeof row.redeemable !== "boolean") return true;
+    if (row.redeemable !== true || row.current_size <= 0) return false;
+    return typeof row.condition_id !== "string" || !row.condition_id ||
+      typeof row.token_id !== "string" || !/^\d+$/.test(row.token_id);
+  });
   if (malformed.length) {
     const error = new Error("Open position snapshot contains malformed rows");
     error.malformedRows = malformed.length;
