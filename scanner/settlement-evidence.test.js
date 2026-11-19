@@ -13,7 +13,7 @@ const token = (tokenId, final_price) => ({
 const closed = (tokenId, last_event_at = 1794916900) => ({
   position:{
     condition_id:condition, token_id:tokenId, status:"CLOSED",
-    current_size:0, total_size:10, last_event_at, realized_pnl:1,
+    current_size:0, total_size:10, first_entry_at:1794000000, last_event_at, realized_pnl:1,
   },
 });
 const base = {
@@ -46,7 +46,7 @@ test("counts still-held winners and losers from redeemable position snapshots", 
   const winners = summarizeSettledEvidence({
     ...base, closedPositions:[],
     currentPositions:[{
-      position:{condition_id:condition,token_id:"101",current_size:4},
+      position:{condition_id:condition,token_id:"101",current_size:4,first_entry_at:1794000000},
       sourceStatusFilter:"REDEEMABLE",
     }],
     tokenFacts:new Map([["101",token("101",1)]]),
@@ -54,7 +54,7 @@ test("counts still-held winners and losers from redeemable position snapshots", 
   const losers = summarizeSettledEvidence({
     ...base, closedPositions:[],
     currentPositions:[{
-      position:{condition_id:condition,token_id:"101",current_size:4},
+      position:{condition_id:condition,token_id:"101",current_size:4,first_entry_at:1794000000},
       sourceStatusFilter:"REDEEMABLE_LOST",
     }],
     tokenFacts:new Map([["101",token("101",0)]]),
