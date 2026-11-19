@@ -41,6 +41,12 @@ test("full wallet audit joins activity, redemption, token payout and resolution 
       condition_id: condition, token_id: tokenId, size: 10, usdc_size: 10,
       transaction_hash: "0xredeem",
     },
+    {
+      proxy_wallet: wallet, timestamp: 1795999940, type: "TRADE",
+      condition_id: "0x" + "b".repeat(64), token_id: "987654321",
+      side: "BUY", size: 20, price: 0.6, usdc_size: 12,
+      transaction_hash: "0xrecent",
+    },
   ];
   const calls = [];
   const client = {
@@ -72,6 +78,8 @@ test("full wallet audit joins activity, redemption, token payout and resolution 
   assert.equal(result.qualification.qualified, true);
   assert.equal(result.tokenFacts, 1);
   assert.equal(result.resolutionFacts, 1);
+  assert.equal(result.recentBuys.length, 1);
+  assert.equal(result.recentBuys[0].usdSize, 12);
   assert.equal(calls.filter(x => x.path === "/v2/tokens").length, 1);
 });
 
