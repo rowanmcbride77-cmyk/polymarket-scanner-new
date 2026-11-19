@@ -123,7 +123,8 @@ async function loadDashboard() {
     statusPanel.classList.add("status-success");
     title.textContent = "Latest scan validated";
     const earlyExitDetail = Number.isFinite(status.earlyExitsExcluded)
-      ? ` · ${status.earlyExitsExcluded.toLocaleString()} early exits excluded` : "";
+      ? ` · ${status.earlyExitsExcluded.toLocaleString()} early exits excluded`
+      : " · early exits excluded from win rate";
     detail.textContent = `${status.discoveredWallets.toLocaleString()} wallets scanned · ${status.qualifiedWallets.toLocaleString()} qualified${earlyExitDetail} · ${status.consensusCount.toLocaleString()} consensus signals.`;
     lastScan.textContent = status.completedAt ? new Date(status.completedAt).toLocaleString()
       : status.generatedAt ? new Date(status.generatedAt).toLocaleString() : "Not reported";
