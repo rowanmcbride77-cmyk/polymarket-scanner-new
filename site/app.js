@@ -1,6 +1,7 @@
 const title = document.querySelector("#status-title");
 const detail = document.querySelector("#status-detail");
 const lastScan = document.querySelector("#last-scan");
+const statusPanel = document.querySelector(".status");
 
 function setEmpty(id, message) {
   const target = document.getElementById(id);
@@ -114,6 +115,7 @@ async function loadDashboard() {
       }
     }
 
+    statusPanel.classList.add("status-success");
     title.textContent = "Latest scan validated";
     detail.textContent = `${status.discoveredWallets.toLocaleString()} wallets scanned · ${status.qualifiedWallets.toLocaleString()} qualified · ${status.consensusCount.toLocaleString()} consensus signals.`;
     lastScan.textContent = status.completedAt ? new Date(status.completedAt).toLocaleString()
@@ -122,6 +124,7 @@ async function loadDashboard() {
     renderLeaderboard("monthly-board", monthly.traders);
     renderConsensus(consensus.signals);
   } catch {
+    statusPanel.classList.remove("status-success");
     title.textContent = "Waiting for first validated scan";
     detail.textContent = "No valid complete scan is published. Unverified or stale rankings are never substituted.";
     lastScan.textContent = "Not yet available";
