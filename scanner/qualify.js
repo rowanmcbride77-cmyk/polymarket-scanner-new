@@ -123,6 +123,13 @@ export async function runQualification({
       qualifiedWallets: boards.qualifiedWalletCount,
       consensusSignals: consensus.signals.length,
     },
+    qualifiedWallets: batch.results
+      .filter((row) => row.qualification.qualified)
+      .map((row) => ({
+        wallet: row.wallet,
+        username: row.username,
+        summary: row.summary,
+      })),
     weekly: boards.weekly,
     monthly: boards.monthly,
   };
