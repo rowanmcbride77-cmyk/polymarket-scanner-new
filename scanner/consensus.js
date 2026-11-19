@@ -58,6 +58,7 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     .filter((row) => row.complete === true && row.qualification?.qualified === true)
     .map((row) => row.wallet.toLowerCase()));
   const byCondition = new Map();
+  const heldByWallet = new Map();
   const exclusions = {};
   const mixedCurrentHoldings = new Set();
 
@@ -65,12 +66,6 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     const wallet = audit.wallet.toLowerCase();
     if (!qualified.has(wallet)) continue;
     const recentBuys = audit.recentBuys ?? [];
-    const recentBuyConditions = new Set(recentBuys
-      .filter((buy) => buy?.conditionId && buy?.tokenId &&
-        Number.isInteger(buy.timestamp) && buy.timestamp >= cutoff && buy.timestamp <= nowSeconds &&
-        Number.isFinite(buy.size) && buy.size > 0 &&
-        Number.isFinite(buy.usdSize) && buy.usdSize > 0)
-      .map((buy) => String(buy.conditionId).toLowerCase()));
     const heldByCondition = new Map();
     for (const position of audit.currentPositions ?? []) {
       if (!position?.conditionId || !position?.tokenId ||
@@ -80,11 +75,7 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
       tokens.add(String(position.tokenId));
       heldByCondition.set(conditionId, tokens);
     }
-    for (const conditionId of recentBuyConditions) {
-      if ((heldByCondition.get(conditionId)?.size ?? 0) > 1) {
-        mixedCurrentHoldings.add(conditionId);
-      }
-    }
+    heldByWallet.set(wallet, heldByCondition);
     for (const buy of recentBuys) {
       if (!buy || !buy.conditionId || !buy.tokenId ||
           !Number.isInteger(buy.timestamp) || buy.timestamp < cutoff ||
@@ -106,6 +97,17 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
       walletBuys.set(wallet, existing);
       tokens.set(tokenId, walletBuys);
       byCondition.set(conditionId, tokens);
+    }
+  }
+
+  for (const [conditionId, tokenGroups] of byCondition) {
+    for (const walletBuys of tokenGroups.values()) {
+      for (const [wallet, buy] of walletBuys) {
+        if (buy.usdSize >= minUsdPerWallet &&
+            (heldByWallet.get(wallet)?.get(conditionId)?.size ?? 0) > 1) {
+          mixedCurrentHoldings.add(conditionId);
+        }
+      }
     }
   }
 
