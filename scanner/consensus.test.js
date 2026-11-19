@@ -5,7 +5,7 @@ import { buildConsensusSignals } from "./consensus.js";
 const now = 1796000000;
 const condition = "0x" + "a".repeat(64);
 const market = (overrides = {}) => ({
-  conditionId: condition, title:"Team vs Team", slug:"team-vs-team",
+  conditionId: condition, title:"Team vs Team", slug:"team-vs-team", eventId:"event-1",
   active:true, enableOrderBook:true, closed:false, endDate:new Date((now+12*3600)*1000).toISOString(),
   category:"Sports", tags:["NBA"],
   clobTokenIds:["yes-token","no-token"], outcomes:["Yes","No"],
@@ -71,4 +71,28 @@ test("ignores stale or future-invalid buy records and rejects incomplete audit b
   const result = buildConsensusSignals({complete:true,results},new Map([[condition,market()]]),{nowSeconds:now});
   assert.equal(result.signals.length,0);
   assert.throws(() => buildConsensusSignals({complete:false,results},new Map()),/complete wallet audit batch/);
+});
+
+test("does not publish duplicate market representations within one event", () => {
+  const secondCondition = "0x" + "c".repeat(64);
+  const results = Array.from({length:8},(_,i)=>({
+    wallet:`wallet-${i}`, complete:true, qualification:{qualified:true},
+    recentBuys:[
+      {conditionId:condition,tokenId:"yes-token",timestamp:now-120,size:20,usdSize:12},
+      {conditionId:secondCondition,tokenId:"yes-token-2",timestamp:now-120,size:20,usdSize:12},
+    ],
+  }));
+  const first = market();
+  const second = market({
+    conditionId:secondCondition,
+    slug:"team-vs-team-duplicate",
+    clobTokenIds:["yes-token-2","no-token-2"],
+  });
+  const result = buildConsensusSignals(
+    {complete:true,results},
+    new Map([[condition,first],[secondCondition,second]]),
+    {nowSeconds:now},
+  );
+  assert.equal(result.signals.length,1);
+  assert.equal(result.exclusions.duplicate_market_representation,1);
 });
