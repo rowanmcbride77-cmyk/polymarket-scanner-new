@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fetchRedeemablePositionSnapshot, fetchClosedPositionSnapshot, auditCurrentRedeemableSnapshot } from "./wallet-positions.js";
+import { fetchRedeemablePositionSnapshot, fetchClosedPositionSnapshot, fetchCurrentPositionSnapshot, auditCurrentRedeemableSnapshot } from "./wallet-positions.js";
 
 const wallet = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const position = (token_id) => ({
@@ -70,4 +70,24 @@ test("fetches bounded CLOSED positions by last economic event time", async () =>
   assert.equal("include_archived" in call.params, false);
   assert.equal(snapshot.records.length, 1);
   assert.equal(snapshot.complete, true);
+});
+
+test("fetches current held positions for consensus confirmation", async () => {
+  let call;
+  const client = {
+    async collectPages(path, params) {
+      call = {path,params};
+      return {rows:[
+        {proxy_wallet:wallet,condition_id:"0xcondition",token_id:"44",current_size:5},
+        {proxy_wallet:wallet,condition_id:"0xcondition",token_id:"55",current_size:0},
+      ],pages:1,complete:true};
+    },
+  };
+  const snapshot=await fetchCurrentPositionSnapshot(client,wallet);
+  assert.equal(call.params.status,"OPEN");
+  assert.equal(snapshot.records.length,1);
+  assert.deepEqual(snapshot.records[0],{
+    conditionId:"0xcondition",tokenId:"44",currentSize:5,
+  });
+  assert.equal(snapshot.complete,true);
 });
