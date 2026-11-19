@@ -105,9 +105,7 @@ export async function fetchClosedPositionSnapshot(client, wallet, {
     row.status !== "CLOSED" ||
     typeof row.condition_id !== "string" || !row.condition_id ||
     typeof row.token_id !== "string" || !/^\d+$/.test(row.token_id) ||
-    !Number.isInteger(row.last_event_at) || row.last_event_at <= 0 ||
-    !Number.isFinite(row.total_size) || row.total_size <= 0 ||
-    !Number.isFinite(row.realized_pnl));
+    !Number.isInteger(row.last_event_at) || row.last_event_at <= 0);
   if (malformed.length) {
     const error = new Error("Closed position snapshot contains malformed rows");
     error.malformedRows = malformed.length;
