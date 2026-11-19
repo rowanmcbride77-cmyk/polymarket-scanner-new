@@ -1,4 +1,4 @@
-name: Live candidate discovery
+name: Live candidate discovery and qualification
 
 on:
   workflow_dispatch:
@@ -11,9 +11,9 @@ permissions:
   contents: read
 
 jobs:
-  discover:
+  discover-and-qualify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -25,12 +25,22 @@ jobs:
         run: |
           npm test
           npm run check
-      - name: Discover leaderboard candidates
+      - name: Discover 20,000 candidate wallets
         run: npm run scan
-      - name: Upload discovery dataset
+      - name: Audit settlements and build qualified weekly/monthly Top 100
+        run: npm run qualify
+        env:
+          SCANNER_CONCURRENCY: 16
+      - name: Upload validated scanner outputs and diagnostics
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: polymarket-candidate-discovery
-          path: data/discovery.json
-          if-no-files-found: error
+          name: polymarket-qualified-scanner-output
+          path: |
+            data/discovery.json
+            data/qualification.json
+            data/qualification-incomplete.json
+            data/week.json
+            data/month.json
+          if-no-files-found: ignore
           retention-days: 14
