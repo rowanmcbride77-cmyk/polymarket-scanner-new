@@ -9,6 +9,8 @@ export async function auditCandidates(candidates, {
     throw new RangeError("concurrency must be 1..32");
   }
   const results = new Array(candidates.length);
+  const errorCounts = new Map();
+  const errorSamples = [];
   let nextIndex = 0;
   let completed = 0;
   let failed = 0;
@@ -32,23 +34,39 @@ export async function auditCandidates(candidates, {
         if (audit.complete !== true) failed += 1;
       } catch (error) {
         failed += 1;
+        const stage = error?.auditStage ?? "unknown";
+        const message = error?.message ?? String(error);
+        const key = `${stage}: ${message}`;
+        errorCounts.set(key, (errorCounts.get(key) ?? 0) + 1);
+        if (errorSamples.length < 12) {
+          errorSamples.push({ wallet: candidate.wallet, stage, message });
+        }
         results[index] = {
           wallet: candidate.wallet,
           username: candidate.username,
           complete: false,
           qualification: { qualified: false, reason: "audit_error" },
-          error: error?.message ?? String(error),
+          auditStage: stage,
+          error: message,
         };
       }
       completed += 1;
       if (onProgress && (completed % 100 === 0 || completed === candidates.length)) {
-        await onProgress({ completed, total: candidates.length, failed });
+        const commonErrors = [...errorCounts.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([error, count]) => ({ error, count }));
+        await onProgress({
+          completed, total: candidates.length, failed,
+          commonErrors, errorSamples: errorSamples.slice(0, 5),
+        });
       }
     }
   }
 
   await Promise.all(Array.from({ length: Math.min(concurrency, candidates.length) }, worker));
-  return { results, complete: failed === 0, completed, failed };
+  return { results, complete: failed === 0, completed, failed,
+    errorCounts: Object.fromEntries(errorCounts), errorSamples };
 }
 
 function periodAppearance(candidate, period) {
