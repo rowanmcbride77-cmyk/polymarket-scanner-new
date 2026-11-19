@@ -89,6 +89,7 @@ export function createActivityService(client = createDataApiClient()) {
 export async function fetchRecentWalletActivity(client, wallet, {
   startSeconds,
   endSeconds = Math.floor(Date.now() / 1000),
+  type,
   limit = 1000,
   maxPages = 100,
 } = {}) {
@@ -100,6 +101,7 @@ export async function fetchRecentWalletActivity(client, wallet, {
     user: wallet,
     start: startSeconds,
     end: endSeconds,
+    ...(type ? { type } : {}),
     sort_direction: "DESC",
     limit,
   }, { maxPages });
