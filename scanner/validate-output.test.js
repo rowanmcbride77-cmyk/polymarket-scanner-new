@@ -13,12 +13,15 @@ function fixtures() {
   const weekly = {schemaVersion:1,validation:{passed:true},count:1,traders:[trader]};
   const monthly = {schemaVersion:1,validation:{passed:true},count:1,traders:[trader]};
   const qualification = {
-    schemaVersion:1,validation:{
+    schemaVersion:1,
+    qualification:{minimumResolvedMarkets:20,minimumWinRate:0.9,lookbackDays:30,earlyExitsCounted:false,settlementIntegrityRequired:true},
+    validation:{
       passed:true,allWalletAuditsComplete:true,discoveredWallets:1,auditedWallets:1,qualifiedWallets:1,
     },qualifiedWallets:[qualified],
   };
   const consensus = {
     schemaVersion:1,validation:{passed:true},signalCount:1,
+    thresholds:{windowMinutes:60,maxResolutionHours:24,minWallets:8,minUsdPerWallet:10},
     signals:[{
       category:"sports",conditionId:"0xcondition",tokenId:"token-1",outcome:"Yes",
       minutesToResolution:60,endDate:"2026-11-19T06:00:00.000Z",
