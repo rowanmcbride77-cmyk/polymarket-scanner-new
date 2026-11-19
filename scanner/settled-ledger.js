@@ -46,6 +46,7 @@ export function reconstructSettledMarketResults({
     const type = String(row.type ?? "").toUpperCase();
     if (NON_POSITION_TYPES.has(type)) continue;
     if (!["TRADE", "SPLIT", "MERGE", "REDEEM"].includes(type)) {
+      if (!row.condition_id) throw new Error("Unsupported activity action has no condition id; wallet audit is unsafe");
       markUnsupported(unsupported, row.condition_id, `unsupported_action:${type || "unknown"}`);
       continue;
     }
@@ -119,7 +120,7 @@ export function reconstructSettledMarketResults({
   }
 
   const exposuresByCondition = new Map();
-  const allTokenIds = new Set([...redemptionTotals.keys(), ...currentByToken.keys()]);
+  const allTokenIds = new Set([...balances.keys(), ...redemptionTotals.keys(), ...currentByToken.keys()]);
   for (const tokenId of allTokenIds) {
     const conditionId = tokenConditions.get(tokenId) ?? currentByToken.get(tokenId)?.conditionId;
     if (!conditionId) continue;
