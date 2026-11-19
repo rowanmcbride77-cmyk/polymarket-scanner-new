@@ -55,7 +55,10 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
   }
   if (!Array.isArray(consensus.signals)) fail("consensus signal list");
   const duplicateKeys = new Set();
+  const seenConditions = new Set();
   for (const signal of consensus.signals) {
+    if (seenConditions.has(signal.conditionId)) fail("duplicate condition signal");
+    seenConditions.add(signal.conditionId);
     if (!["sports", "esports", "crypto"].includes(signal.category) ||
         !signal.conditionId || !signal.tokenId || !signal.marketTitle || !signal.outcome ||
         !Number.isFinite(signal.minutesToResolution) ||
