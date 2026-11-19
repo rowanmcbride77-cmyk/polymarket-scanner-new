@@ -99,13 +99,15 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     if (!category) { count(exclusions, "excluded_or_unclassified_category"); continue; }
 
     const tokenIds = parseArray(market.clobTokenIds).map(String);
-    if (tokenIds.length && !tokenIds.includes(tokenId)) {
+    if (!tokenIds.length || !tokenIds.includes(tokenId)) {
       count(exclusions, "token_not_in_market"); continue;
     }
     const outcomes = parseArray(market.outcomes);
     const outcomeIndex = tokenIds.indexOf(tokenId);
-    const outcome = outcomeIndex >= 0 && outcomes[outcomeIndex] !== undefined
-      ? String(outcomes[outcomeIndex]) : null;
+    if (outcomeIndex < 0 || outcomes[outcomeIndex] === undefined) {
+      count(exclusions, "missing_token_outcome"); continue;
+    }
+    const outcome = String(outcomes[outcomeIndex]);
 
     const wallets = [...walletBuys.values()]
       .filter((row) => row.usdSize >= minUsdPerWallet)
