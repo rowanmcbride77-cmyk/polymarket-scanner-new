@@ -1,12 +1,6 @@
 name: Live candidate discovery and qualification
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "scanner/wallet-positions.js"
-      - "scanner/audit-wallet.js"
-      - ".github/workflows/discover.yml"
   workflow_dispatch:
 
 concurrency:
