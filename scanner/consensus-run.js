@@ -172,7 +172,7 @@ export async function runConsensus({
     auditedWallets: qualification.validation.auditedWallets ?? 0,
     qualifiedWallets: qualification.validation.qualifiedWallets ?? wallets.length,
     disqualifiedWallets: qualification.auditSummary?.disqualifiedWallets ?? 0,
-    earlyExitsExcluded: qualification.auditSummary?.earlyExitsExcluded ?? 0,
+    earlyExitsExcluded: qualification.auditSummary?.earlyExitsExcluded,
     ambiguousSameSecondExcluded: qualification.auditSummary?.ambiguousSameSecondExcluded ?? 0,
     postResolutionAcquisitionsExcluded: qualification.auditSummary?.postResolutionAcquisitionsExcluded ?? 0,
     weeklyCount: weekly.traders.length,
