@@ -42,7 +42,10 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
   if (consensus.thresholds?.windowMinutes !== 60 ||
       consensus.thresholds?.maxResolutionHours !== 24 ||
       consensus.thresholds?.minWallets !== 8 ||
-      consensus.thresholds?.minUsdPerWallet !== 10) {
+      consensus.thresholds?.minUsdPerWallet !== 10 ||
+      consensus.thresholds?.requireCurrentHoldings !== true ||
+      consensus.thresholds?.sameSideOnly !== true ||
+      consensus.thresholds?.excludeDuplicateRepresentations !== true) {
     fail("consensus thresholds");
   }
   if (status.discoveredWallets !== qualification.validation.discoveredWallets ||
