@@ -34,8 +34,15 @@ export async function fetchGammaMarkets(conditionIds, {
     url.searchParams.set("include_tag", "true");
     let response;
     for (let attempt = 0; ; attempt += 1) {
-      response = await fetchImpl(url, { method: "GET", headers: { accept: "application/json" } });
-      if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
+      try {
+        response = await fetchImpl(url, { method: "GET", headers: { accept: "application/json" } });
+      } catch (error) {
+        if (attempt >= maxRetries) throw error;
+        await sleep(Math.min(15000, 500 * (2 ** attempt)));
+        continue;
+      }
+      if ((response.status === 429 || response.status === 503 || response.status >= 500) &&
+          attempt < maxRetries) {
         await sleep(retryDelay(response, attempt));
         continue;
       }
