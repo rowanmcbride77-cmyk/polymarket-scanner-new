@@ -147,12 +147,14 @@ export function reconstructSettledMarketResults({
   const exclude = (reason) => { exclusions[reason] = (exclusions[reason] ?? 0) + 1; };
 
   for (const [conditionId, exposures] of exposuresByCondition) {
-    if (unsupported.has(conditionId)) {
-      exclude("unsupported_or_inconsistent_activity");
-      continue;
-    }
     if (exposures.length !== 1) {
       exclude("multiple_outcomes_held_in_same_market");
+      continue;
+    }
+    const { tokenId, redeemed, current } = exposures[0];
+    const token = tokenFacts.get(tokenId);
+    if (!token || token.resolved !== true || !Number.isFinite(token.final_price)) {
+      exclude("missing_onchain_token_resolution");
       continue;
     }
     const resolution = resolutions.get(conditionId);
@@ -161,11 +163,8 @@ export function reconstructSettledMarketResults({
       continue;
     }
     if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
-
-    const { tokenId, redeemed, current } = exposures[0];
-    const token = tokenFacts.get(tokenId);
-    if (!token || token.resolved !== true || !Number.isFinite(token.final_price)) {
-      exclude("missing_onchain_token_resolution");
+    if (unsupported.has(conditionId)) {
+      exclude("unsupported_or_inconsistent_activity");
       continue;
     }
     if (token.conditionId && String(token.conditionId).toLowerCase() !== conditionId) {
@@ -199,9 +198,23 @@ export function reconstructSettledMarketResults({
     });
   }
 
-  for (const conditionId of unsupported.keys()) {
-    if (!exposuresByCondition.has(conditionId)) exclude("unsupported_or_inconsistent_activity");
-  }
+  const severeExclusions = new Set([
+    "unsupported_or_inconsistent_activity",
+    "missing_onchain_token_resolution",
+    "missing_resolution_timestamp",
+    "token_condition_mismatch",
+    "redemption_payout_mismatch",
+    "current_balance_mismatch",
+    "unaccounted_residual_inventory",
+    "negative_reconstructed_inventory",
+    "redeem_exceeds_reconstructed_balance",
+    "redeem_missing_payout",
+    "malformed_token_flow",
+    "token_condition_conflict",
+    "malformed_current_position",
+    "duplicate_current_position",
+  ]);
+  const integrityFailures = Object.keys(exclusions).filter((reason) => severeExclusions.has(reason));
 
   return {
     results,
@@ -210,6 +223,8 @@ export function reconstructSettledMarketResults({
     resolvedMarkets: results.length,
     winRate: results.length ? results.filter((x) => x.result === "win").length / results.length : null,
     exclusions,
+    integrityPassed: integrityFailures.length === 0,
+    integrityFailures,
     complete: true,
     windowStartSeconds,
   };
