@@ -18,7 +18,7 @@ A fail-closed Polymarket trader scanner and consensus dashboard. It does not pub
    - each counted wallet invested at least $10;
    - at least 8 qualified wallets bought the exact same outcome token;
    - the market is active, open, order-book enabled, sports/esports/crypto, and scheduled to resolve within 24 hours;
-   - any market with qualified buys on opposing outcomes is excluded;
+   - any market with qualified buys or current holdings on opposing outcomes is excluded;
    - duplicate representations of the same event and market title are not published.
 
 ## Safety and publication
