@@ -10,6 +10,7 @@
     "test": "node --test",
     "check": "for f in scanner/*.js; do node --check \"$f\" || exit 1; done",
     "scan": "node scanner/index.js",
-    "scan:discover": "node scanner/index.js"
+    "scan:discover": "node scanner/index.js",
+    "qualify": "node scanner/qualify.js"
   }
 }
