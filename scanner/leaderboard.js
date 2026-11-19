@@ -83,7 +83,8 @@ export async function discoverLeaderboardCandidates({
   categories = ["sports", "esports", "crypto"],
   periods = ["week", "month"],
   limit = 1000,
-  maxPages = 100,
+  maxCandidates = 20000,
+  maxPagesPerPartition = 20,
 } = {}) {
   for (const category of categories) {
     if (!VALID_CATEGORIES.has(category)) throw new TypeError(`Unsupported discovery category: ${category}`);
@@ -91,36 +92,108 @@ export async function discoverLeaderboardCandidates({
   for (const period of periods) {
     if (!VALID_PERIODS.has(period)) throw new TypeError(`Unsupported discovery period: ${period}`);
   }
-
-  const partitions = [];
-  for (const timePeriod of periods) {
-    for (const category of categories) {
-      partitions.push(await fetchLeaderboardPartition(client, {
-        timePeriod, category, sortBy: "PNL", limit, maxPages,
-      }));
-    }
+  if (!Number.isInteger(maxCandidates) || maxCandidates < 1) {
+    throw new RangeError("maxCandidates must be a positive integer");
+  }
+  if (!Number.isInteger(maxPagesPerPartition) || maxPagesPerPartition < 1) {
+    throw new RangeError("maxPagesPerPartition must be a positive integer");
   }
 
+  const states = periods.flatMap((timePeriod) => categories.map((category) => ({
+    category, timePeriod, cursor: undefined, pages: 0, rowCount: 0,
+    exhausted: false, seenCursors: new Set(), seenWallets: new Set(),
+  })));
   const candidates = new Map();
-  for (const partition of partitions) {
-    for (const row of partition.rows) {
-      const existing = candidates.get(row.wallet) ?? {
-        wallet: row.wallet, username: row.username, verified: row.verified,
-        profileImage: row.profileImage, xUsername: row.xUsername,
+
+  async function readNextPage(state) {
+    const page = await client.getPage("/v2/leaderboard", {
+      time_period: state.timePeriod,
+      category: state.category,
+      sort_by: "PNL",
+      limit,
+    }, state.cursor);
+    state.pages += 1;
+    state.rowCount += page.rows.length;
+
+    for (const row of page.rows) {
+      if (!validateRow(row)) {
+        throw new LeaderboardError("Leaderboard returned malformed rows; refusing partial candidate set", {
+          category: state.category, timePeriod: state.timePeriod, complete: false,
+        });
+      }
+      const wallet = row.user_id.toLowerCase();
+      if (state.seenWallets.has(wallet)) continue;
+      state.seenWallets.add(wallet);
+      const existing = candidates.get(wallet) ?? {
+        wallet, username: typeof row.user_name === "string" ? row.user_name : wallet,
+        verified: row.verified === true,
+        profileImage: typeof row.profile_image === "string" ? row.profile_image : null,
+        xUsername: typeof row.x_username === "string" ? row.x_username : null,
         appearances: [],
       };
       existing.appearances.push({
-        category: row.category, timePeriod: row.timePeriod,
-        rank: row.rank, pnl: row.pnl, volumeShares: row.volumeShares,
+        category: state.category, timePeriod: state.timePeriod,
+        rank: row.rank, pnl: row.pnl, volumeShares: row.volume,
       });
-      candidates.set(row.wallet, existing);
+      candidates.set(wallet, existing);
     }
+
+    if (!page.hasMore) {
+      state.exhausted = true;
+      state.cursor = undefined;
+      return;
+    }
+    if (!page.nextCursor) {
+      throw new LeaderboardError("Leaderboard reports more rows without a cursor", {
+        category: state.category, timePeriod: state.timePeriod, complete: false,
+      });
+    }
+    if (state.seenCursors.has(page.nextCursor)) {
+      throw new LeaderboardError("Leaderboard repeated a cursor", {
+        category: state.category, timePeriod: state.timePeriod, complete: false,
+      });
+    }
+    state.seenCursors.add(page.nextCursor);
+    state.cursor = page.nextCursor;
   }
+
+  // Seed every vertical/window before deepening any one leaderboard.
+  for (const state of states) await readNextPage(state);
+
+  while (candidates.size < maxCandidates) {
+    const active = states.filter((state) =>
+      !state.exhausted && state.pages < maxPagesPerPartition);
+    if (!active.length) break;
+    let advanced = false;
+    for (const state of active) {
+      if (candidates.size >= maxCandidates) break;
+      await readNextPage(state);
+      advanced = true;
+    }
+    if (!advanced) break;
+  }
+
+  const sortedCandidates = [...candidates.values()].sort((a, b) =>
+    b.appearances.length - a.appearances.length ||
+    a.appearances.reduce((sum, x) => sum + x.rank, 0) -
+      b.appearances.reduce((sum, x) => sum + x.rank, 0));
+  const cappedCandidates = sortedCandidates.slice(0, maxCandidates);
+  const partitions = states.map((state) => ({
+    category: state.category,
+    timePeriod: state.timePeriod,
+    sortBy: "PNL",
+    pages: state.pages,
+    rowCount: state.rowCount,
+    complete: true,
+    exhausted: state.exhausted,
+    truncated: !state.exhausted,
+  }));
   return {
-    candidates: [...candidates.values()],
-    partitions: partitions.map(({ category, timePeriod, sortBy, pages, rows }) => ({
-      category, timePeriod, sortBy, pages, rowCount: rows.length, complete: true,
-    })),
-    complete: partitions.every((partition) => partition.complete),
+    candidates: cappedCandidates,
+    partitions,
+    complete: true,
+    sourceExhausted: states.every((state) => state.exhausted),
+    candidateCapReached: sortedCandidates.length >= maxCandidates,
+    maxCandidates,
   };
 }
