@@ -17,7 +17,7 @@ export async function fetchRedeemablePositionSnapshot(client, wallet, {
       status: sourceStatusFilter,
       limit,
       filter_type: "TOKENS",
-      filter_amount: 0,
+      filter_amount: 0.000001,
       include_archived: true,
       sort_by: "TIMESTAMP",
       sort_direction: "DESC",
