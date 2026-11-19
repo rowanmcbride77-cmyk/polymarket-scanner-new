@@ -26,7 +26,8 @@ export async function fetchRedeemablePositionSnapshot(client, wallet, {
         typeof row.redeemable !== "boolean") return true;
     if (row.redeemable !== true || row.current_size <= 0) return false;
     return typeof row.condition_id !== "string" || !row.condition_id ||
-      typeof row.token_id !== "string" || !/^\d+$/.test(row.token_id);
+      typeof row.token_id !== "string" || !/^\d+$/.test(row.token_id) ||
+      !Number.isInteger(row.first_entry_at) || row.first_entry_at < 0;
   });
   if (malformed.length) {
     const error = new Error("Open position snapshot contains malformed rows");
@@ -105,6 +106,7 @@ export async function fetchClosedPositionSnapshot(client, wallet, {
     row.status !== "CLOSED" ||
     typeof row.condition_id !== "string" || !row.condition_id ||
     typeof row.token_id !== "string" || !/^\d+$/.test(row.token_id) ||
+    !Number.isInteger(row.first_entry_at) || row.first_entry_at < 0 ||
     !Number.isInteger(row.last_event_at) || row.last_event_at <= 0);
   if (malformed.length) {
     const error = new Error("Closed position snapshot contains malformed rows");
