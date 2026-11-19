@@ -47,8 +47,11 @@ export function summarizeSettledEvidence({
       exclude("token_condition_mismatch");
       continue;
     }
-    if (token.resolved !== true) continue;
     const resolution = resolutions.get(conditionId);
+    if (token.resolved !== true) {
+      if (resolution?.status === "resolved") exclude("token_resolution_state_mismatch");
+      continue;
+    }
     if (!resolution || !Number.isInteger(resolution.resolvedAtSeconds)) {
       exclude("missing_resolution_timestamp");
       continue;
@@ -135,6 +138,7 @@ export function summarizeSettledEvidence({
     "missing_closed_position_token_fact",
     "token_condition_mismatch",
     "missing_resolution_timestamp",
+    "token_resolution_state_mismatch",
     "malformed_current_redeemable_position",
     "missing_current_position_token_resolution",
     "redeemable_status_payout_mismatch",
