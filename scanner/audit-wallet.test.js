@@ -26,36 +26,22 @@ test("qualification never treats a missing win rate as zero or a pass", () => {
   }).qualified, false);
 });
 
-test("full wallet audit joins activity, redemption, token payout and resolution date", async () => {
+test("full wallet audit classifies a closed position only when its last event follows resolution", async () => {
   const wallet = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
   const condition = "0x" + "a".repeat(64);
   const tokenId = "123456789";
-  const activity = [
-    {
-      proxy_wallet: wallet, timestamp: 1794000000, type: "TRADE",
-      condition_id: condition, token_id: tokenId, side: "BUY", size: 10, usdc_size: 5, price: 0.5,
-      transaction_hash: "0xtrade",
-    },
-    {
-      proxy_wallet: wallet, timestamp: 1794916900, type: "REDEEM",
-      condition_id: condition, token_id: tokenId, side: "", price: 0, size: 10, usdc_size: 10,
-      transaction_hash: "0xredeem",
-    },
-    {
-      proxy_wallet: wallet, timestamp: 1795999940, type: "TRADE",
-      condition_id: "0x" + "b".repeat(64), token_id: "987654321",
-      side: "BUY", size: 20, price: 0.6, usdc_size: 12,
-      transaction_hash: "0xrecent",
-    },
-  ];
+  const closedPosition = {
+    proxy_wallet: wallet, condition_id: condition, token_id: tokenId,
+    status: "CLOSED", current_size: 0, total_size: 10,
+    last_event_at: 1794916900, realized_pnl: 10,
+  };
   const calls = [];
   const client = {
     async collectPages(path, params) {
       calls.push({ path, params });
-      if (path === "/v2/activity") return {
-        rows: activity.filter((row) => row.type === params.type),
-        pages: 1, complete: true,
-      };
+      if (path === "/v2/positions" && params.status === "CLOSED") {
+        return { rows: [closedPosition], pages: 1, complete: true };
+      }
       if (path === "/v2/positions") return { rows: [], pages: 1, complete: true };
       throw new Error("unexpected paginated path");
     },
@@ -81,22 +67,24 @@ test("full wallet audit joins activity, redemption, token payout and resolution 
   assert.equal(result.qualification.qualified, true);
   assert.equal(result.tokenFacts, 1);
   assert.equal(result.resolutionFacts, 1);
-  const activityCall = calls.find((x) => x.path === "/v2/activity");
-  assert.equal(activityCall.params.type, "REDEEM");
-  assert.equal(activityCall.params.start, 1796000000 - 30 * 86400);
-  assert.equal(calls.filter(x => x.path === "/v2/tokens").length, 1);
+  const closedCall = calls.find((x) => x.path === "/v2/positions" && x.params.status === "CLOSED");
+  assert.equal(closedCall.params.start, 1796000000 - 30 * 86400);
+  assert.equal(closedCall.params.end, 1796000000);
+  assert.equal(calls.filter(x => x.path === "/v2/positions").length, 3);
 });
 
-test("wallet audit fails when either source history is incomplete", async () => {
+test("wallet audit fails when either position snapshot is incomplete", async () => {
   const wallet = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
   const client = {
-    async collectPages(path) {
-      if (path === "/v2/activity") return { rows: [], pages: 1, complete: false };
+    async collectPages(path, params) {
+      if (path === "/v2/positions" && params.status === "CLOSED") {
+        return { rows: [], pages: 1, complete: false };
+      }
       return { rows: [], pages: 1, complete: true };
     },
     async getJson() { return { data: [] }; },
   };
-  await assert.rejects(auditWallet(client, wallet), /source history is incomplete/);
+  await assert.rejects(auditWallet(client, wallet), /position snapshots are incomplete/);
 });
 
 test("qualification rejects uncertain settlement accounting", () => {
