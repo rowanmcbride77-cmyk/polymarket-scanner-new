@@ -1,6 +1,5 @@
 import { createDataApiClient } from "./data-api.js";
-import { fetchRecentWalletActivity } from "./activity.js";
-import { fetchRedeemablePositionSnapshot } from "./wallet-positions.js";
+import { fetchRedeemablePositionSnapshot, fetchClosedPositionSnapshot } from "./wallet-positions.js";
 import { fetchTokenFacts } from "./tokens.js";
 import { fetchMarketResolutions } from "./resolutions.js";
 import { summarizeSettledEvidence } from "./settlement-evidence.js";
@@ -32,40 +31,39 @@ export async function auditWallet(client, wallet, {
     throw new TypeError("Invalid audit time window");
   }
   const windowStartSeconds = nowSeconds - lookbackDays * 86400;
-  const [redemptionActivity, positionSnapshot] = await Promise.all([
-    fetchRecentWalletActivity(client, wallet, {
+  const [positionSnapshot, closedSnapshot] = await Promise.all([
+    fetchRedeemablePositionSnapshot(client, wallet),
+    fetchClosedPositionSnapshot(client, wallet, {
       startSeconds: windowStartSeconds,
       endSeconds: nowSeconds,
-      type: "REDEEM",
-      maxPages: 100,
+      maxPages: 20,
     }),
-    fetchRedeemablePositionSnapshot(client, wallet),
   ]);
-  if (!redemptionActivity.complete || !positionSnapshot.complete) {
-    throw new Error("Wallet audit source history is incomplete");
+  if (!positionSnapshot.complete || !closedSnapshot.complete) {
+    throw new Error("Wallet audit position snapshots are incomplete");
   }
 
   const tokenFacts = new Map();
   for (const record of positionSnapshot.records) {
     if (record.tokenFact) tokenFacts.set(String(record.position.token_id), record.tokenFact);
   }
-  const missingRedeemedTokenIds = redemptionActivity.rows
-    .map((row) => row.token_id).filter(Boolean)
+  const missingClosedTokenIds = closedSnapshot.records
+    .map((record) => record.position.token_id)
     .filter((tokenId) => !tokenFacts.has(String(tokenId)));
-  const redeemedTokenFacts = await fetchTokenFacts(client, missingRedeemedTokenIds);
-  for (const [tokenId, fact] of redeemedTokenFacts) tokenFacts.set(tokenId, fact);
+  const closedTokenFacts = await fetchTokenFacts(client, missingClosedTokenIds);
+  for (const [tokenId, fact] of closedTokenFacts) tokenFacts.set(tokenId, fact);
 
   const conditionIds = [
-    ...redemptionActivity.rows.map((row) => row.condition_id).filter(Boolean),
-    ...positionSnapshot.records.map((record) => record.position.condition_id).filter(Boolean),
+    ...closedSnapshot.records.map((record) => record.position.condition_id),
+    ...positionSnapshot.records.map((record) => record.position.condition_id),
   ];
   const resolutions = await fetchMarketResolutions(client, conditionIds);
   const summary = summarizeSettledEvidence({
-    redemptions: redemptionActivity.rows,
+    closedPositions: closedSnapshot.records,
     currentPositions: positionSnapshot.records,
     tokenFacts,
     resolutions,
-    activityComplete: redemptionActivity.complete,
+    closedPositionsComplete: closedSnapshot.complete,
     positionsComplete: positionSnapshot.complete,
     windowStartSeconds,
   });
@@ -73,9 +71,9 @@ export async function auditWallet(client, wallet, {
   const result = {
     wallet: wallet.toLowerCase(),
     complete: true,
-    coverage: "30_DAY_REDEEM_ACTIVITY_PLUS_CURRENT_REDEEMABLE_POSITIONS",
-    activityRows: redemptionActivity.rows.length,
-    activityPages: redemptionActivity.pages,
+    coverage: "30_DAY_CLOSED_POSITIONS_PLUS_CURRENT_REDEEMABLE_POSITIONS",
+    closedPositions: closedSnapshot.records.length,
+    closedPositionPages: closedSnapshot.pages,
     positionPartitions: positionSnapshot.partitions,
     tokenFacts: tokenFacts.size,
     resolutionFacts: resolutions.size,
