@@ -7,7 +7,7 @@
 
 ## Data flow
 
-Discover up to 20,000 candidate wallets → fetch current held positions and CLOSED positions whose last economic event occurred in the trailing 30 days → fetch token final-payout facts and market resolution timestamps → count only positions still redeemable or closed after resolution → exclude positions closed before resolution → apply 90%/20-market qualification → build weekly/monthly Top 100 → fetch the qualified wallets' last-hour BUY activity → verify Gamma market state, outcome token, category and resolution window → build same-outcome consensus → validate the complete output generation → publish the static dashboard.
+Discover up to 20,000 candidate wallets → fetch current held positions and CLOSED positions whose last economic event occurred in the trailing 30 days → fetch token final-payout facts and market resolution timestamps → count only positions still redeemable or closed after resolution → exclude positions closed before resolution → apply 90%/20-market qualification → build weekly/monthly Top 100 → fetch the qualified wallets' last-hour BUY activity and current positions → require each recent BUY token to remain held and exclude mixed current outcomes → verify Gamma market state, outcome token, category and resolution window → build same-outcome consensus → validate the complete output generation → publish the static dashboard.
 
 ## Reliability
 
