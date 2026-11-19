@@ -54,7 +54,10 @@ export function reconstructSettledMarketResults({
     const tokenId = row.token_id ? String(row.token_id) : "";
     const conditionId = row.condition_id ? String(row.condition_id).toLowerCase() : "";
     const size = row.size;
-    if (!tokenId || !conditionId || !Number.isFinite(size) || size <= 0) {
+    if (!conditionId) {
+      throw new Error("Position-changing activity lacks a condition id; wallet audit is unsafe");
+    }
+    if (!tokenId || !Number.isFinite(size) || size <= 0) {
       markUnsupported(unsupported, conditionId, "malformed_token_flow");
       continue;
     }
