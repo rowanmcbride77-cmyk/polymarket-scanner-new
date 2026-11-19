@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createDataApiClient } from "./data-api.js";
 import { fetchRecentWalletActivity } from "./activity.js";
+import { fetchCurrentPositionSnapshot } from "./wallet-positions.js";
 import { fetchGammaMarkets } from "./gamma-markets.js";
 import { buildConsensusSignals } from "./consensus.js";
 import { auditCandidates } from "./qualification-runner.js";
@@ -13,8 +14,9 @@ function createPacedFetch({ fetchImpl = globalThis.fetch, sleep = (ms) =>
   const nextStartByLane = new Map();
   return async (input, init) => {
     const url = new URL(typeof input === "string" ? input : input.url ?? String(input));
-    const lane = url.pathname === "/v2/activity" ? "activity" : "general";
-    const interval = lane === "activity" ? 50 : 30;
+    const lane = url.pathname === "/v2/activity" ? "activity"
+      : url.pathname === "/v2/positions" ? "positions" : "general";
+    const interval = lane === "activity" || lane === "positions" ? 50 : 30;
     const now = Date.now();
     const startAt = Math.max(now, nextStartByLane.get(lane) ?? now);
     nextStartByLane.set(lane, startAt + interval);
@@ -103,13 +105,18 @@ export async function runConsensus({
             : Number.isFinite(row.price) ? row.price * row.size : null,
           outcome: typeof row.outcome === "string" ? row.outcome : null,
         }));
+      const currentSnapshot = recent.complete && recentBuys.length
+        ? await fetchCurrentPositionSnapshot(client, wallet)
+        : { records: [], complete: recent.complete, pages: 0 };
       const source = walletByAddress.get(wallet.toLowerCase());
       return {
-        complete: recent.complete,
+        complete: recent.complete && currentSnapshot.complete,
         qualification: { qualified: true, reason: "qualified_weekly_or_monthly_top100" },
         summary: source?.summary,
         recentBuys,
+        currentPositions: currentSnapshot.records,
         coverage: recent.coverage,
+        positionPages: currentSnapshot.pages,
       };
     },
     onProgress: ({ completed, total, failed }) => {
