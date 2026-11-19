@@ -66,3 +66,20 @@ test("leaderboard build refuses any incomplete audit batch", () => {
     {complete:false,results:[]},
   ), /Every discovered wallet/);
 });
+
+test("leaderboard refuses a wallet marked qualified without settlement integrity", () => {
+  const discovery = {
+    validation: { passed:true },
+    candidates: [{ wallet:"w1", username:"one", appearances:[
+      {timePeriod:"week",category:"sports",pnl:10,rank:1},
+    ]}],
+  };
+  const auditBatch = {
+    complete:true,
+    results:[{
+      wallet:"w1",complete:true,qualification:{qualified:true},
+      summary:{wins:20,losses:0,winRate:1,resolvedMarkets:20,integrityPassed:false},
+    }],
+  };
+  assert.throws(() => buildQualifiedLeaderboards(discovery,auditBatch), /Missing complete audit/);
+});
