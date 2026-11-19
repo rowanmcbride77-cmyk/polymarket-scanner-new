@@ -6,7 +6,7 @@ const WALLET_RE = /^0x[a-fA-F0-9]{40}$/;
 
 export async function fetchRedeemablePositionSnapshot(client, wallet, {
   limit = 1000,
-  maxPages = 100,
+  maxPages = 20,
 } = {}) {
   if (!WALLET_RE.test(wallet ?? "")) throw new TypeError("A valid proxy wallet address is required");
   const result = await client.collectPages("/v2/positions", {
