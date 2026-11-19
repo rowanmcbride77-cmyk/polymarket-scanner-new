@@ -1,8 +1,23 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { buildDiscoveryPayload } from "./index.js";
 
-test("scanner refuses to emit placeholder rankings", async () => {
-  const source = await readFile(new URL("./index.js", import.meta.url), "utf8");
-  assert.match(source, /No data was generated or published/);
+test("discovery payload records complete partitions and candidate counts", () => {
+  const payload = buildDiscoveryPayload({
+    complete: true,
+    candidates: [{ wallet: "0xabc" }],
+    partitions: [{ category: "sports", timePeriod: "week", pages: 1, rowCount: 1, complete: true }],
+  }, "2026-11-18T00:00:00.000Z");
+  assert.equal(payload.validation.passed, true);
+  assert.equal(payload.validation.candidateCount, 1);
+  assert.equal(payload.generatedAt, "2026-11-18T00:00:00.000Z");
+});
+
+test("discovery refuses incomplete partitions and never builds a publishable Top 100", () => {
+  assert.throws(() => buildDiscoveryPayload({
+    complete: false, candidates: [], partitions: [],
+  }), /incomplete/);
+  const payload = buildDiscoveryPayload({ complete: true, candidates: [], partitions: [] });
+  assert.equal(payload.validation.allPartitionsComplete, true);
+  assert.equal("top100" in payload, false);
 });
