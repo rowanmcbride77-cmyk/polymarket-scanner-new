@@ -2,18 +2,29 @@ import { createDataApiClient } from "./data-api.js";
 
 const WALLET_RE = /^0x[a-fA-F0-9]{40}$/;
 
+const NON_POSITION_TYPES = new Set([
+  "REWARD", "YIELD", "MAKER_REBATE", "TAKER_REBATE",
+  "REFERRAL_REWARD", "DEPOSIT", "WITHDRAWAL", "TIP",
+]);
+
 function validActivityRow(row, wallet) {
-  return row && typeof row === "object" &&
-    String(row.proxy_wallet ?? "").toLowerCase() === wallet.toLowerCase() &&
-    Number.isInteger(row.timestamp) && row.timestamp > 0 &&
-    typeof row.type === "string" && row.type.length > 0 &&
-    typeof row.condition_id === "string" && row.condition_id.length > 0 &&
-    typeof row.token_id === "string" && /^\d+$/.test(row.token_id) &&
-    Number.isFinite(row.size) && row.size >= 0 &&
-    Number.isFinite(row.usdc_size) && row.usdc_size >= 0 &&
-    Number.isFinite(row.price) &&
-    typeof row.transaction_hash === "string" &&
-    typeof row.side === "string";
+  if (!row || typeof row !== "object" ||
+      String(row.proxy_wallet ?? "").toLowerCase() !== wallet.toLowerCase() ||
+      !Number.isInteger(row.timestamp) || row.timestamp <= 0 ||
+      typeof row.type !== "string" || row.type.length === 0 ||
+      !Number.isFinite(row.size) || row.size < 0 ||
+      !Number.isFinite(row.usdc_size) || row.usdc_size < 0 ||
+      !Number.isFinite(row.price) ||
+      typeof row.transaction_hash !== "string" ||
+      typeof row.side !== "string") return false;
+
+  const type = row.type.toUpperCase();
+  if (NON_POSITION_TYPES.has(type)) return true;
+  if (typeof row.condition_id !== "string" || row.condition_id.length === 0) return false;
+  if (["TRADE", "SPLIT", "MERGE", "REDEEM"].includes(type)) {
+    return typeof row.token_id === "string" && /^\d+$/.test(row.token_id);
+  }
+  return true;
 }
 
 /**
