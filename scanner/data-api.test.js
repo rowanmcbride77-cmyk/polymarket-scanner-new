@@ -93,3 +93,16 @@ test("does not interpret missing data as an empty success", async () => {
   const client = createDataApiClient({ fetchImpl: async () => jsonResponse({ rows: [] }) });
   await assert.rejects(client.getJson("/v2/trades"), /expected a data field/);
 });
+
+test("stops when API explicitly reports has_more false", async () => {
+  const client = createDataApiClient({
+    fetchImpl: async () => new Response(JSON.stringify({
+      data: [{ id: 1 }],
+      pagination: { has_more: false, next_cursor: "terminal-cursor" },
+    }), { status: 200, headers: { "content-type": "application/json" } }),
+  });
+  const result = await client.collectPages("/v2/leaderboard", {});
+  assert.equal(result.complete, true);
+  assert.equal(result.pages, 1);
+  assert.equal(result.rows.length, 1);
+});
