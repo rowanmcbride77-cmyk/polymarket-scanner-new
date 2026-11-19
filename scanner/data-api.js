@@ -129,13 +129,13 @@ export function createDataApiClient({
       pages += 1;
       rows.push(...page.rows);
       if (onPage) await onPage({ pageNumber: pages, rowCount: page.rows.length, totalRows: rows.length });
-      if (page.nextCursor === null) {
-        if (page.hasMore) {
-          throw new DataApiError("API reported more data but supplied no next_cursor", {
-            path, pages, complete: false,
-          });
-        }
+      if (!page.hasMore) {
         return { rows, pages, complete: true };
+      }
+      if (page.nextCursor === null) {
+        throw new DataApiError("API reported more data but supplied no next_cursor", {
+          path, pages, complete: false,
+        });
       }
       if (seenCursors.has(page.nextCursor)) {
         throw new DataApiError("Repeated pagination cursor; refusing an incomplete history", {
