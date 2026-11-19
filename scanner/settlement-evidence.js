@@ -54,8 +54,9 @@ export function summarizeSettledEvidence({
       continue;
     }
     if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
-    if (lastEventAt < resolution.resolvedAtSeconds) {
-      exclude("early_exit_excluded");
+    if (lastEventAt <= resolution.resolvedAtSeconds) {
+      exclude(lastEventAt === resolution.resolvedAtSeconds
+        ? "same_second_as_resolution_ambiguous" : "early_exit_excluded");
       continue;
     }
     const item = getToken(conditionId, tokenId);
