@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fetchRedeemablePositionSnapshot, auditCurrentRedeemableSnapshot } from "./wallet-positions.js";
+import { fetchRedeemablePositionSnapshot, fetchClosedPositionSnapshot, auditCurrentRedeemableSnapshot } from "./wallet-positions.js";
 
 const wallet = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const position = (token_id) => ({
@@ -44,4 +44,29 @@ test("snapshot diagnostics never qualify a trader from current unredeemed positi
 
 test("invalid wallet address is rejected", async () => {
   await assert.rejects(fetchRedeemablePositionSnapshot({}, "not-a-wallet"), /valid proxy wallet/);
+});
+
+test("fetches bounded CLOSED positions by last economic event time", async () => {
+  let call;
+  const closed = {
+    proxy_wallet: wallet, condition_id: "0xcondition", token_id: "33",
+    status: "CLOSED", current_size: 0, total_size: 3,
+    last_event_at: 150, realized_pnl: 1,
+  };
+  const client = {
+    async collectPages(path, params, options) {
+      call = { path, params, options };
+      return { rows: [closed], pages: 1, complete: true };
+    },
+  };
+  const snapshot = await fetchClosedPositionSnapshot(client, wallet, {
+    startSeconds: 100, endSeconds: 200,
+  });
+  assert.equal(call.params.status, "CLOSED");
+  assert.equal(call.params.start, 100);
+  assert.equal(call.params.end, 200);
+  assert.equal(call.params.sort_by, "TIMESTAMP");
+  assert.equal("include_archived" in call.params, false);
+  assert.equal(snapshot.records.length, 1);
+  assert.equal(snapshot.complete, true);
 });
