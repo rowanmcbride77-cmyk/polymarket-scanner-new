@@ -68,3 +68,38 @@ export function createActivityService(client = createDataApiClient()) {
       fetchCompleteWalletActivity(client, wallet, options),
   };
 }
+
+export async function fetchRecentWalletActivity(client, wallet, {
+  startSeconds,
+  endSeconds = Math.floor(Date.now() / 1000),
+  limit = 1000,
+  maxPages = 100,
+} = {}) {
+  if (!WALLET_RE.test(wallet ?? "")) throw new TypeError("A valid proxy wallet address is required");
+  if (!Number.isInteger(startSeconds) || !Number.isInteger(endSeconds) || startSeconds > endSeconds) {
+    throw new TypeError("A valid recent activity time window is required");
+  }
+  const result = await client.collectPages("/v2/activity", {
+    user: wallet,
+    start: startSeconds,
+    end: endSeconds,
+    sort_direction: "DESC",
+    limit,
+  }, { maxPages });
+  const malformed = result.rows.filter((row) => !validActivityRow(row, wallet));
+  if (malformed.length) {
+    const error = new Error("Recent wallet activity contains malformed rows");
+    error.malformedRows = malformed.length;
+    error.complete = false;
+    throw error;
+  }
+  return {
+    wallet: wallet.toLowerCase(),
+    rows: result.rows,
+    pages: result.pages,
+    complete: result.complete,
+    coverage: "RECENT_ACTIVITY_WINDOW",
+    startSeconds,
+    endSeconds,
+  };
+}
