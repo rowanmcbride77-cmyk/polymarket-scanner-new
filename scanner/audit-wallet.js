@@ -69,10 +69,31 @@ export async function auditWallet(client, wallet, {
     positionsComplete: positionSnapshot.complete,
     windowStartSeconds: nowSeconds - lookbackDays * 86400,
   });
+  const recentBuys = activity.rows
+    .filter((row) =>
+      String(row.type).toUpperCase() === "TRADE" &&
+      String(row.side).toUpperCase() === "BUY" &&
+      Number.isInteger(row.timestamp) &&
+      row.timestamp >= nowSeconds - 60 * 60 &&
+      row.timestamp <= nowSeconds &&
+      typeof row.condition_id === "string" &&
+      typeof row.token_id === "string")
+    .map((row) => ({
+      conditionId: row.condition_id.toLowerCase(),
+      tokenId: String(row.token_id),
+      timestamp: row.timestamp,
+      size: row.size,
+      price: row.price,
+      usdSize: Number.isFinite(row.usdc_size) ? row.usdc_size
+        : Number.isFinite(row.price) && Number.isFinite(row.size) ? row.price * row.size : null,
+      outcome: typeof row.outcome === "string" ? row.outcome : null,
+    }));
+
   const result = {
     wallet: wallet.toLowerCase(),
     complete: true,
     coverage: "FULL_AVAILABLE_ACTIVITY_PLUS_CURRENT_REDEEMABLE_POSITIONS",
+    recentBuys,
     activityRows: activity.rows.length,
     activityPages: activity.pages,
     positionPartitions: positionSnapshot.partitions,
