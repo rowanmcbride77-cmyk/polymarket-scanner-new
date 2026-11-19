@@ -7,7 +7,13 @@ function validActivityRow(row, wallet) {
     String(row.proxy_wallet ?? "").toLowerCase() === wallet.toLowerCase() &&
     Number.isInteger(row.timestamp) && row.timestamp > 0 &&
     typeof row.type === "string" && row.type.length > 0 &&
-    (row.token_id === undefined || row.token_id === null || /^\d+$/.test(String(row.token_id)));
+    typeof row.condition_id === "string" && row.condition_id.length > 0 &&
+    typeof row.token_id === "string" && /^\d+$/.test(row.token_id) &&
+    Number.isFinite(row.size) && row.size >= 0 &&
+    Number.isFinite(row.usdc_size) && row.usdc_size >= 0 &&
+    Number.isFinite(row.price) &&
+    typeof row.transaction_hash === "string" &&
+    typeof row.side === "string";
 }
 
 /**
