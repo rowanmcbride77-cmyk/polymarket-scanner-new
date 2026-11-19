@@ -20,7 +20,7 @@ function fixtures() {
   const consensus = {
     schemaVersion:1,validation:{passed:true},signalCount:1,
     signals:[{
-      category:"sports",conditionId:"0xcondition",tokenId:"token-1",
+      category:"sports",conditionId:"0xcondition",tokenId:"token-1",outcome:"Yes",
       minutesToResolution:60,endDate:"2026-11-19T06:00:00.000Z",
       qualifiedWalletCount:8,totalUsd:100,eventId:"event-1",marketTitle:"Team vs Team",
       wallets:Array.from({length:8},(_,i)=>({
@@ -30,6 +30,7 @@ function fixtures() {
   };
   const status = {
     schemaVersion:1,validation:{passed:true},state:"success",
+    discoveredWallets:1,auditedWallets:1,qualifiedWallets:1,
     consensusCount:1,weeklyCount:1,monthlyCount:1,
   };
   return {qualification,weekly,monthly,consensus,status};
