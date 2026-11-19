@@ -1,6 +1,12 @@
 name: Live candidate discovery and qualification
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scanner/**"
+      - "package.json"
+      - ".github/workflows/discover.yml"
   workflow_dispatch:
 
 concurrency:
@@ -31,6 +37,7 @@ jobs:
         run: npm run qualify
         env:
           SCANNER_CONCURRENCY: 16
+          NODE_OPTIONS: --max-old-space-size=6144
       - name: Upload validated scanner outputs and diagnostics
         if: always()
         uses: actions/upload-artifact@v4
