@@ -60,9 +60,11 @@ test("fails closed when unsupported token flow is present", () => {
       { type:"TRADE", condition_id:condition, token_id:"101", side:"BUY", size:5, timestamp:1 },
       { type:"CONVERSION", condition_id:condition, token_id:"101", size:5, timestamp:2 },
     ],
+    currentPositions: [{ condition_id:condition, token_id:"101", current_size:5 }],
   });
   assert.equal(result.resolvedMarkets, 0);
   assert.equal(result.exclusions.unsupported_or_inconsistent_activity, 1);
+  assert.equal(result.integrityPassed, false);
 });
 
 test("excludes a market when both outcomes are held", () => {
