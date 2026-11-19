@@ -16,11 +16,17 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
       periods: ["week", "month"],
       categories: ["sports", "esports", "crypto"],
       sortBy: "PNL",
-      maxRowsPerPartition: 1000,
+      pageSize: 1000,
+      maxCandidates: 20000,
+      maxPagesPerPartition: 20,
     },
     validation: {
       passed: true,
-      allPartitionsComplete: true,
+      allPageRequestsComplete: true,
+      sourceExhausted: result.sourceExhausted === true,
+      candidateCapReached: result.candidateCapReached === true,
+      maxCandidates: result.maxCandidates,
+      truncatedPartitions: result.partitions.filter((p) => p.truncated).length,
       candidateCount: result.candidates.length,
       partitionCount: result.partitions.length,
     },
@@ -30,7 +36,9 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
 }
 
 export async function runDiscovery({ outputPath = "data/discovery.json" } = {}) {
-  const result = await discoverLeaderboardCandidates({ limit: 1000, maxPages: 100 });
+  const result = await discoverLeaderboardCandidates({
+    limit: 1000, maxCandidates: 20000, maxPagesPerPartition: 20,
+  });
   const payload = buildDiscoveryPayload(result);
   const target = resolve(outputPath);
   await mkdir(dirname(target), { recursive: true });
