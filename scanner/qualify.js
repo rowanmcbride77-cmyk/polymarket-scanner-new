@@ -84,7 +84,7 @@ export async function runQualification({
   const payload = {
     schemaVersion: 1,
     generatedAt,
-    source: "Polymarket Data API v2 activity, positions, tokens and resolutions; Gamma market metadata",
+    source: "Polymarket Data API v2 redemption activity, positions, tokens and resolutions",
     qualification: {
       minimumResolvedMarkets: 20,
       minimumWinRate: 0.9,
