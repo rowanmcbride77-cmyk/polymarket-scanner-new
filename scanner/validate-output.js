@@ -29,6 +29,11 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
     }
   }
   if (status.state !== "success") fail("status is not successful");
+  if (status.discoveredWallets !== qualification.validation.discoveredWallets ||
+      status.auditedWallets !== qualification.validation.auditedWallets ||
+      status.qualifiedWallets !== qualification.validation.qualifiedWallets) {
+    fail("status/qualification count mismatch");
+  }
   if (qualification.validation.allWalletAuditsComplete !== true ||
       qualification.validation.auditedWallets !== qualification.validation.discoveredWallets) {
     fail("candidate wallet audit coverage");
