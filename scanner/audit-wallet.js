@@ -38,13 +38,21 @@ export async function auditWallet(client, wallet, {
   }
 
   const currentPositions = positionSnapshot.records.map((record) => record.position);
-  const tokenIds = [
-    ...activity.rows.map((row) => row.token_id).filter(Boolean),
-    ...currentPositions.map((row) => row.token_id).filter(Boolean),
-  ];
-  const tokenFacts = await fetchTokenFacts(client, tokenIds);
+  const tokenFacts = new Map();
+  for (const record of positionSnapshot.records) {
+    if (record.tokenFact) tokenFacts.set(String(record.position.token_id), record.tokenFact);
+  }
+  const redeemRows = activity.rows.filter((row) => String(row.type).toUpperCase() === "REDEEM");
+  const missingRedeemedTokenIds = redeemRows
+    .map((row) => row.token_id).filter(Boolean)
+    .filter((tokenId) => !tokenFacts.has(String(tokenId)));
+  const redeemedTokenFacts = await fetchTokenFacts(client, missingRedeemedTokenIds);
+  for (const [tokenId, fact] of redeemedTokenFacts) tokenFacts.set(tokenId, fact);
+
+  // Resolution and token lookups are limited to outcomes actually redeemed or
+  // still held at resolution; ordinary traded-and-exited markets need no lookup.
   const conditionIds = [
-    ...activity.rows.map((row) => row.condition_id).filter(Boolean),
+    ...redeemRows.map((row) => row.condition_id).filter(Boolean),
     ...currentPositions.map((row) => row.condition_id).filter(Boolean),
   ];
   const resolutions = await fetchMarketResolutions(client, conditionIds);
