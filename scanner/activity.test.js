@@ -61,11 +61,12 @@ test("fetches recent wallet activity with explicit 60-minute bounds", async () =
     return { rows: [event(100)], pages: 1, complete: true };
   }};
   const result = await fetchRecentWalletActivity(client, wallet, {
-    startSeconds: 50, endSeconds: 150,
+    startSeconds: 50, endSeconds: 150, type: "REDEEM",
   });
   assert.equal(call.path, "/v2/activity");
   assert.equal(call.params.start, 50);
   assert.equal(call.params.end, 150);
+  assert.equal(call.params.type, "REDEEM");
   assert.equal(call.params.sort_direction, "DESC");
   assert.equal(result.complete, true);
 });
