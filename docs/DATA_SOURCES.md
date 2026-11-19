@@ -12,7 +12,7 @@ Verified API contract details:
 - Pagination is cursor-only. Continue with `pagination.next_cursor` until it is `null`; do not send `offset`.
 - Feed endpoints include `/v2/trades` and `/v2/activity`; wallet positions are served from `/v2/positions`.
 - `/v2/positions` exposes `first_entry_at`, `last_event_at`, `current_size`, `redeemable`, `status`, `condition_id`, and `token_id`. Entry/event timestamps are Unix seconds; zero first-entry time means acquisition is not recorded.
-- An `OPEN` positions request is the superset of current holdings and can include settled-but-unredeemed rows. The `redeemable` flag is true for both winning and losing settled outcomes; token final payout determines win/loss.
+- `REDEEMABLE` filters settled-but-unredeemed winning positions; `REDEEMABLE_LOST` is a separate filter for settled-but-unredeemed losing positions. The scanner queries both explicitly so losses cannot be silently omitted. Returned rows may echo status `REDEEMABLE`, so the source filter is preserved and cross-checked against token final payout.
 - A `CLOSED` positions request can be bounded by `start` and `end` on `last_event_at`. The scanner only counts a closed position when its first entry predates the verified resolution and its last event is strictly after resolution. Pre-resolution closes and same-second ambiguous events are excluded.
 - `/v2/tokens` provides token resolution state and `final_price`; `/v2/resolutions` provides the condition's verified resolution timestamp.
 - On user-scoped `/v2/trades`, `start=1` requests full history; omitted or zero start is limited to a three-year lookback. The activity feed has the same documented start behavior. The qualification scanner does not replay full trade history.
@@ -31,4 +31,4 @@ A raw BUY or SELL is not proof of a settled win or loss. The scanner reconciles 
 
 ## Implementation status
 
-The adapter in `scanner/data-api.js` implements the documented v2 envelope, cursor-only pagination, filter preservation, repeated-cursor protection, page-limit failure, and retry handling. The qualification path uses bounded position snapshots rather than downloading and retaining each wallet's full activity history. The consensus path separately checks the last hour of BUY activity for qualified wallets and confirms that each counted wallet still holds the exact outcome token; mixed current holdings are excluded.
+The adapter in `scanner/data-api.js` implements the documented v2 envelope, cursor-only pagination, filter preservation, repeated-cursor protection, page-limit failure, and retry handling. The qualification path queries both explicit unredeemed settlement statuses plus bounded CLOSED positions rather than downloading and retaining each wallet's full activity history. The consensus path separately checks the last hour of BUY activity for qualified wallets and confirms that each counted wallet still holds the exact outcome token; mixed current holdings are excluded.
