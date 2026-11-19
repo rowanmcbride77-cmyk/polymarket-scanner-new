@@ -44,7 +44,8 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
   }
   for (const row of qualification.qualifiedWallets) {
     if (!/^0x[0-9a-f]{40}$/i.test(String(row.wallet ?? "")) || row.summary?.integrityPassed !== true ||
-        row.summary.resolvedMarkets < 20 || row.summary.winRate < 0.9) {
+        !Number.isInteger(row.summary.resolvedMarkets) || row.summary.resolvedMarkets < 20 ||
+        !Number.isFinite(row.summary.winRate) || row.summary.winRate < 0.9) {
       fail("qualified wallet lacks verified settlement thresholds");
     }
   }
