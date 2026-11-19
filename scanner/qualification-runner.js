@@ -27,6 +27,7 @@ export async function auditCandidates(candidates, {
           qualification: audit.qualification ?? { qualified: false, reason: "missing_qualification_result" },
           summary: audit.summary ?? null,
           coverage: audit.coverage ?? null,
+          recentBuys: Array.isArray(audit.recentBuys) ? audit.recentBuys : [],
         };
         if (audit.complete !== true) failed += 1;
       } catch (error) {
