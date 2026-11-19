@@ -199,6 +199,10 @@ export function reconstructSettledMarketResults({
     });
   }
 
+  for (const conditionId of unsupported.keys()) {
+    if (!exposuresByCondition.has(conditionId)) exclude("unsupported_or_inconsistent_activity");
+  }
+
   return {
     results,
     wins: results.filter((x) => x.result === "win").length,
