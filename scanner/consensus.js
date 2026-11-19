@@ -58,17 +58,42 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     .filter((row) => row.complete === true && row.qualification?.qualified === true)
     .map((row) => row.wallet.toLowerCase()));
   const byCondition = new Map();
+  const exclusions = {};
+  const mixedCurrentHoldings = new Set();
 
   for (const audit of auditBatch.results) {
     const wallet = audit.wallet.toLowerCase();
     if (!qualified.has(wallet)) continue;
-    for (const buy of audit.recentBuys ?? []) {
+    const recentBuys = audit.recentBuys ?? [];
+    const recentBuyConditions = new Set(recentBuys
+      .filter((buy) => buy?.conditionId)
+      .map((buy) => String(buy.conditionId).toLowerCase()));
+    const heldByCondition = new Map();
+    for (const position of audit.currentPositions ?? []) {
+      if (!position?.conditionId || !position?.tokenId ||
+          !Number.isFinite(position.currentSize) || position.currentSize <= 0) continue;
+      const conditionId = String(position.conditionId).toLowerCase();
+      const tokens = heldByCondition.get(conditionId) ?? new Set();
+      tokens.add(String(position.tokenId));
+      heldByCondition.set(conditionId, tokens);
+    }
+    for (const conditionId of recentBuyConditions) {
+      if ((heldByCondition.get(conditionId)?.size ?? 0) > 1) {
+        mixedCurrentHoldings.add(conditionId);
+      }
+    }
+    for (const buy of recentBuys) {
       if (!buy || !buy.conditionId || !buy.tokenId ||
           !Number.isInteger(buy.timestamp) || buy.timestamp < cutoff ||
           buy.timestamp > nowSeconds || !Number.isFinite(buy.size) || buy.size <= 0 ||
           !Number.isFinite(buy.usdSize) || buy.usdSize <= 0) continue;
       const conditionId = buy.conditionId.toLowerCase();
       const tokenId = String(buy.tokenId);
+      const heldTokens = heldByCondition.get(conditionId);
+      if (!heldTokens?.has(tokenId)) {
+        count(exclusions, "recent_buy_not_currently_held");
+        continue;
+      }
       const tokens = byCondition.get(conditionId) ?? new Map();
       const walletBuys = tokens.get(tokenId) ?? new Map();
       const existing = walletBuys.get(wallet) ?? { wallet, usdSize: 0, buyCount: 0, lastBuyAt: 0 };
@@ -81,9 +106,12 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     }
   }
 
-  const exclusions = {};
   const signals = [];
   for (const [conditionId, tokenGroups] of byCondition) {
+    if (mixedCurrentHoldings.has(conditionId)) {
+      count(exclusions, "mixed_current_holdings");
+      continue;
+    }
     if (tokenGroups.size !== 1) {
       count(exclusions, "mixed_outcomes_in_market");
       continue;
