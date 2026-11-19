@@ -15,7 +15,7 @@ Prioritize sports, esports, crypto, and player props. Exclude politics and gover
 - Exact same market/condition and exact same outcome/token.
 - Verified BUY within 60 minutes; minimum $10 entry per wallet.
 - Market expected to resolve within 24 hours based on verified metadata.
-- Never combine YES and NO, different lines, different props, or duplicate market representations.
+- Never combine YES and NO, different lines, different props, or duplicate market representations; exact duplicate event/title entries are excluded.
 - Prefer at least 8–10 distinct qualified wallets; never lower the threshold silently.
 
 ## Publication
