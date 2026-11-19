@@ -10,8 +10,8 @@ export async function fetchMarketResolutions(client, conditionIds, { batchSize =
   for (let i = 0; i < ids.length; i += batchSize) {
     const batch = ids.slice(i, i + batchSize);
     const body = await client.getJson("/v2/resolutions", { condition: batch.join(",") });
-    if (!Array.isArray(body.data)) throw new Error("Resolution lookup returned malformed data envelope");
-    for (const row of body.data) {
+    if (body.data !== null && !Array.isArray(body.data)) throw new Error("Resolution lookup returned malformed data envelope");
+    for (const row of (body.data ?? [])) {
       const conditionId = row.condition_id ?? row.conditionId;
       const resolvedAt = row.resolved_at ?? row.resolvedAt;
       const status = String(row.status ?? "").toLowerCase();
