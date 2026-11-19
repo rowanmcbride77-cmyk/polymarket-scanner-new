@@ -148,7 +148,9 @@ export async function runQualification({
   await writeJsonAtomic("data/status.json", {
     schemaVersion: 1, generatedAt,
     validation: { passed: true },
-    state: "complete",
+    state: "success",
+    completedAt: generatedAt,
+    message: "All wallet audits, settlement checks, leaderboards and consensus validation passed.",
     discoveredWallets: discovery.candidates.length,
     auditedWallets: batch.completed,
     qualifiedWallets: boards.qualifiedWalletCount,
