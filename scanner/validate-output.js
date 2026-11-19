@@ -11,7 +11,7 @@ function validateBoard(rows, label) {
   const seen = new Set();
   rows.forEach((row, index) => {
     const wallet = String(row.wallet ?? "").toLowerCase();
-    if (!wallet || seen.has(wallet)) fail(`${label} duplicate or missing wallet`);
+    if (!/^0x[0-9a-f]{40}$/.test(wallet) || seen.has(wallet)) fail(`${label} duplicate or missing wallet`);
     seen.add(wallet);
     if (row.rank !== index + 1) fail(`${label} rank sequence`);
     if (!Number.isFinite(row.winRate) || row.winRate < 0.9 ||
@@ -38,7 +38,7 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
     fail("qualified wallet universe");
   }
   for (const row of qualification.qualifiedWallets) {
-    if (!row.wallet || row.summary?.integrityPassed !== true ||
+    if (!/^0x[0-9a-f]{40}$/i.test(String(row.wallet ?? "")) || row.summary?.integrityPassed !== true ||
         row.summary.resolvedMarkets < 20 || row.summary.winRate < 0.9) {
       fail("qualified wallet lacks verified settlement thresholds");
     }
@@ -52,7 +52,7 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
   const duplicateKeys = new Set();
   for (const signal of consensus.signals) {
     if (!["sports", "esports", "crypto"].includes(signal.category) ||
-        !signal.conditionId || !signal.tokenId ||
+        !signal.conditionId || !signal.tokenId || !signal.marketTitle || !signal.outcome ||
         !Number.isFinite(signal.minutesToResolution) ||
         signal.minutesToResolution < 0 || signal.minutesToResolution > 1440 ||
         !Number.isFinite(Date.parse(signal.endDate)) ||
@@ -64,13 +64,13 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
     let participantUsd = 0;
     for (const row of signal.wallets) {
       const wallet = String(row.wallet ?? "").toLowerCase();
-      if (!wallet || participants.has(wallet) || !Number.isFinite(row.usdSize) || row.usdSize < 10) {
+      if (!/^0x[0-9a-f]{40}$/.test(wallet) || participants.has(wallet) || !Number.isFinite(row.usdSize) || row.usdSize < 10) {
         fail("consensus participant threshold or duplicate");
       }
       participants.add(wallet);
       participantUsd += row.usdSize;
     }
-    if (!Number.isFinite(signal.totalUsd) || signal.totalUsd + 0.01 < participantUsd) {
+    if (!Number.isFinite(signal.totalUsd) || Math.abs(signal.totalUsd - participantUsd) > 0.01) {
       fail("consensus total notional");
     }
     const eventIdentity = signal.eventId ?? signal.eventSlug;
