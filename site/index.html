@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Polymarket Scanner</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<main class="shell">
+  <header><a class="brand" href="./"><b>P</b> POLYMARKET <strong>SCANNER</strong></a><span class="tag">NEW PLATFORM</span></header>
+  <section class="intro"><p class="eyebrow">TRADER INTELLIGENCE</p><h1>Find the signal.<br><span>Verify the edge.</span></h1><p>Settlement-verified trader rankings and same-side consensus. Results appear only after a complete scan passes validation.</p></section>
+  <section class="status" aria-live="polite"><div class="status-title"><i></i><div><small>SCANNER STATUS</small><h2 id="status-title">Waiting for first validated scan</h2></div></div><p id="status-detail">The new data pipeline is being built. No placeholder rankings or signals are displayed.</p><div class="meta"><span>Last successful scan</span><b id="last-scan">Not yet available</b></div></section>
+  <section class="boards">
+    <article><small>01 / PERFORMANCE · 7 DAYS</small><h2>Weekly Top 100</h2><p>Ranked by verified performance over the weekly measurement window.</p><div class="empty">Awaiting validated data</div></article>
+    <article><small>02 / PERFORMANCE · 30 DAYS</small><h2>Monthly Top 100</h2><p>Qualified traders ranked independently over the monthly window.</p><div class="empty">Awaiting validated data</div></article>
+    <article class="wide"><small>03 / CONVICTION · SAME-SIDE ONLY</small><h2>Consensus Signals</h2><p>Distinct qualified wallets, verified BUY activity, one exact market, and one exact outcome.</p><div class="empty">No signals published until validation is complete</div></article>
+  </section>
+  <footer>Independent rebuild · Data shown only after validation</footer>
+</main>
+<script type="module" src="./app.js"></script>
+</body></html>
