@@ -16,6 +16,9 @@ export async function fetchRedeemablePositionSnapshot(client, wallet, {
       user: wallet,
       status: sourceStatusFilter,
       limit,
+      filter_type: "TOKENS",
+      filter_amount: 0,
+      include_archived: true,
       sort_by: "TIMESTAMP",
       sort_direction: "DESC",
     }, { maxPages });
