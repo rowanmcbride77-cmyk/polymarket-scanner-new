@@ -32,7 +32,7 @@ async function writeJsonAtomic(path, value) {
 }
 
 function qualifiedUniverse(qualification, weekly, monthly) {
-  if (Array.isArray(qualification.qualifiedWallets) && qualification.qualifiedWallets.length) {
+  if (Array.isArray(qualification.qualifiedWallets)) {
     return qualification.qualifiedWallets.map((row) => ({
       wallet: row.wallet, username: row.username,
       summary: row.summary ?? null,
