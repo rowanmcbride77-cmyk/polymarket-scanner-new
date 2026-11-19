@@ -4,8 +4,6 @@ import { pathToFileURL } from "node:url";
 import { createDataApiClient } from "./data-api.js";
 import { createWalletAuditor } from "./audit-wallet.js";
 import { auditCandidates, buildQualifiedLeaderboards } from "./qualification-runner.js";
-import { fetchGammaMarkets } from "./gamma-markets.js";
-import { buildConsensusSignals } from "./consensus.js";
 
 function createPacedFetch({
   fetchImpl = globalThis.fetch,
@@ -83,18 +81,6 @@ export async function runQualification({
   }
 
   const boards = buildQualifiedLeaderboards(discovery, batch, { topN: 100 });
-  const recentConditionIds = [...new Set(batch.results
-    .filter((row) => row.qualification.qualified)
-    .flatMap((row) => (row.recentBuys ?? []).map((buy) => buy.conditionId))
-    .filter(Boolean))];
-  const marketFacts = await fetchGammaMarkets(recentConditionIds, { fetchImpl: pacedFetch });
-  const consensus = buildConsensusSignals(batch, marketFacts, {
-    nowSeconds,
-    windowMinutes: 60,
-    maxResolutionHours: 24,
-    minWallets: 8,
-    minUsdPerWallet: 10,
-  });
   const payload = {
     schemaVersion: 1,
     generatedAt,
@@ -106,22 +92,13 @@ export async function runQualification({
       earlyExitsCounted: false,
       settlementIntegrityRequired: true,
     },
-    consensusThresholds: {
-      buyWindowMinutes: 60,
-      maxHoursToResolution: 24,
-      minimumQualifiedWallets: 8,
-      minimumUsdPerWallet: 10,
-      mixedOutcomesExcluded: true,
-    },
     validation: {
       passed: true,
       allWalletAuditsComplete: true,
-      marketMetadataComplete: true,
       discoveredWallets: discovery.candidates.length,
       auditedWallets: batch.completed,
       failedWalletAudits: 0,
       qualifiedWallets: boards.qualifiedWalletCount,
-      consensusSignals: consensus.signals.length,
     },
     qualifiedWallets: batch.results
       .filter((row) => row.qualification.qualified)
@@ -148,30 +125,7 @@ export async function runQualification({
     schemaVersion: 1, generatedAt, validation: { passed: true },
     count: boards.monthly.length, traders: boards.monthly,
   });
-  await writeJsonAtomic("data/consensus.json", {
-    schemaVersion: 1, generatedAt,
-    validation: { passed: true, complete: true },
-    thresholds: consensus.thresholds,
-    signalCount: consensus.signals.length,
-    qualifiedWalletsConsidered: consensus.qualifiedWalletsConsidered,
-    marketsWithRecentQualifiedBuys: consensus.marketsWithRecentQualifiedBuys,
-    exclusions: consensus.exclusions,
-    signals: consensus.signals,
-  });
-  await writeJsonAtomic("data/status.json", {
-    schemaVersion: 1, generatedAt,
-    validation: { passed: true },
-    state: "success",
-    completedAt: generatedAt,
-    message: "All wallet audits, settlement checks, leaderboards and consensus validation passed.",
-    discoveredWallets: discovery.candidates.length,
-    auditedWallets: batch.completed,
-    qualifiedWallets: boards.qualifiedWalletCount,
-    weeklyCount: boards.weekly.length,
-    monthlyCount: boards.monthly.length,
-    consensusCount: consensus.signals.length,
-  });
-  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; weekly Top ${boards.weekly.length}; monthly Top ${boards.monthly.length}; consensus signals ${consensus.signals.length}.\n`);
+  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; weekly Top ${boards.weekly.length}; monthly Top ${boards.monthly.length}.\n`);
   process.stdout.write(`Output: ${target}\n`);
   return payload;
 }
