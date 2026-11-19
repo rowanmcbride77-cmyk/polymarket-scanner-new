@@ -4,25 +4,25 @@ import { auditWallet, qualifyWalletAudit } from "./audit-wallet.js";
 
 test("qualification requires complete audit and 20 settled markets at 90 percent", () => {
   assert.deepEqual(qualifyWalletAudit({
-    complete: true, summary: { resolvedMarkets: 20, winRate: 0.9 },
+    complete: true, summary: { resolvedMarkets: 20, winRate: 0.9, integrityPassed: true },
   }), { qualified: true, reason: "all_thresholds_met" });
 });
 
 test("qualification rejects incomplete, undersampled and low-win-rate wallets", () => {
   assert.equal(qualifyWalletAudit({
-    complete: false, summary: { resolvedMarkets: 100, winRate: 1 },
+    complete: false, summary: { resolvedMarkets: 100, winRate: 1, integrityPassed: true },
   }).reason, "incomplete_audit");
   assert.equal(qualifyWalletAudit({
-    complete: true, summary: { resolvedMarkets: 19, winRate: 1 },
+    complete: true, summary: { resolvedMarkets: 19, winRate: 1, integrityPassed: true },
   }).reason, "insufficient_resolved_markets");
   assert.equal(qualifyWalletAudit({
-    complete: true, summary: { resolvedMarkets: 20, winRate: 0.89 },
+    complete: true, summary: { resolvedMarkets: 20, winRate: 0.89, integrityPassed: true },
   }).reason, "win_rate_below_threshold");
 });
 
 test("qualification never treats a missing win rate as zero or a pass", () => {
   assert.equal(qualifyWalletAudit({
-    complete: true, summary: { resolvedMarkets: 20, winRate: null },
+    complete: true, summary: { resolvedMarkets: 20, winRate: null, integrityPassed: true },
   }).qualified, false);
 });
 
@@ -85,4 +85,11 @@ test("wallet audit fails when either source history is incomplete", async () => 
     async getJson() { return { data: [] }; },
   };
   await assert.rejects(auditWallet(client, wallet), /source history is incomplete/);
+});
+
+test("qualification rejects uncertain settlement accounting", () => {
+  assert.equal(qualifyWalletAudit({
+    complete: true,
+    summary: { resolvedMarkets: 40, winRate: 1, integrityPassed: false },
+  }).reason, "settlement_integrity_not_verified");
 });
