@@ -34,7 +34,9 @@ export function summarizeSettledEvidence({
     const conditionId = String(position?.condition_id ?? "").toLowerCase();
     const tokenId = String(position?.token_id ?? "");
     const lastEventAt = position?.last_event_at;
-    if (!conditionId || !tokenId || !Number.isInteger(lastEventAt) || lastEventAt <= 0) {
+    const firstEntryAt = position?.first_entry_at;
+    if (!conditionId || !tokenId || !Number.isInteger(lastEventAt) || lastEventAt <= 0 ||
+        !Number.isInteger(firstEntryAt) || firstEntryAt < 0) {
       exclude("malformed_closed_position");
       continue;
     }
@@ -57,6 +59,15 @@ export function summarizeSettledEvidence({
       continue;
     }
     if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
+    if (firstEntryAt === 0) {
+      exclude("missing_first_entry_timestamp");
+      continue;
+    }
+    if (firstEntryAt >= resolution.resolvedAtSeconds) {
+      exclude(firstEntryAt === resolution.resolvedAtSeconds
+        ? "same_second_entry_resolution_ambiguous" : "post_resolution_acquisition_excluded");
+      continue;
+    }
     if (lastEventAt <= resolution.resolvedAtSeconds) {
       exclude(lastEventAt === resolution.resolvedAtSeconds
         ? "same_second_as_resolution_ambiguous" : "early_exit_excluded");
@@ -71,8 +82,10 @@ export function summarizeSettledEvidence({
     const conditionId = String(position?.condition_id ?? "").toLowerCase();
     const tokenId = String(position?.token_id ?? "");
     const currentSize = position?.current_size;
+    const firstEntryAt = position?.first_entry_at;
     const sourceStatusFilter = record?.sourceStatusFilter ?? position?.sourceStatusFilter;
     if (!conditionId || !tokenId || !Number.isFinite(currentSize) || currentSize <= 0 ||
+        !Number.isInteger(firstEntryAt) || firstEntryAt < 0 ||
         !["REDEEMABLE", "REDEEMABLE_LOST"].includes(sourceStatusFilter)) {
       exclude("malformed_current_redeemable_position");
       continue;
@@ -92,6 +105,15 @@ export function summarizeSettledEvidence({
       continue;
     }
     if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
+    if (firstEntryAt === 0) {
+      exclude("missing_first_entry_timestamp");
+      continue;
+    }
+    if (firstEntryAt >= resolution.resolvedAtSeconds) {
+      exclude(firstEntryAt === resolution.resolvedAtSeconds
+        ? "same_second_entry_resolution_ambiguous" : "post_resolution_acquisition_excluded");
+      continue;
+    }
     if ((sourceStatusFilter === "REDEEMABLE" && token.final_price !== 1) ||
         (sourceStatusFilter === "REDEEMABLE_LOST" && token.final_price !== 0)) {
       exclude("redeemable_status_payout_mismatch");
@@ -140,11 +162,13 @@ export function summarizeSettledEvidence({
   const severeReasons = new Set([
     "malformed_closed_position",
     "missing_closed_position_token_fact",
+    "missing_first_entry_timestamp",
     "closed_and_current_same_token",
     "token_condition_mismatch",
     "missing_resolution_timestamp",
     "token_resolution_state_mismatch",
     "malformed_current_redeemable_position",
+    "missing_first_entry_timestamp",
     "missing_current_position_token_resolution",
     "redeemable_status_payout_mismatch",
     "missing_or_nonbinary_token_resolution",
