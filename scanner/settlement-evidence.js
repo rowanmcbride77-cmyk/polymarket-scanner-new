@@ -109,6 +109,10 @@ export function summarizeSettledEvidence({
       continue;
     }
     const [tokenId, evidence] = [...tokenRows.entries()][0];
+    if (evidence.closedEvidence && evidence.currentSize > 0) {
+      exclude("closed_and_current_same_token");
+      continue;
+    }
     const token = tokenFacts.get(tokenId);
     if (!token || token.resolved !== true ||
         (token.final_price !== 0 && token.final_price !== 1)) {
@@ -136,6 +140,7 @@ export function summarizeSettledEvidence({
   const severeReasons = new Set([
     "malformed_closed_position",
     "missing_closed_position_token_fact",
+    "closed_and_current_same_token",
     "token_condition_mismatch",
     "missing_resolution_timestamp",
     "token_resolution_state_mismatch",
