@@ -81,6 +81,19 @@ export async function runQualification({
   }
 
   const boards = buildQualifiedLeaderboards(discovery, batch, { topN: 100 });
+  const disqualificationReasons = {};
+  let earlyExitsExcluded = 0;
+  let ambiguousSameSecondExcluded = 0;
+  let postResolutionAcquisitionsExcluded = 0;
+  for (const row of batch.results) {
+    if (!row.qualification.qualified) {
+      const reason = row.qualification.reason ?? "unknown";
+      disqualificationReasons[reason] = (disqualificationReasons[reason] ?? 0) + 1;
+    }
+    earlyExitsExcluded += row.summary?.exclusions?.early_exit_excluded ?? 0;
+    ambiguousSameSecondExcluded += row.summary?.exclusions?.same_second_as_resolution_ambiguous ?? 0;
+    postResolutionAcquisitionsExcluded += row.summary?.exclusions?.post_resolution_acquisition_excluded ?? 0;
+  }
   const payload = {
     schemaVersion: 1,
     generatedAt,
@@ -91,6 +104,13 @@ export async function runQualification({
       lookbackDays: 30,
       earlyExitsCounted: false,
       settlementIntegrityRequired: true,
+    },
+    auditSummary: {
+      disqualifiedWallets: batch.results.length - boards.qualifiedWalletCount,
+      disqualificationReasons,
+      earlyExitsExcluded,
+      ambiguousSameSecondExcluded,
+      postResolutionAcquisitionsExcluded,
     },
     validation: {
       passed: true,
