@@ -5,16 +5,15 @@ import { fetchRedeemablePositionSnapshot, fetchClosedPositionSnapshot, auditCurr
 const wallet = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const position = (token_id) => ({
   proxy_wallet: wallet, condition_id: "0xcondition", token_id,
-  status: "REDEEMABLE", current_size: 3,
+  status: "REDEEMABLE", current_size: 3, redeemable: true,
 });
 
-test("fetches both winning and losing held-position filters and joins on-chain token facts", async () => {
+test("fetches the OPEN superset once and classifies held winners and losers by token payout", async () => {
   const calls = [];
   const client = {
     async collectPages(path, params) {
       calls.push(params);
-      const rows = params.status === "REDEEMABLE" ? [position("11")] : [position("22")];
-      return { rows, pages: 1, complete: true };
+      return { rows: [position("11"), position("22")], pages: 1, complete: true };
     },
     async getJson(path, params) {
       return { data: params.token_id.split(",").map(token_id => ({
@@ -24,10 +23,12 @@ test("fetches both winning and losing held-position filters and joins on-chain t
     },
   };
   const snapshot = await fetchRedeemablePositionSnapshot(client, wallet);
-  assert.deepEqual(calls.map(x => x.status), ["REDEEMABLE", "REDEEMABLE_LOST"]);
+  assert.deepEqual(calls.map(x => x.status), ["OPEN"]);
   assert.equal(snapshot.records.length, 2);
+  assert.equal(snapshot.records[0].sourceStatusFilter, "REDEEMABLE");
+  assert.equal(snapshot.records[1].sourceStatusFilter, "REDEEMABLE_LOST");
   assert.equal(snapshot.records[1].tokenFact.final_price, 0);
-  assert.equal(snapshot.coverage, "CURRENT_UNREDEEMED_REDEEMABLE_POSITIONS_ONLY");
+  assert.equal(snapshot.coverage, "CURRENT_REDEEMABLE_POSITIONS_FROM_OPEN_SUPERSET");
 });
 
 test("snapshot diagnostics never qualify a trader from current unredeemed positions alone", async () => {
