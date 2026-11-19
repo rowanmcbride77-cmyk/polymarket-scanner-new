@@ -13,8 +13,8 @@ export async function fetchTokenFacts(client, tokenIds, { batchSize = 50 } = {})
   for (let i = 0; i < unique.length; i += batchSize) {
     const batch = unique.slice(i, i + batchSize);
     const body = await client.getJson("/v2/tokens", { token_id: batch.join(",") });
-    if (!Array.isArray(body.data)) throw new Error("Token lookup returned a malformed data envelope");
-    for (const token of body.data) {
+    if (body.data !== null && !Array.isArray(body.data)) throw new Error("Token lookup returned a malformed data envelope");
+    for (const token of (body.data ?? [])) {
       if (!token || typeof token.token_id !== "string" ||
           typeof token.resolved !== "boolean" ||
           (token.final_price !== null && !Number.isFinite(token.final_price))) {
