@@ -1,6 +1,12 @@
 name: Live candidate discovery and qualification
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scanner/wallet-positions.js"
+      - "scanner/audit-wallet.js"
+      - ".github/workflows/discover.yml"
   workflow_dispatch:
 
 concurrency:
@@ -13,7 +19,7 @@ permissions:
 jobs:
   discover-and-qualify:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
