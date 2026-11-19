@@ -32,7 +32,7 @@ test("full wallet audit classifies a closed position only when its last event fo
   const tokenId = "123456789";
   const closedPosition = {
     proxy_wallet: wallet, condition_id: condition, token_id: tokenId,
-    status: "CLOSED", current_size: 0, total_size: 10,
+    status: "CLOSED", current_size: 0, total_size: 10, first_entry_at: 1794000000,
     last_event_at: 1794916900, realized_pnl: 10,
   };
   const calls = [];
