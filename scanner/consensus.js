@@ -192,7 +192,7 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     qualifiedWalletsConsidered: qualified.size,
     marketsWithRecentQualifiedBuys: byCondition.size,
     exclusions,
-    thresholds: { windowMinutes, maxResolutionHours, minWallets, minUsdPerWallet },
+    thresholds: { windowMinutes, maxResolutionHours, minWallets, minUsdPerWallet, requireCurrentHoldings: true, sameSideOnly: true, excludeDuplicateRepresentations: true },
     complete: true,
   };
 }
