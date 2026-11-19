@@ -198,6 +198,14 @@ export function reconstructSettledMarketResults({
     });
   }
 
+  for (const conditionId of unsupported.keys()) {
+    if (exposuresByCondition.has(conditionId)) continue;
+    const resolution = resolutions.get(conditionId);
+    if (resolution && resolution.resolvedAtSeconds >= windowStartSeconds) {
+      exclude("unsupported_or_inconsistent_activity");
+    }
+  }
+
   const severeExclusions = new Set([
     "unsupported_or_inconsistent_activity",
     "missing_onchain_token_resolution",
