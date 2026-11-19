@@ -31,4 +31,4 @@ A raw BUY or SELL is not proof of a settled win or loss. The scanner reconciles 
 
 ## Implementation status
 
-The adapter in `scanner/data-api.js` implements the documented v2 envelope, cursor-only pagination, filter preservation, repeated-cursor protection, page-limit failure, and retry handling. The qualification path uses bounded position snapshots rather than downloading and retaining each wallet's full activity history. The consensus path separately checks the last hour of BUY activity for qualified wallets.
+The adapter in `scanner/data-api.js` implements the documented v2 envelope, cursor-only pagination, filter preservation, repeated-cursor protection, page-limit failure, and retry handling. The qualification path uses bounded position snapshots rather than downloading and retaining each wallet's full activity history. The consensus path separately checks the last hour of BUY activity for qualified wallets and confirms that each counted wallet still holds the exact outcome token; mixed current holdings are excluded.
