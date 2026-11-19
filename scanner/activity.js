@@ -39,17 +39,15 @@ export async function fetchCompleteWalletActivity(client, wallet, {
   const seen = new Set();
   const rows = [];
   for (const row of result.rows) {
-    const key = [
-      row.transaction_hash ?? "",
-      row.timestamp,
-      row.type,
-      row.token_id ?? "",
-      row.outcome_index ?? "",
-      row.side ?? "",
-      row.size ?? "",
-    ].join(":");
-    if (seen.has(key)) continue;
-    seen.add(key);
+    // Only deduplicate on an explicit unique event identifier. Transaction
+    // hashes are not unique per activity row: one transaction can contain
+    // multiple fills for the same token and size.
+    const eventId = row.id ?? row.activity_id ?? row.event_id ?? null;
+    if (eventId !== null) {
+      const key = String(eventId);
+      if (seen.has(key)) continue;
+      seen.add(key);
+    }
     rows.push(row);
   }
   rows.sort((a, b) => a.timestamp - b.timestamp);
