@@ -5,9 +5,9 @@ function retryDelayMs(response, attempt, baseDelayMs, maxDelayMs) {
   const header = response.headers?.get?.("retry-after");
   if (header !== null && header !== undefined) {
     const seconds = Number(header);
-    if (Number.isFinite(seconds) && seconds >= 0) return Math.min(maxDelayMs, seconds * 1000);
+    if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
     const dateMs = Date.parse(header);
-    if (Number.isFinite(dateMs)) return Math.max(0, Math.min(maxDelayMs, dateMs - Date.now()));
+    if (Number.isFinite(dateMs)) return Math.max(0, dateMs - Date.now());
   }
   return Math.min(maxDelayMs, baseDelayMs * (2 ** attempt));
 }
