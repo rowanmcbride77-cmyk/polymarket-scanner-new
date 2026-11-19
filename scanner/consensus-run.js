@@ -6,6 +6,7 @@ import { fetchRecentWalletActivity } from "./activity.js";
 import { fetchGammaMarkets } from "./gamma-markets.js";
 import { buildConsensusSignals } from "./consensus.js";
 import { auditCandidates } from "./qualification-runner.js";
+import { validatePublishedOutput } from "./validate-output.js";
 
 function createPacedFetch({ fetchImpl = globalThis.fetch, sleep = (ms) =>
   new Promise((resolveSleep) => setTimeout(resolveSleep, ms)) } = {}) {
@@ -159,9 +160,8 @@ export async function runConsensus({
     exclusions: result.exclusions,
     signals: result.signals,
   };
-  await writeJsonAtomic("data/consensus.json", consensus);
   const completedAt = new Date().toISOString();
-  await writeJsonAtomic("data/status.json", {
+  const status = {
     schemaVersion: 1,
     generatedAt,
     completedAt,
@@ -178,7 +178,11 @@ export async function runConsensus({
     weeklyCount: weekly.traders.length,
     monthlyCount: monthly.traders.length,
     consensusCount: result.signals.length,
-  });
+  };
+  const finalValidation = validatePublishedOutput({ qualification, weekly, monthly, consensus, status });
+  process.stdout.write(`Final publication validation passed: ${finalValidation.weekly} weekly, ${finalValidation.monthly} monthly, ${finalValidation.signals} consensus signals.\n`);
+  await writeJsonAtomic("data/consensus.json", consensus);
+  await writeJsonAtomic("data/status.json", status);
   process.stdout.write(`Consensus complete: ${result.signals.length} signals from ${wallets.length} qualified wallets.\n`);
   return consensus;
 }
