@@ -87,7 +87,12 @@ function renderConsensus(signals) {
     meta.textContent = `${signal.category} · ${signal.outcome || "Outcome"} · ${formatUsd(signal.totalUsd)} combined`;
     const end = document.createElement("small");
     end.textContent = `Resolves ${new Date(signal.endDate).toLocaleString()}`;
-    card.append(heading, meta, end);
+    const participants = document.createElement("small");
+    participants.className = "signal-wallets";
+    participants.textContent = (signal.wallets ?? [])
+      .map((row) => row.wallet ? `${row.wallet.slice(0, 6)}…${row.wallet.slice(-4)}` : "")
+      .filter(Boolean).join(" · ");
+    card.append(heading, meta, end, participants);
     target.append(card);
   }
 }
