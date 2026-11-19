@@ -10,17 +10,21 @@ const resolution = {
 const token = (tokenId, final_price) => ({
   tokenId, conditionId:condition, resolved:true, final_price,
 });
+const closed = (tokenId, last_event_at = 1794916900) => ({
+  position:{
+    condition_id:condition, token_id:tokenId, status:"CLOSED",
+    current_size:0, total_size:10, last_event_at, realized_pnl:1,
+  },
+});
 const base = {
-  activityComplete:true, positionsComplete:true,
+  closedPositionsComplete:true, positionsComplete:true,
   windowStartSeconds:1794000000,
   resolutions:new Map([[condition,resolution]]),
 };
 
-test("counts redeemed winners from explicit redemption evidence", () => {
+test("counts a closed position whose last economic event occurred after resolution", () => {
   const result = summarizeSettledEvidence({
-    ...base,
-    redemptions:[{condition_id:condition,token_id:"101",size:10,usdc_size:10}],
-    currentPositions:[],
+    ...base, closedPositions:[closed("101")], currentPositions:[],
     tokenFacts:new Map([["101",token("101",1)]]),
   });
   assert.equal(result.wins,1);
@@ -28,9 +32,19 @@ test("counts redeemed winners from explicit redemption evidence", () => {
   assert.equal(result.integrityPassed,true);
 });
 
+test("excludes a closed position whose last event preceded resolution", () => {
+  const result = summarizeSettledEvidence({
+    ...base, closedPositions:[closed("101",1794916700)], currentPositions:[],
+    tokenFacts:new Map([["101",token("101",1)]]),
+  });
+  assert.equal(result.resolvedMarkets,0);
+  assert.equal(result.exclusions.early_exit_excluded,1);
+  assert.equal(result.integrityPassed,true);
+});
+
 test("counts still-held winners and losers from redeemable position snapshots", () => {
   const winners = summarizeSettledEvidence({
-    ...base, redemptions:[],
+    ...base, closedPositions:[],
     currentPositions:[{
       position:{condition_id:condition,token_id:"101",current_size:4},
       sourceStatusFilter:"REDEEMABLE",
@@ -38,7 +52,7 @@ test("counts still-held winners and losers from redeemable position snapshots", 
     tokenFacts:new Map([["101",token("101",1)]]),
   });
   const losers = summarizeSettledEvidence({
-    ...base, redemptions:[],
+    ...base, closedPositions:[],
     currentPositions:[{
       position:{condition_id:condition,token_id:"101",current_size:4},
       sourceStatusFilter:"REDEEMABLE_LOST",
@@ -49,22 +63,19 @@ test("counts still-held winners and losers from redeemable position snapshots", 
   assert.equal(losers.losses,1);
 });
 
-test("excludes early exits because they have neither redemption nor current redeemable evidence", () => {
+test("excludes early exits because no post-resolution or current position evidence exists", () => {
   const result = summarizeSettledEvidence({
-    ...base, redemptions:[], currentPositions:[], tokenFacts:new Map(),
+    ...base, closedPositions:[], currentPositions:[], tokenFacts:new Map(),
   });
   assert.equal(result.resolvedMarkets,0);
   assert.equal(result.winRate,null);
   assert.equal(result.integrityPassed,true);
 });
 
-test("excludes a market when both outcomes are represented", () => {
+test("excludes a market when both outcomes were held through resolution", () => {
   const result = summarizeSettledEvidence({
     ...base,
-    redemptions:[
-      {condition_id:condition,token_id:"101",size:5,usdc_size:5},
-      {condition_id:condition,token_id:"202",size:5,usdc_size:0},
-    ],
+    closedPositions:[closed("101"),closed("202")],
     currentPositions:[],
     tokenFacts:new Map([["101",token("101",1)],["202",token("202",0)]]),
   });
@@ -72,11 +83,10 @@ test("excludes a market when both outcomes are represented", () => {
   assert.equal(result.exclusions.multiple_outcomes_held_in_same_market,1);
 });
 
-test("rejects redemption payout that contradicts token final price", () => {
+test("rejects missing resolution facts for resolved closed positions", () => {
   const result = summarizeSettledEvidence({
-    ...base,
-    redemptions:[{condition_id:condition,token_id:"101",size:10,usdc_size:0}],
-    currentPositions:[],
+    ...base, resolutions:new Map(),
+    closedPositions:[closed("101")], currentPositions:[],
     tokenFacts:new Map([["101",token("101",1)]]),
   });
   assert.equal(result.resolvedMarkets,0);
@@ -85,6 +95,6 @@ test("rejects redemption payout that contradicts token final price", () => {
 
 test("requires complete source snapshots", () => {
   assert.throws(() => summarizeSettledEvidence({
-    ...base, activityComplete:false, redemptions:[], currentPositions:[], tokenFacts:new Map(),
-  }), /Complete redemption activity/);
+    ...base, closedPositionsComplete:false, closedPositions:[], currentPositions:[], tokenFacts:new Map(),
+  }), /Complete closed-position/);
 });
