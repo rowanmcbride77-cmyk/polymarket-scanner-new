@@ -1,13 +1,11 @@
 name: Live candidate discovery
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "scanner/**"
-      - "package.json"
-      - ".github/workflows/discover.yml"
   workflow_dispatch:
+
+concurrency:
+  group: polymarket-candidate-discovery
+  cancel-in-progress: true
 
 permissions:
   contents: read
