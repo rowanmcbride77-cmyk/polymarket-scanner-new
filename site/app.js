@@ -122,7 +122,9 @@ async function loadDashboard() {
 
     statusPanel.classList.add("status-success");
     title.textContent = "Latest scan validated";
-    detail.textContent = `${status.discoveredWallets.toLocaleString()} wallets scanned · ${status.qualifiedWallets.toLocaleString()} qualified · ${(status.earlyExitsExcluded ?? 0).toLocaleString()} early exits excluded · ${status.consensusCount.toLocaleString()} consensus signals.`;
+    const earlyExitDetail = Number.isFinite(status.earlyExitsExcluded)
+      ? ` · ${status.earlyExitsExcluded.toLocaleString()} early exits excluded` : "";
+    detail.textContent = `${status.discoveredWallets.toLocaleString()} wallets scanned · ${status.qualifiedWallets.toLocaleString()} qualified${earlyExitDetail} · ${status.consensusCount.toLocaleString()} consensus signals.`;
     lastScan.textContent = status.completedAt ? new Date(status.completedAt).toLocaleString()
       : status.generatedAt ? new Date(status.generatedAt).toLocaleString() : "Not reported";
     renderLeaderboard("weekly-board", weekly.traders);
