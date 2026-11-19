@@ -55,7 +55,8 @@ export async function auditWallet(client, wallet, {
   // Resolution and token lookups are limited to outcomes actually redeemed or
   // still held at resolution; ordinary traded-and-exited markets need no lookup.
   const conditionIds = [
-    ...redeemRows.map((row) => row.condition_id).filter(Boolean),
+    ...activity.rows.filter((row) => String(row.type).toUpperCase() !== "TRADE")
+      .map((row) => row.condition_id).filter(Boolean),
     ...currentPositions.map((row) => row.condition_id).filter(Boolean),
   ];
   const resolutions = await fetchMarketResolutions(client, conditionIds);
