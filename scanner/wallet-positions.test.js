@@ -5,7 +5,7 @@ import { fetchRedeemablePositionSnapshot, fetchClosedPositionSnapshot, auditCurr
 const wallet = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const position = (token_id) => ({
   proxy_wallet: wallet, condition_id: "0xcondition", token_id,
-  status: "REDEEMABLE", current_size: 3, redeemable: true,
+  status: "REDEEMABLE", current_size: 3, redeemable: true, first_entry_at: 100,
 });
 
 test("fetches the OPEN superset once and classifies held winners and losers by token payout", async () => {
@@ -51,7 +51,7 @@ test("fetches bounded CLOSED positions by last economic event time", async () =>
   let call;
   const closed = {
     proxy_wallet: wallet, condition_id: "0xcondition", token_id: "33",
-    status: "CLOSED", current_size: 0, total_size: 3,
+    status: "CLOSED", current_size: 0, total_size: 3, first_entry_at: 110,
     last_event_at: 150, realized_pnl: 1,
   };
   const client = {
