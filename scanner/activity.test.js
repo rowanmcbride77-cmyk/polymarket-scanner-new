@@ -22,8 +22,18 @@ test("requests full ascending activity history and returns ordered rows", async 
   assert.equal(result.complete, true);
 });
 
-test("deduplicates repeated identical activity rows", async () => {
+test("preserves repeated rows without an explicit event ID", async () => {
   const row = event(10);
+  const client = { async collectPages() {
+    return { rows: [row, row], pages: 1, complete: true };
+  }};
+  const result = await fetchCompleteWalletActivity(client, wallet);
+  assert.equal(result.rows.length, 2);
+  assert.equal(result.deduplicatedRows, 0);
+});
+
+test("deduplicates only repeated explicit event IDs", async () => {
+  const row = event(10, { id: "activity-1" });
   const client = { async collectPages() {
     return { rows: [row, row], pages: 1, complete: true };
   }};
