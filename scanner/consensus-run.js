@@ -160,10 +160,11 @@ export async function runConsensus({
     signals: result.signals,
   };
   await writeJsonAtomic("data/consensus.json", consensus);
+  const completedAt = new Date().toISOString();
   await writeJsonAtomic("data/status.json", {
     schemaVersion: 1,
     generatedAt,
-    completedAt: generatedAt,
+    completedAt,
     validation: { passed: true },
     state: "success",
     message: "Wallet rankings and same-side consensus passed validation.",
