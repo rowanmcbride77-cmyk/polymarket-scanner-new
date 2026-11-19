@@ -1,0 +1,74 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { buildConsensusSignals } from "./consensus.js";
+
+const now = 1796000000;
+const condition = "0x" + "a".repeat(64);
+const market = (overrides = {}) => ({
+  conditionId: condition, title:"Team vs Team", slug:"team-vs-team",
+  active:true, closed:false, endDate:new Date((now+12*3600)*1000).toISOString(),
+  category:"Sports", tags:["NBA"],
+  clobTokenIds:["yes-token","no-token"], outcomes:["Yes","No"],
+  ...overrides,
+});
+function audit(wallet, tokenId="yes-token", usdSize=12, qualified=true) {
+  return {
+    wallet, complete:true,
+    qualification:{qualified},
+    recentBuys:[{
+      conditionId:condition, tokenId, timestamp:now-120,
+      usdSize, size:20, price:.6,
+    }],
+  };
+}
+
+test("creates a signal from eight qualified wallets buying the same outcome", () => {
+  const results = Array.from({length:8},(_,i)=>audit(`wallet-${i}`));
+  const result = buildConsensusSignals({
+    complete:true, results,
+  }, new Map([[condition,market()]]), {nowSeconds:now});
+  assert.equal(result.signals.length,1);
+  assert.equal(result.signals[0].qualifiedWalletCount,8);
+  assert.equal(result.signals[0].outcome,"Yes");
+  assert.equal(result.signals[0].totalUsd,96);
+});
+
+test("excludes a market if qualified wallets bought both outcomes", () => {
+  const results = [
+    ...Array.from({length:8},(_,i)=>audit(`wallet-${i}`)),
+    audit("opposite-wallet","no-token",25),
+  ];
+  const result = buildConsensusSignals({complete:true,results},new Map([[condition,market()]]),{nowSeconds:now});
+  assert.equal(result.signals.length,0);
+  assert.equal(result.exclusions.mixed_outcomes_in_market,1);
+});
+
+test("only qualified wallets with at least ten dollars count", () => {
+  const results = [
+    ...Array.from({length:7},(_,i)=>audit(`wallet-${i}`)),
+    audit("unqualified","yes-token",100,false),
+    audit("small-position","yes-token",9),
+  ];
+  const result = buildConsensusSignals({complete:true,results},new Map([[condition,market()]]),{nowSeconds:now});
+  assert.equal(result.signals.length,0);
+  assert.equal(result.exclusions.insufficient_qualified_wallets,1);
+});
+
+test("requires open market, allowed category and resolution within 24 hours", () => {
+  const results = Array.from({length:8},(_,i)=>audit(`wallet-${i}`));
+  const tooLate = market({endDate:new Date((now+25*3600)*1000).toISOString()});
+  const political = market({category:"Politics",tags:["Election"]});
+  const closed = market({closed:true});
+  for (const m of [tooLate,political,closed]) {
+    const result = buildConsensusSignals({complete:true,results},new Map([[condition,m]]),{nowSeconds:now});
+    assert.equal(result.signals.length,0);
+  }
+});
+
+test("ignores stale or future-invalid buy records and rejects incomplete audit batches", () => {
+  const results = Array.from({length:8},(_,i)=>audit(`wallet-${i}`));
+  for (const row of results) row.recentBuys[0].timestamp = now - 61*60;
+  const result = buildConsensusSignals({complete:true,results},new Map([[condition,market()]]),{nowSeconds:now});
+  assert.equal(result.signals.length,0);
+  assert.throws(() => buildConsensusSignals({complete:false,results},new Map()),/complete wallet audit batch/);
+});
