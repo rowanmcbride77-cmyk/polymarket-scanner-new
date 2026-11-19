@@ -4,11 +4,11 @@ import { validatePublishedOutput } from "./validate-output.js";
 
 const qualified = {
   wallet:"0x" + "a".repeat(40),
-  summary:{integrityPassed:true,resolvedMarkets:20,winRate:0.95},
+  summary:{integrityPassed:true,resolvedMarkets:20,wins:19,losses:1,winRate:0.95},
 };
 function fixtures() {
   const trader = {
-    wallet:qualified.wallet, rank:1, winRate:0.95, resolvedMarkets:20, leaderboardPnl:100,
+    wallet:qualified.wallet, rank:1, winRate:0.95, resolvedMarkets:20, wins:19, losses:1, leaderboardPnl:100,
   };
   const weekly = {schemaVersion:1,validation:{passed:true},count:1,traders:[trader]};
   const monthly = {schemaVersion:1,validation:{passed:true},count:1,traders:[trader]};
