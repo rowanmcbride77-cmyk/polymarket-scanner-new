@@ -32,6 +32,10 @@ function count(exclusions, key) {
   exclusions[key] = (exclusions[key] ?? 0) + 1;
 }
 
+function normalizeTitle(value) {
+  return String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
 export function buildConsensusSignals(auditBatch, marketFacts, {
   nowSeconds = Math.floor(Date.now() / 1000),
   windowMinutes = 60,
@@ -124,6 +128,7 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
       marketTitle: market.title,
       marketSlug: market.slug,
       eventId: market.eventId,
+      eventSlug: market.eventSlug,
       category,
       endDate: new Date(endDateMs).toISOString(),
       minutesToResolution: Math.round(secondsToResolution / 60),
@@ -137,8 +142,22 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     b.qualifiedWalletCount - a.qualifiedWalletCount ||
     b.totalUsd - a.totalUsd ||
     a.minutesToResolution - b.minutesToResolution);
+  const seenRepresentations = new Set();
+  const uniqueSignals = [];
+  for (const signal of signals) {
+    const eventIdentity = signal.eventId ?? signal.eventSlug;
+    const titleIdentity = normalizeTitle(signal.marketTitle);
+    const duplicateKey = eventIdentity && titleIdentity
+      ? `${eventIdentity}:${titleIdentity}` : null;
+    if (duplicateKey && seenRepresentations.has(duplicateKey)) {
+      count(exclusions, "duplicate_market_representation");
+      continue;
+    }
+    if (duplicateKey) seenRepresentations.add(duplicateKey);
+    uniqueSignals.push(signal);
+  }
   return {
-    signals,
+    signals: uniqueSignals,
     qualifiedWalletsConsidered: qualified.size,
     marketsWithRecentQualifiedBuys: byCondition.size,
     exclusions,
