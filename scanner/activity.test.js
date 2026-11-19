@@ -5,7 +5,8 @@ import { fetchCompleteWalletActivity, fetchRecentWalletActivity } from "./activi
 const wallet = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const event = (timestamp, overrides = {}) => ({
   proxy_wallet: wallet, timestamp, type: "TRADE", token_id: "123",
-  transaction_hash: `0x${timestamp}`, side: "BUY", size: 2, ...overrides,
+  condition_id: "0x" + "a".repeat(64), transaction_hash: `0x${timestamp}`,
+  side: "BUY", size: 2, usdc_size: 1, price: 0.5, ...overrides,
 });
 
 test("requests full ascending activity history and returns ordered rows", async () => {
