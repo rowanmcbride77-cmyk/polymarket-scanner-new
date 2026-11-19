@@ -7,15 +7,15 @@ A fail-closed Polymarket trader scanner and consensus dashboard. It does not pub
 1. Discover up to **20,000 unique wallets** from the Polymarket Data API v2 weekly/monthly leaderboards across sports, esports and crypto.
 2. Audit each wallet's last 30 days of settled outcomes using:
    - `CLOSED` positions whose first acquisition occurred before resolution and whose last economic event occurred strictly after the market's verified resolution time;
-   - current held positions whose `redeemable` flag is true, including winning and losing outcomes;
+   - current unredeemed winners queried with `REDEEMABLE` and current unredeemed losers queried separately with `REDEEMABLE_LOST`;
    - token final-payout facts from `/v2/tokens`;
    - actual resolution timestamps from `/v2/resolutions`.
 3. Exclude early exits: a trade that was sold before resolution is neither a redemption nor a current redeemable holding, so it is not counted as a win or loss.
 4. Require at least **20 verified resolved markets** and at least **90% win rate**. Unverifiable settlement evidence blocks qualification.
 5. Build weekly and monthly Top 100 lists only after every candidate wallet audit completes.
 6. Check recent BUY activity for qualified wallets and build same-outcome consensus only when:
-   - the buy occurred within the last 60 minutes;
-   - each counted wallet invested at least $10;
+   - the buy occurred within the last 60 minutes and the wallet still holds that exact token;
+   - each counted wallet has at least $10 of recent BUY notional;
    - at least 8 qualified wallets bought the exact same outcome token;
    - the market is active, open, order-book enabled, sports/esports/crypto, and scheduled to resolve within 24 hours;
    - any market with qualified buys or current holdings on opposing outcomes is excluded;
