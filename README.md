@@ -6,7 +6,7 @@ A fail-closed Polymarket trader scanner and consensus dashboard. It does not pub
 
 1. Discover up to **20,000 unique wallets** from the Polymarket Data API v2 weekly/monthly leaderboards across sports, esports and crypto.
 2. Audit each wallet's last 30 days of settled outcomes using:
-   - `CLOSED` positions whose last economic event occurred at or after the market's verified resolution time;
+   - `CLOSED` positions whose last economic event occurred strictly after the market's verified resolution time;
    - current held positions whose `redeemable` flag is true, including winning and losing outcomes;
    - token final-payout facts from `/v2/tokens`;
    - actual resolution timestamps from `/v2/resolutions`.
@@ -18,7 +18,8 @@ A fail-closed Polymarket trader scanner and consensus dashboard. It does not pub
    - each counted wallet invested at least $10;
    - at least 8 qualified wallets bought the exact same outcome token;
    - the market is active, open, order-book enabled, sports/esports/crypto, and scheduled to resolve within 24 hours;
-   - any market with qualified buys on opposing outcomes is excluded.
+   - any market with qualified buys on opposing outcomes is excluded;
+   - duplicate representations of the same event and market title are not published.
 
 ## Safety and publication
 
