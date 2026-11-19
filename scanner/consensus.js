@@ -101,6 +101,19 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
   }
 
   for (const [conditionId, tokenGroups] of byCondition) {
+    for (const [tokenId, walletBuys] of tokenGroups) {
+      for (const [wallet, buy] of walletBuys) {
+        if (buy.usdSize < minUsdPerWallet) {
+          walletBuys.delete(wallet);
+          count(exclusions, "wallet_below_minimum_usd");
+        }
+      }
+      if (walletBuys.size === 0) tokenGroups.delete(tokenId);
+    }
+    if (tokenGroups.size === 0) {
+      byCondition.delete(conditionId);
+      continue;
+    }
     for (const walletBuys of tokenGroups.values()) {
       for (const [wallet, buy] of walletBuys) {
         if (buy.usdSize >= minUsdPerWallet &&
