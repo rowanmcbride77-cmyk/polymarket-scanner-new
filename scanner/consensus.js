@@ -21,7 +21,7 @@ function marketCategory(market) {
   const category = String(market.category ?? "").toLowerCase();
   const tags = (market.tags ?? []).map(tagText);
   const all = [category, market.title ?? "", ...tags].join(" ");
-  if (/politic|election|government|congress|senate/.test(all)) return null;
+  if (/politic|election|government|congress|senate|president|white house/.test(all)) return null;
   if (/esport/.test(all)) return "esports";
   if (/crypto|bitcoin|ethereum|solana/.test(all)) return "crypto";
   if (/sport|nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey/.test(all)) return "sports";
