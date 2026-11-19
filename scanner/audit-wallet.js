@@ -71,7 +71,7 @@ export async function auditWallet(client, wallet, {
   const result = {
     wallet: wallet.toLowerCase(),
     complete: true,
-    coverage: "30_DAY_CLOSED_POSITIONS_PLUS_CURRENT_REDEEMABLE_POSITIONS",
+    coverage: "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
     closedPositions: closedSnapshot.records.length,
     closedPositionPages: closedSnapshot.pages,
     positionPartitions: positionSnapshot.partitions,
