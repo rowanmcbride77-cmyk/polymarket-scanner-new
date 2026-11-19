@@ -82,6 +82,7 @@ export async function runConsensus({
       const recent = await fetchRecentWalletActivity(client, wallet, {
         startSeconds: nowSeconds - 60 * 60,
         endSeconds: nowSeconds,
+        type: "TRADE",
         maxPages: 100,
       });
       const recentBuys = recent.rows
