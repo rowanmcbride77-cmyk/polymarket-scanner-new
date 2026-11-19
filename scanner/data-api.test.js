@@ -78,7 +78,7 @@ test("honors Retry-After for rate limits", async () => {
     fetchImpl: async () => {
       calls += 1;
       return calls === 1
-        ? jsonResponse({ error: "busy" }, 429, { "retry-after": "2" })
+        ? jsonResponse({ error: "busy" }, 429, { "retry-after": "20" })
         : jsonResponse({ data: { ok: true } });
     },
     sleep: async (ms) => delays.push(ms),
@@ -86,7 +86,7 @@ test("honors Retry-After for rate limits", async () => {
   const body = await client.getJson("/v2/user-stats", { user: "0xabc" });
   assert.equal(body.data.ok, true);
   assert.equal(calls, 2);
-  assert.deepEqual(delays, [2000]);
+  assert.deepEqual(delays, [20000]);
 });
 
 test("does not interpret missing data as an empty success", async () => {
