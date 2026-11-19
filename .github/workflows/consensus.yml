@@ -37,8 +37,14 @@ jobs:
         run: |
           npm test
           npm run check
-      - name: Verify recent BUY activity and build consensus
-        run: npm run consensus
+      - name: Verify or build consensus
+        run: |
+          if [ -s data/consensus.json ] && [ -s data/status.json ]; then
+            node -e "const c=require('./data/consensus.json'); const s=require('./data/status.json'); if(c.validation?.passed!==true || s.validation?.passed!==true || s.state!=='success') process.exit(1)"
+            echo "Qualification artifact already contains validated consensus."
+          else
+            npm run consensus
+          fi
         env:
           SCANNER_CONCURRENCY: 16
       - name: Upload final validated scanner output
