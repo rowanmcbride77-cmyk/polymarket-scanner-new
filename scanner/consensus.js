@@ -61,7 +61,8 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     for (const buy of audit.recentBuys ?? []) {
       if (!buy || !buy.conditionId || !buy.tokenId ||
           !Number.isInteger(buy.timestamp) || buy.timestamp < cutoff ||
-          buy.timestamp > nowSeconds || !Number.isFinite(buy.usdSize) || buy.usdSize <= 0) continue;
+          buy.timestamp > nowSeconds || !Number.isFinite(buy.size) || buy.size <= 0 ||
+          !Number.isFinite(buy.usdSize) || buy.usdSize <= 0) continue;
       const conditionId = buy.conditionId.toLowerCase();
       const tokenId = String(buy.tokenId);
       const tokens = byCondition.get(conditionId) ?? new Map();
