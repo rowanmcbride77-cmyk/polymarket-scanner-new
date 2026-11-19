@@ -1,5 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { createDataApiClient } from "./data-api.js";
 import { createWalletAuditor } from "./audit-wallet.js";
 import { auditCandidates, buildQualifiedLeaderboards } from "./qualification-runner.js";
@@ -115,7 +116,7 @@ export async function runQualification({
   return payload;
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${resolve(process.argv[1])}`).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   runQualification().catch((error) => {
     process.stderr.write(`Qualification failed: ${error.message}\n`);
     process.exitCode = 1;
