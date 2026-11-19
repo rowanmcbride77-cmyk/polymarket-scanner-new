@@ -9,53 +9,52 @@ export async function fetchRedeemablePositionSnapshot(client, wallet, {
   maxPages = 20,
 } = {}) {
   if (!WALLET_RE.test(wallet ?? "")) throw new TypeError("A valid proxy wallet address is required");
-  const result = await client.collectPages("/v2/positions", {
-    user: wallet,
-    status: "OPEN",
-    limit,
-    filter_type: "TOKENS",
-    filter_amount: 0.000001,
-    include_archived: true,
-    sort_by: "TIMESTAMP",
-    sort_direction: "DESC",
-  }, { maxPages });
-  const malformed = result.rows.filter((row) => {
-    if (!row || typeof row !== "object" ||
-        String(row.proxy_wallet ?? "").toLowerCase() !== wallet.toLowerCase() ||
-        !Number.isFinite(row.current_size) || row.current_size < 0 ||
-        typeof row.redeemable !== "boolean") return true;
-    if (row.redeemable !== true || row.current_size <= 0) return false;
-    return typeof row.condition_id !== "string" || !row.condition_id ||
-      typeof row.token_id !== "string" || !/^\d+$/.test(row.token_id) ||
-      !Number.isInteger(row.first_entry_at) || row.first_entry_at < 0;
-  });
+  const statuses = ["REDEEMABLE", "REDEEMABLE_LOST"];
+  const partitions = await Promise.all(statuses.map(async (sourceStatusFilter) => ({
+    sourceStatusFilter,
+    result: await client.collectPages("/v2/positions", {
+      user: wallet,
+      status: sourceStatusFilter,
+      limit,
+      filter_type: "TOKENS",
+      filter_amount: 0.000001,
+      include_archived: true,
+      sort_by: "TIMESTAMP",
+      sort_direction: "DESC",
+    }, { maxPages }),
+  })));
+  const rows = partitions.flatMap(({sourceStatusFilter, result}) =>
+    result.rows.map((position) => ({position, sourceStatusFilter})));
+  const malformed = rows.filter(({position: row}) =>
+    !row || typeof row !== "object" ||
+    String(row.proxy_wallet ?? "").toLowerCase() !== wallet.toLowerCase() ||
+    typeof row.condition_id !== "string" || !row.condition_id ||
+    typeof row.token_id !== "string" || !/^\d+$/.test(row.token_id) ||
+    !Number.isFinite(row.current_size) || row.current_size <= 0 ||
+    !Number.isInteger(row.first_entry_at) || row.first_entry_at < 0);
   if (malformed.length) {
-    const error = new Error("Open position snapshot contains malformed rows");
+    const error = new Error("Redeemable position snapshot contains malformed rows");
     error.malformedRows = malformed.length;
     error.complete = false;
     throw error;
   }
-  const redeemableRows = result.rows.filter((row) => row.redeemable === true && row.current_size > 0);
-  const tokenFacts = await fetchTokenFacts(client, redeemableRows.map((row) => row.token_id));
-  const records = redeemableRows.map((position) => {
-    const tokenFact = tokenFacts.get(String(position.token_id)) ?? null;
-    return {
-      position,
-      sourceStatusFilter: tokenFact?.final_price === 0 ? "REDEEMABLE_LOST" : "REDEEMABLE",
-      tokenFact,
-    };
-  });
+  const tokenFacts = await fetchTokenFacts(client, rows.map(({position}) => position.token_id));
+  const records = rows.map(({position, sourceStatusFilter}) => ({
+    position,
+    sourceStatusFilter,
+    tokenFact: tokenFacts.get(String(position.token_id)) ?? null,
+  }));
   return {
     wallet: wallet.toLowerCase(),
     records,
-    partitions: [{
-      sourceStatusFilter: "OPEN_REDEEMABLE_SUPERSET",
+    partitions: partitions.map(({sourceStatusFilter, result}) => ({
+      sourceStatusFilter,
       pages: result.pages,
-      count: redeemableRows.length,
+      count: result.rows.length,
       complete: result.complete,
-    }],
-    complete: result.complete,
-    coverage: "CURRENT_REDEEMABLE_POSITIONS_FROM_OPEN_SUPERSET",
+    })),
+    complete: partitions.every(({result}) => result.complete),
+    coverage: "CURRENT_REDEEMABLE_WIN_AND_LOSS_POSITIONS",
   };
 }
 
