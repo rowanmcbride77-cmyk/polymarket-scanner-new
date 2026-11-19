@@ -11,7 +11,11 @@ Verified API contract details:
 - Responses use a `data` envelope; paginated routes also include `pagination`.
 - Pagination is cursor-only. Continue with `pagination.next_cursor` until it is `null`; do not send `offset`.
 - Feed endpoints include `/v2/trades` and `/v2/activity`; wallet positions are served from `/v2/positions`.
-- On user-scoped `/v2/trades`, `start=1` requests full history; omitted or zero start is limited to a three-year lookback. The activity feed has the same documented start behavior.
+- `/v2/positions` exposes `first_entry_at`, `last_event_at`, `current_size`, `redeemable`, `status`, `condition_id`, and `token_id`. Entry/event timestamps are Unix seconds; zero first-entry time means acquisition is not recorded.
+- An `OPEN` positions request is the superset of current holdings and can include settled-but-unredeemed rows. The `redeemable` flag is true for both winning and losing settled outcomes; token final payout determines win/loss.
+- A `CLOSED` positions request can be bounded by `start` and `end` on `last_event_at`. The scanner only counts a closed position when its first entry predates the verified resolution and its last event is strictly after resolution. Pre-resolution closes and same-second ambiguous events are excluded.
+- `/v2/tokens` provides token resolution state and `final_price`; `/v2/resolutions` provides the condition's verified resolution timestamp.
+- On user-scoped `/v2/trades`, `start=1` requests full history; omitted or zero start is limited to a three-year lookback. The activity feed has the same documented start behavior. The qualification scanner does not replay full trade history.
 - Re-send identical filters on each feed page.
 - Retry 429 and retryable 503 responses using the `Retry-After` header.
 - A missing/null numeric value is unavailable, not zero.
@@ -19,12 +23,12 @@ Verified API contract details:
 
 ## Gamma API
 
-Base URL: `https://gamma-api.polymarket.com`. Used for market/event metadata, tags, categories, and event/market end dates. Gamma supports offset pagination with a documented maximum page size of 500 (distinct from Data API v2).
+Base URL: `https://gamma-api.polymarket.com`. Used for market/event metadata, tags, categories, and event/market end dates. Gamma supports offset pagination with a documented maximum page size of 500 (distinct from Data API v2). The consensus stage requests tag metadata and requires an active, non-closed, order-book-enabled market.
 
 ## Important modeling constraint
 
-The API exposes wallet trades, activity, positions, and resolution lifecycle data as separate resources. A raw BUY or SELL is not itself proof of a settled win or loss. The scanner must reconcile token/condition identity, wallet position lifecycle, and authoritative resolution data before assigning a settled result. If that reconciliation cannot be proven for a wallet-market position, mark it unverified and exclude it from the win-rate denominator rather than guessing.
+A raw BUY or SELL is not proof of a settled win or loss. The scanner reconciles wallet position lifecycle, first-entry and last-event timestamps, token final payout, and authoritative resolution data. Early exits are excluded. Ambiguous same-second events, missing timestamps, missing token facts, resolution-state disagreements, and non-binary payouts fail closed. A position that cannot be proven held through resolution is not counted.
 
 ## Implementation status
 
-The adapter in `scanner/data-api.js` implements the documented v2 envelope, cursor-only pagination, filter preservation, repeated-cursor protection, page-limit failure, and retry handling. It does not yet calculate P&L or declare any trader qualified.
+The adapter in `scanner/data-api.js` implements the documented v2 envelope, cursor-only pagination, filter preservation, repeated-cursor protection, page-limit failure, and retry handling. The qualification path uses bounded position snapshots rather than downloading and retaining each wallet's full activity history. The consensus path separately checks the last hour of BUY activity for qualified wallets.
