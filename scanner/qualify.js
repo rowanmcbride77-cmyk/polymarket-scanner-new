@@ -128,7 +128,13 @@ export async function runQualification({
       .map((row) => ({
         wallet: row.wallet,
         username: row.username,
-        summary: row.summary,
+        summary: row.summary ? {
+          wins: row.summary.wins,
+          losses: row.summary.losses,
+          resolvedMarkets: row.summary.resolvedMarkets,
+          winRate: row.summary.winRate,
+          integrityPassed: row.summary.integrityPassed,
+        } : null,
       })),
     weekly: boards.weekly,
     monthly: boards.monthly,
