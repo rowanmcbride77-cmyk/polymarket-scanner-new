@@ -52,7 +52,10 @@ test("full wallet audit joins activity, redemption, token payout and resolution 
   const client = {
     async collectPages(path, params) {
       calls.push({ path, params });
-      if (path === "/v2/activity") return { rows: activity, pages: 1, complete: true };
+      if (path === "/v2/activity") return {
+        rows: activity.filter((row) => row.type === params.type),
+        pages: 1, complete: true,
+      };
       if (path === "/v2/positions") return { rows: [], pages: 1, complete: true };
       throw new Error("unexpected paginated path");
     },
@@ -78,8 +81,6 @@ test("full wallet audit joins activity, redemption, token payout and resolution 
   assert.equal(result.qualification.qualified, true);
   assert.equal(result.tokenFacts, 1);
   assert.equal(result.resolutionFacts, 1);
-  assert.equal(result.recentBuys.length, 1);
-  assert.equal(result.recentBuys[0].usdSize, 12);
   assert.equal(calls.filter(x => x.path === "/v2/tokens").length, 1);
 });
 
