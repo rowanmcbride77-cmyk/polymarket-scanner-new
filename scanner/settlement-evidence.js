@@ -1,43 +1,65 @@
 export function summarizeSettledEvidence({
-  redemptions,
+  closedPositions,
   currentPositions,
   tokenFacts,
   resolutions,
-  activityComplete = false,
+  closedPositionsComplete = false,
   positionsComplete = false,
   windowStartSeconds,
 }) {
-  if (!activityComplete || !positionsComplete) {
-    throw new Error("Complete redemption activity and position snapshots are required");
+  if (!closedPositionsComplete || !positionsComplete) {
+    throw new Error("Complete closed-position and redeemable-position snapshots are required");
   }
-  if (!Array.isArray(redemptions) || !Array.isArray(currentPositions) ||
+  if (!Array.isArray(closedPositions) || !Array.isArray(currentPositions) ||
       !(tokenFacts instanceof Map) || !(resolutions instanceof Map) ||
       !Number.isInteger(windowStartSeconds)) {
     throw new TypeError("Invalid settlement evidence inputs");
   }
 
-  const byCondition = new Map();
+  const heldAtResolution = new Map();
   const exclusions = {};
   const exclude = (reason) => { exclusions[reason] = (exclusions[reason] ?? 0) + 1; };
   function getToken(conditionId, tokenId) {
-    const rows = byCondition.get(conditionId) ?? new Map();
-    const record = rows.get(tokenId) ?? { tokenId, redeemedSize: 0, redemptionPayout: 0, currentSize: 0, sourceStatusFilters: new Set() };
+    const rows = heldAtResolution.get(conditionId) ?? new Map();
+    const record = rows.get(tokenId) ?? {
+      tokenId, closedEvidence: false, currentSize: 0, sourceStatusFilters: new Set(),
+    };
     rows.set(tokenId, record);
-    byCondition.set(conditionId, rows);
+    heldAtResolution.set(conditionId, rows);
     return record;
   }
 
-  for (const row of redemptions) {
-    const conditionId = String(row.condition_id ?? "").toLowerCase();
-    const tokenId = String(row.token_id ?? "");
-    if (!conditionId || !tokenId || !Number.isFinite(row.size) || row.size <= 0 ||
-        !Number.isFinite(row.usdc_size) || row.usdc_size < 0) {
-      exclude("malformed_redemption_event");
+  for (const record of closedPositions) {
+    const position = record?.position ?? record;
+    const conditionId = String(position?.condition_id ?? "").toLowerCase();
+    const tokenId = String(position?.token_id ?? "");
+    const lastEventAt = position?.last_event_at;
+    if (!conditionId || !tokenId || !Number.isInteger(lastEventAt) || lastEventAt <= 0) {
+      exclude("malformed_closed_position");
       continue;
     }
-    const record = getToken(conditionId, tokenId);
-    record.redeemedSize += row.size;
-    record.redemptionPayout += row.usdc_size;
+    const token = tokenFacts.get(tokenId);
+    if (!token) {
+      exclude("missing_closed_position_token_fact");
+      continue;
+    }
+    if (token.conditionId && String(token.conditionId).toLowerCase() !== conditionId) {
+      exclude("token_condition_mismatch");
+      continue;
+    }
+    if (token.resolved !== true) continue;
+    const resolution = resolutions.get(conditionId);
+    if (!resolution || !Number.isInteger(resolution.resolvedAtSeconds)) {
+      exclude("missing_resolution_timestamp");
+      continue;
+    }
+    if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
+    if (lastEventAt < resolution.resolvedAtSeconds) {
+      exclude("early_exit_excluded");
+      continue;
+    }
+    const item = getToken(conditionId, tokenId);
+    item.closedEvidence = true;
   }
 
   for (const record of currentPositions) {
@@ -51,48 +73,47 @@ export function summarizeSettledEvidence({
       exclude("malformed_current_redeemable_position");
       continue;
     }
-    const item = getToken(conditionId, tokenId);
-    item.currentSize += currentSize;
-    item.sourceStatusFilters.add(sourceStatusFilter);
-  }
-
-  const results = [];
-  for (const [conditionId, tokenRows] of byCondition) {
-    if (tokenRows.size !== 1) {
-      exclude("multiple_outcomes_held_in_same_market");
-      continue;
-    }
-    const [tokenId, evidence] = [...tokenRows.entries()][0];
-    const resolution = resolutions.get(conditionId);
-    if (!resolution || !Number.isInteger(resolution.resolvedAtSeconds)) {
-      exclude("missing_resolution_timestamp");
-      continue;
-    }
-    if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
-
     const token = tokenFacts.get(tokenId);
-    if (!token || token.resolved !== true || !Number.isFinite(token.final_price) ||
-        (token.final_price !== 0 && token.final_price !== 1)) {
-      exclude("missing_or_nonbinary_token_resolution");
+    if (!token || token.resolved !== true || !Number.isFinite(token.final_price)) {
+      exclude("missing_current_position_token_resolution");
       continue;
     }
     if (token.conditionId && String(token.conditionId).toLowerCase() !== conditionId) {
       exclude("token_condition_mismatch");
       continue;
     }
-    if (evidence.redeemedSize > 0) {
-      const payoutPerShare = evidence.redemptionPayout / evidence.redeemedSize;
-      if (Math.abs(payoutPerShare - token.final_price) > 0.001) {
-        exclude("redemption_payout_mismatch");
-        continue;
-      }
-    }
-    if (evidence.sourceStatusFilters.has("REDEEMABLE") && token.final_price !== 1) {
-      exclude("winner_position_payout_mismatch");
+    const resolution = resolutions.get(conditionId);
+    if (!resolution || !Number.isInteger(resolution.resolvedAtSeconds)) {
+      exclude("missing_resolution_timestamp");
       continue;
     }
-    if (evidence.sourceStatusFilters.has("REDEEMABLE_LOST") && token.final_price !== 0) {
-      exclude("loser_position_payout_mismatch");
+    if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
+    if ((sourceStatusFilter === "REDEEMABLE" && token.final_price !== 1) ||
+        (sourceStatusFilter === "REDEEMABLE_LOST" && token.final_price !== 0)) {
+      exclude("redeemable_status_payout_mismatch");
+      continue;
+    }
+    const item = getToken(conditionId, tokenId);
+    item.currentSize += currentSize;
+    item.sourceStatusFilters.add(sourceStatusFilter);
+  }
+
+  const results = [];
+  for (const [conditionId, tokenRows] of heldAtResolution) {
+    if (tokenRows.size !== 1) {
+      exclude("multiple_outcomes_held_in_same_market");
+      continue;
+    }
+    const [tokenId, evidence] = [...tokenRows.entries()][0];
+    const token = tokenFacts.get(tokenId);
+    if (!token || token.resolved !== true ||
+        (token.final_price !== 0 && token.final_price !== 1)) {
+      exclude("missing_or_nonbinary_token_resolution");
+      continue;
+    }
+    const resolution = resolutions.get(conditionId);
+    if (!resolution || !Number.isInteger(resolution.resolvedAtSeconds)) {
+      exclude("missing_resolution_timestamp");
       continue;
     }
     results.push({
@@ -101,23 +122,22 @@ export function summarizeSettledEvidence({
       result: token.final_price === 1 ? "win" : "loss",
       resolvedAt: resolution.resolvedAt,
       resolvedAtSeconds: resolution.resolvedAtSeconds,
-      redeemedShares: evidence.redeemedSize,
       currentShares: evidence.currentSize,
-      source: evidence.redeemedSize > 0 && evidence.currentSize > 0 ? "redeemed_and_current"
-        : evidence.redeemedSize > 0 ? "verified_redeem_activity"
-        : "verified_current_redeemable_position",
+      source: evidence.closedEvidence && evidence.currentSize > 0 ? "closed_and_current"
+        : evidence.closedEvidence ? "closed_after_resolution"
+        : "current_redeemable_position",
     });
   }
 
   const severeReasons = new Set([
-    "malformed_redemption_event",
-    "malformed_current_redeemable_position",
-    "missing_resolution_timestamp",
-    "missing_or_nonbinary_token_resolution",
+    "malformed_closed_position",
+    "missing_closed_position_token_fact",
     "token_condition_mismatch",
-    "redemption_payout_mismatch",
-    "winner_position_payout_mismatch",
-    "loser_position_payout_mismatch",
+    "missing_resolution_timestamp",
+    "malformed_current_redeemable_position",
+    "missing_current_position_token_resolution",
+    "redeemable_status_payout_mismatch",
+    "missing_or_nonbinary_token_resolution",
   ]);
   const integrityFailures = Object.keys(exclusions).filter((reason) => severeReasons.has(reason));
   const wins = results.filter((row) => row.result === "win").length;
