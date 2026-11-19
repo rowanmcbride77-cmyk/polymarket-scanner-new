@@ -19,6 +19,7 @@ function audit(wallet, tokenId="yes-token", usdSize=12, qualified=true) {
       conditionId:condition, tokenId, timestamp:now-120,
       usdSize, size:20, price:.6,
     }],
+    currentPositions:[{conditionId:condition,tokenId,currentSize:20}],
   };
 }
 
@@ -81,6 +82,10 @@ test("does not publish duplicate market representations within one event", () =>
       {conditionId:condition,tokenId:"yes-token",timestamp:now-120,size:20,usdSize:12},
       {conditionId:secondCondition,tokenId:"yes-token-2",timestamp:now-120,size:20,usdSize:12},
     ],
+    currentPositions:[
+      {conditionId:condition,tokenId:"yes-token",currentSize:20},
+      {conditionId:secondCondition,tokenId:"yes-token-2",currentSize:20},
+    ],
   }));
   const first = market();
   const second = market({
@@ -95,4 +100,21 @@ test("does not publish duplicate market representations within one event", () =>
   );
   assert.equal(result.signals.length,1);
   assert.equal(result.exclusions.duplicate_market_representation,1);
+});
+
+test("requires the recent BUY token to remain in current holdings", () => {
+  const results = Array.from({length:8},(_,i)=>({
+    ...audit(`wallet-${i}`), currentPositions:[],
+  }));
+  const result = buildConsensusSignals({complete:true,results},new Map([[condition,market()]]),{nowSeconds:now});
+  assert.equal(result.signals.length,0);
+  assert.equal(result.exclusions.recent_buy_not_currently_held,8);
+});
+
+test("excludes a market when a recent buyer currently holds both outcomes", () => {
+  const results = Array.from({length:8},(_,i)=>audit(`wallet-${i}`));
+  results[0].currentPositions.push({conditionId:condition,tokenId:"no-token",currentSize:5});
+  const result = buildConsensusSignals({complete:true,results},new Map([[condition,market()]]),{nowSeconds:now});
+  assert.equal(result.signals.length,0);
+  assert.equal(result.exclusions.mixed_current_holdings,1);
 });
