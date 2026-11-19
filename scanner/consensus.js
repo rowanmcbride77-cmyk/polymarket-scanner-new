@@ -66,7 +66,10 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     if (!qualified.has(wallet)) continue;
     const recentBuys = audit.recentBuys ?? [];
     const recentBuyConditions = new Set(recentBuys
-      .filter((buy) => buy?.conditionId)
+      .filter((buy) => buy?.conditionId && buy?.tokenId &&
+        Number.isInteger(buy.timestamp) && buy.timestamp >= cutoff && buy.timestamp <= nowSeconds &&
+        Number.isFinite(buy.size) && buy.size > 0 &&
+        Number.isFinite(buy.usdSize) && buy.usdSize > 0)
       .map((buy) => String(buy.conditionId).toLowerCase()));
     const heldByCondition = new Map();
     for (const position of audit.currentPositions ?? []) {
