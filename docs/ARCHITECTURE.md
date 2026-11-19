@@ -13,6 +13,6 @@ Discover up to 20,000 candidate wallets → fetch current held positions and CLO
 
 Treat API data as untrusted input. Validate schemas. Use cursor pagination, bounded history windows, rate limits and retries. Keep calculations deterministic for a fixed input snapshot. Missing token facts, resolution timestamps, incomplete pages, payout mismatches and ambiguous same-second closes fail closed or are excluded. Never silently fall back when data is missing. The site must not invent data when a file is absent or invalid.
 
-Early exits are not counted: a CLOSED position is eligible only when its last economic event is strictly after the verified market resolution timestamp. Still-held resolved positions are checked against their final token payout.
+Early exits are not counted: a CLOSED position is eligible only when its first acquisition predates and its last economic event strictly follows the verified market resolution timestamp. Still-held resolved positions are checked against their final token payout.
 
 No fabricated traders or consensus signals are permitted.
