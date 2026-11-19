@@ -71,7 +71,8 @@ export function buildQualifiedLeaderboards(discovery, auditBatch, { topN = 100 }
   for (const candidate of discovery.candidates) {
     const audit = audits.get(candidate.wallet.toLowerCase());
     if (!audit || audit.complete !== true || !audit.summary ||
-        audit.qualification?.qualified === undefined) {
+        audit.qualification?.qualified === undefined ||
+        (audit.qualification.qualified && audit.summary.integrityPassed !== true)) {
       throw new Error(`Missing complete audit for wallet ${candidate.wallet}`);
     }
   }
