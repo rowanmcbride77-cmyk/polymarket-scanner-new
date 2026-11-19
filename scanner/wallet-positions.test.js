@@ -8,12 +8,15 @@ const position = (token_id) => ({
   status: "REDEEMABLE", current_size: 3, redeemable: true, first_entry_at: 100,
 });
 
-test("fetches the OPEN superset once and classifies held winners and losers by token payout", async () => {
+test("fetches settled winners and losers with explicit status filters", async () => {
   const calls = [];
   const client = {
     async collectPages(path, params) {
       calls.push(params);
-      return { rows: [position("11"), position("22")], pages: 1, complete: true };
+      return {
+        rows: [position(params.status === "REDEEMABLE" ? "11" : "22")],
+        pages: 1, complete: true,
+      };
     },
     async getJson(path, params) {
       return { data: params.token_id.split(",").map(token_id => ({
@@ -23,12 +26,12 @@ test("fetches the OPEN superset once and classifies held winners and losers by t
     },
   };
   const snapshot = await fetchRedeemablePositionSnapshot(client, wallet);
-  assert.deepEqual(calls.map(x => x.status), ["OPEN"]);
+  assert.deepEqual(calls.map(x => x.status), ["REDEEMABLE", "REDEEMABLE_LOST"]);
   assert.equal(snapshot.records.length, 2);
   assert.equal(snapshot.records[0].sourceStatusFilter, "REDEEMABLE");
   assert.equal(snapshot.records[1].sourceStatusFilter, "REDEEMABLE_LOST");
   assert.equal(snapshot.records[1].tokenFact.final_price, 0);
-  assert.equal(snapshot.coverage, "CURRENT_REDEEMABLE_POSITIONS_FROM_OPEN_SUPERSET");
+  assert.equal(snapshot.coverage, "CURRENT_REDEEMABLE_WIN_AND_LOSS_POSITIONS");
 });
 
 test("snapshot diagnostics never qualify a trader from current unredeemed positions alone", async () => {
