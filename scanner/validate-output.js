@@ -29,6 +29,19 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
     }
   }
   if (status.state !== "success") fail("status is not successful");
+  if (qualification.qualification?.minimumResolvedMarkets !== 20 ||
+      qualification.qualification?.minimumWinRate !== 0.9 ||
+      qualification.qualification?.lookbackDays !== 30 ||
+      qualification.qualification?.earlyExitsCounted !== false ||
+      qualification.qualification?.settlementIntegrityRequired !== true) {
+    fail("qualification thresholds or early-exit policy");
+  }
+  if (consensus.thresholds?.windowMinutes !== 60 ||
+      consensus.thresholds?.maxResolutionHours !== 24 ||
+      consensus.thresholds?.minWallets !== 8 ||
+      consensus.thresholds?.minUsdPerWallet !== 10) {
+    fail("consensus thresholds");
+  }
   if (status.discoveredWallets !== qualification.validation.discoveredWallets ||
       status.auditedWallets !== qualification.validation.auditedWallets ||
       status.qualifiedWallets !== qualification.validation.qualifiedWallets) {
