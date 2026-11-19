@@ -87,7 +87,7 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     const [tokenId, walletBuys] = [...tokenGroups.entries()][0];
     const market = marketFacts.get(conditionId);
     if (!market) { count(exclusions, "missing_market_metadata"); continue; }
-    if (market.active !== true || market.closed !== false) {
+    if (market.active !== true || market.enableOrderBook !== true || market.closed !== false) {
       count(exclusions, "market_not_open"); continue;
     }
     const endDateMs = Date.parse(market.endDate ?? "");
