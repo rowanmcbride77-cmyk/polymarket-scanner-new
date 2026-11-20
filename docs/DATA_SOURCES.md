@@ -32,3 +32,13 @@ A raw BUY or SELL is not proof of a settled win or loss. The scanner reconciles 
 ## Implementation status
 
 The adapter in `scanner/data-api.js` implements the documented v2 envelope, cursor-only pagination, filter preservation, repeated-cursor protection, page-limit failure, and retry handling. The qualification path queries both explicit unredeemed settlement statuses plus bounded CLOSED positions rather than downloading and retaining each wallet's full activity history. The consensus path separately checks the last hour of BUY activity for qualified wallets and confirms that each counted wallet still holds the exact outcome token; mixed current holdings are excluded.
+
+
+## Combo positions
+
+The combo opportunity feed uses the public Data API v2 routes:
+- `/v2/positions/combos?user={wallet}` for currently held combo positions.
+- The same route with `status=RESOLVED_WIN,RESOLVED_LOSS,RESOLVED_PARTIAL` for the trader's resolved combo sample.
+- Cursor pagination is followed for both queries; failed wallet requests are surfaced as incomplete coverage.
+
+For an active combo, the scanner uses `entry_cost_usdc` (or documented gross entry cost when net entry is unavailable) and `current_size` shares. A winning binary combo share pays $1, so potential gross payout equals current shares. Potential profit is gross payout minus entry. No undocumented max-payout field is trusted. The trader's 30-day resolved combo W/L is descriptive only and is not a qualification threshold.
