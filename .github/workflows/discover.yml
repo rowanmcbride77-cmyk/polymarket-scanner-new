@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/discover.yml"
+      - "scanner/**"
+      - "package.json"
 
 concurrency:
   group: polymarket-candidate-discovery
