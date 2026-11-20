@@ -175,7 +175,14 @@ export async function runQualification({
     schemaVersion: 1, generatedAt, validation: { passed: true },
     count: boards.monthly.length, traders: boards.monthly,
   });
-  await writeJsonAtomic("data/status.json", {\n    schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),\n    validation: { passed: true }, state: "success",\n    discoveredWallets: discovery.candidates.length, auditedWallets: batch.completed,\n    qualifiedWallets: boards.qualifiedWalletCount, earlyExitsExcluded,\n    monthlyCount: boards.monthly.length,\n  });\n  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; monthly Top ${boards.monthly.length}.\\n`);
+  await writeJsonAtomic("data/status.json", {
+    schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
+    validation: { passed: true }, state: "success",
+    discoveredWallets: discovery.candidates.length, auditedWallets: batch.completed,
+    qualifiedWallets: boards.qualifiedWalletCount, earlyExitsExcluded,
+    monthlyCount: boards.monthly.length,
+  });
+  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; monthly Top ${boards.monthly.length}.\\n`);
   process.stdout.write(`Output: ${target}\n`);
   return payload;
 }

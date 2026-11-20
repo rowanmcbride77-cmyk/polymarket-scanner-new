@@ -14,7 +14,7 @@ function fixtures() {
   const monthly = {schemaVersion:1,validation:{passed:true},count:1,traders:[trader]};
   const qualification = {
     schemaVersion:1,
-    qualification:{minimumResolvedMarkets:20,minimumWinRate:0.9,lookbackDays:30,earlyExitsCounted:false,settlementIntegrityRequired:true},
+    qualification:{minimumResolvedMarkets:10,minimumWinRate:0.9,lookbackDays:30,earlyExitsCounted:false,settlementIntegrityRequired:true},
     validation:{
       passed:true,allWalletAuditsComplete:true,discoveredWallets:1,auditedWallets:1,qualifiedWallets:1,
     },qualifiedWallets:[qualified],
