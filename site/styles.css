@@ -3,3 +3,17 @@
 .table-wrap{margin-top:18px;overflow-x:auto}.table-wrap table{width:100%;border-collapse:collapse;min-width:560px;text-align:left;font-size:12px}.table-wrap th{color:#7f9bb9;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}.table-wrap th,.table-wrap td{padding:12px 9px;border-bottom:1px solid #263b54;white-space:nowrap}.table-wrap td{color:#dce8f7}.table-wrap td strong{display:block;color:#f4f8ff}.table-wrap td small{display:block;margin-top:4px;color:#718aa6;font-size:10px;letter-spacing:0}.signal-list{display:grid;gap:12px;margin-top:18px}.signal{min-height:0;padding:16px;background:#0b1727;border:1px solid #304a65;border-radius:12px}.signal-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.signal-heading strong{font-size:15px;color:#f4f8ff}.signal-count{color:#67d4bc;font-size:11px;font-weight:800;white-space:nowrap}.signal p{margin:9px 0;color:#a7bad0;font-size:12px}.signal>small{letter-spacing:.02em;font-size:10px;color:#728ca9}.status-success .status-title i{background:#67d4bc;box-shadow:0 0 16px #67d4bc66}
 
 .signal-wallets{display:block;margin-top:8px;line-height:1.8;overflow-wrap:anywhere}
+
+.section-kicker{color:#67d4bc;font-size:10px;font-weight:800;letter-spacing:.15em;margin-bottom:10px}
+.filters{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0;color:#9eafc5;font-size:12px}
+.filters label{display:flex;align-items:center;gap:8px}
+.filters select{background:#0b1727;color:#eef3fb;border:1px solid #38516c;border-radius:8px;padding:9px 12px}
+.feed-note{color:#8298b2;font-size:11px;margin:12px 0}
+.signal a{color:#7dd3fc;text-decoration:none;font-size:11px}
+.signal a:hover{text-decoration:underline}
+.signal-wallets{display:flex;flex-wrap:wrap;gap:6px 12px}
+.signal-wallets span{font-size:11px;color:#91a7c0}
+.combo-trader{margin:8px 0}
+.combo-legs{margin:12px 0 0;padding:12px 12px 12px 30px;border-top:1px solid #263b54;color:#a7bad0;font-size:12px;line-height:1.8}
+.combo-legs li{padding:3px 0}
+@media(max-width:650px){.filters{flex-direction:column;align-items:flex-start}}
