@@ -163,6 +163,12 @@ export async function runQualification({
           resolvedMarkets: row.summary.resolvedMarkets,
           winRate: row.summary.winRate,
           integrityPassed: row.summary.integrityPassed,
+          earlyExitCount: row.summary.exclusions?.early_exit_excluded ?? 0,
+          earlyExitRate: (() => {
+            const early = row.summary.exclusions?.early_exit_excluded ?? 0;
+            const total = row.summary.resolvedMarkets + early;
+            return total > 0 ? early / total : 0;
+          })(),
         } : null,
       })),
     weekly: boards.weekly,
