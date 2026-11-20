@@ -14,13 +14,16 @@ function createPacedFetch({
   sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms)),
   intervalMs = 80,
 } = {}) {
-  // Polymarket applies a per-client allowance across endpoints, not one
-  // independent allowance per route. Keep every Data API request on one lane.
-  let nextStartAt = 0;
+  // Pace each endpoint independently. A single global queue needlessly
+  // serialized positions, tokens, and resolutions requests and made a
+  // 20,000-wallet audit take hours. Keep a conservative lane per API route.
+  const nextStartAtByRoute = new Map();
   return async (input, init) => {
+    const url = input instanceof URL ? input : new URL(input.url ?? input);
+    const route = `${url.origin}${url.pathname}`;
     const now = Date.now();
-    const startAt = Math.max(now, nextStartAt);
-    nextStartAt = startAt + intervalMs;
+    const startAt = Math.max(now, nextStartAtByRoute.get(route) ?? 0);
+    nextStartAtByRoute.set(route, startAt + intervalMs);
     if (startAt > now) await sleep(startAt - now);
     return fetchImpl(input, init);
   };
