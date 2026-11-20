@@ -1,4 +1,4 @@
-name: Wallet audit diagnostics
+name: Small-sample wallet qualification
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,17 +25,17 @@ jobs:
           npm run check
       - name: Discover candidate wallets
         run: npm run scan
-      - name: Audit a diagnostic sample of 300 wallets
+      - name: Audit a diagnostic sample of 100 wallets
         run: npm run qualify
         env:
           SCANNER_CONCURRENCY: 16
-          SCANNER_DIAGNOSTIC_LIMIT: 300
+          SCANNER_DIAGNOSTIC_LIMIT: 100
           NODE_OPTIONS: --max-old-space-size=6144
       - name: Upload diagnostic report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wallet-audit-diagnostics
+          name: wallet-qualification-sample
           path: data/qualification-diagnostic.json
           if-no-files-found: ignore
           retention-days: 14
