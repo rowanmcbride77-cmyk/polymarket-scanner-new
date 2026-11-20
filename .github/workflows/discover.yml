@@ -31,13 +31,18 @@ jobs:
         run: |
           npm test
           npm run check
-      - name: Discover up to 1,000 candidate wallets
+      - name: Discover up to 20,000 candidate wallets
         run: npm run scan
       - name: Verify settlements and build qualified monthly Top 100
         run: npm run qualify
         env:
           SCANNER_CONCURRENCY: 12
           SCANNER_API_INTERVAL_MS: 100
+          NODE_OPTIONS: --max-old-space-size=6144
+      - name: Build same-side consensus and high-multiplier combos
+        run: npm run consensus
+        env:
+          SCANNER_CONCURRENCY: 12
           NODE_OPTIONS: --max-old-space-size=6144
       - name: Upload validated scanner outputs and diagnostics
         if: always()
