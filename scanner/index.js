@@ -17,7 +17,7 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
       categories: ["overall"],
       sortBy: "PNL",
       pageSize: 1000,
-      maxCandidates: 1000,
+      maxCandidates: 20000,
       maxPagesPerPartition: 20,
     },
     validation: {
@@ -38,7 +38,7 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
 export async function runDiscovery({ outputPath = "data/discovery.json" } = {}) {
   const result = await discoverLeaderboardCandidates({
     categories: ["overall"], periods: ["month"],
-    limit: 1000, maxCandidates: 1000, maxPagesPerPartition: 2,
+    limit: 1000, maxCandidates: 20000, maxPagesPerPartition: 20,
   });
   const payload = buildDiscoveryPayload(result);
   const target = resolve(outputPath);
