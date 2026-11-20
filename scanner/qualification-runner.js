@@ -30,6 +30,7 @@ export async function auditCandidates(candidates, {
           summary: audit.summary ?? null,
           coverage: audit.coverage ?? null,
           recentBuys: Array.isArray(audit.recentBuys) ? audit.recentBuys : [],
+          comboRows: Array.isArray(audit.comboRows) ? audit.comboRows : [],
         };
         if (audit.complete !== true) failed += 1;
       } catch (error) {
