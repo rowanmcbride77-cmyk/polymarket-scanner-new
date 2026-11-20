@@ -90,7 +90,7 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
       }
       const tokens = byCondition.get(conditionId) ?? new Map();
       const walletBuys = tokens.get(tokenId) ?? new Map();
-      const existing = walletBuys.get(wallet) ?? { wallet, usdSize: 0, buyCount: 0, lastBuyAt: 0 };
+      const existing = walletBuys.get(wallet) ?? { wallet, username: audit.username ?? null, usdSize: 0, buyCount: 0, lastBuyAt: 0 };
       existing.usdSize += buy.usdSize;
       existing.buyCount += 1;
       existing.lastBuyAt = Math.max(existing.lastBuyAt, buy.timestamp);
