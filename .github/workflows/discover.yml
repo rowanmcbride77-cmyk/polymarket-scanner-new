@@ -11,7 +11,7 @@ on:
 
 concurrency:
   group: polymarket-candidate-discovery-v3
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -31,8 +31,10 @@ jobs:
         run: |
           npm test
           npm run check
-      - name: Discover up to 20,000 candidate wallets
+      - name: Discover up to 1,000 candidate wallets
         run: npm run scan
+        env:
+          SCANNER_MAX_CANDIDATES: 1000
       - name: Verify settlements and build qualified monthly Top 100
         run: npm run qualify
         env:
