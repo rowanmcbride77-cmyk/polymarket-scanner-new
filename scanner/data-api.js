@@ -24,9 +24,9 @@ export function createDataApiClient({
   baseUrl = DEFAULT_BASE_URL,
   fetchImpl = globalThis.fetch,
   timeoutMs = 20_000,
-  maxRetries = 4,
+  maxRetries = 8,
   baseDelayMs = 500,
-  maxDelayMs = 15_000,
+  maxDelayMs = 60_000,
   sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 } = {}) {
   if (typeof fetchImpl !== "function") throw new TypeError("A fetch implementation is required");
