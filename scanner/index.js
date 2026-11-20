@@ -3,6 +3,16 @@ import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { discoverLeaderboardCandidates } from "./leaderboard.js";
 
+const DEFAULT_MAX_CANDIDATES = 1000;
+
+function candidateLimitFromEnv() {
+  const value = Number(process.env.SCANNER_MAX_CANDIDATES ?? DEFAULT_MAX_CANDIDATES);
+  if (!Number.isInteger(value) || value < 100 || value > 20000) {
+    throw new RangeError("SCANNER_MAX_CANDIDATES must be an integer from 100 to 20000");
+  }
+  return value;
+}
+
 export function buildDiscoveryPayload(result, generatedAt = new Date().toISOString()) {
   if (!result || result.complete !== true || !Array.isArray(result.candidates) ||
       !Array.isArray(result.partitions) || !result.partitions.every((p) => p.complete === true)) {
@@ -17,7 +27,7 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
       categories: ["overall"],
       sortBy: "PNL",
       pageSize: 1000,
-      maxCandidates: 20000,
+      maxCandidates: result.maxCandidates ?? DEFAULT_MAX_CANDIDATES,
       maxPagesPerPartition: 20,
     },
     validation: {
@@ -25,7 +35,7 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
       allPageRequestsComplete: true,
       sourceExhausted: result.sourceExhausted === true,
       candidateCapReached: result.candidateCapReached === true,
-      maxCandidates: result.maxCandidates,
+      maxCandidates: result.maxCandidates ?? DEFAULT_MAX_CANDIDATES,
       truncatedPartitions: result.partitions.filter((p) => p.truncated).length,
       candidateCount: result.candidates.length,
       partitionCount: result.partitions.length,
@@ -36,9 +46,10 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
 }
 
 export async function runDiscovery({ outputPath = "data/discovery.json" } = {}) {
+  const maxCandidates = candidateLimitFromEnv();
   const result = await discoverLeaderboardCandidates({
     categories: ["overall"], periods: ["week", "month"],
-    limit: 1000, maxCandidates: 20000, maxPagesPerPartition: 20,
+    limit: 1000, maxCandidates, maxPagesPerPartition: 20,
   });
   const payload = buildDiscoveryPayload(result);
   const target = resolve(outputPath);
