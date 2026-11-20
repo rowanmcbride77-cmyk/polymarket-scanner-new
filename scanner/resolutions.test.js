@@ -49,7 +49,7 @@ test("normalizes numeric epoch seconds and milliseconds", async () => {
       { conditionId: "0x3", status: "resolved", resolvedAt: "1794916800" },
     ] };
   }};
-  const result = await fetchMarketResolutions(client, ["0x1", "0x2"]);
+  const result = await fetchMarketResolutions(client, ["0x1", "0x2", "0x3"]);
   assert.equal(result.get("0x1").resolvedAtSeconds, 1794916800);
   assert.equal(result.get("0x2").resolvedAtSeconds, 1794916800);
   assert.equal(result.get("0x3").resolvedAtSeconds, 1794916800);
