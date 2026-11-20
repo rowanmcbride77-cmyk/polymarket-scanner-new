@@ -8,6 +8,7 @@ import { fetchGammaMarkets } from "./gamma-markets.js";
 import { buildConsensusSignals } from "./consensus.js";
 import { auditCandidates } from "./qualification-runner.js";
 import { validatePublishedOutput } from "./validate-output.js";
+import { fetchWalletCombos, buildComboOpportunities } from "./combos.js";
 
 function createPacedFetch({
   fetchImpl = globalThis.fetch,
@@ -155,6 +156,30 @@ export async function runConsensus({
     minWallets: 8,
     minUsdPerWallet: 10,
   });
+  process.stdout.write(`Checking active combo positions for ${wallets.length} qualified wallets.\\n`);
+  const comboBatch = await auditCandidates(wallets, {
+    concurrency: Math.min(concurrency, 12),
+    auditWallet: async (wallet) => {
+      const fetched = await fetchWalletCombos(client, wallet, { maxPages: 3, limit: 1000 });
+      const trader = walletByAddress.get(wallet.toLowerCase());
+      return {
+        complete: fetched.complete,
+        comboRows: fetched.rows.map((row) => ({
+          ...row, _wallet: wallet.toLowerCase(), _username: trader?.username ?? null,
+        })),
+      };
+    },
+    onProgress: ({ completed, total, failed }) => {
+      process.stdout.write(`Combo positions: ${completed}/${total}; failures: ${failed}.\\n`);
+    },
+  });
+  const comboRows = comboBatch.results.flatMap((row) => row.comboRows ?? []);
+  const comboResult = buildComboOpportunities(comboRows, {
+    nowMs: nowSeconds * 1000,
+    minEntryUsd: 5,
+    maxEntryUsd: 100,
+    minMultiplier: 10,
+  });
   const generatedAt = new Date(nowSeconds * 1000).toISOString();
   const consensus = {
     schemaVersion: 1,
@@ -170,6 +195,15 @@ export async function runConsensus({
     thresholds: result.thresholds,
     exclusions: result.exclusions,
     signals: result.signals,
+    combos: {
+      validation: { passed: comboBatch.complete, complete: comboBatch.complete, failedWallets: comboBatch.failed },
+      walletsChecked: wallets.length,
+      walletsWithComboData: new Set(comboRows.map((row) => row._wallet)).size,
+      count: comboResult.opportunities.length,
+      thresholds: comboResult.thresholds,
+      exclusions: comboResult.exclusions,
+      opportunities: comboResult.opportunities,
+    },
   };
   const completedAt = new Date().toISOString();
   const status = {
@@ -189,6 +223,9 @@ export async function runConsensus({
     weeklyCount: weekly.traders.length,
     monthlyCount: monthly.traders.length,
     consensusCount: result.signals.length,
+    comboCount: comboResult.opportunities.length,
+    comboScanComplete: comboBatch.complete,
+    comboScanFailures: comboBatch.failed,
   };
   const finalValidation = validatePublishedOutput({ qualification, weekly, monthly, consensus, status });
   process.stdout.write(`Final publication validation passed: ${finalValidation.weekly} weekly, ${finalValidation.monthly} monthly, ${finalValidation.signals} consensus signals.\n`);
