@@ -12,7 +12,7 @@ function atStage(stage, promise) {
 }
 
 export function qualifyWalletAudit(audit, {
-  minimumResolvedMarkets = 20,
+  minimumResolvedMarkets = 10,
   minimumWinRate = 0.9,
 } = {}) {
   if (!audit || audit.complete !== true) return { qualified: false, reason: "incomplete_audit" };

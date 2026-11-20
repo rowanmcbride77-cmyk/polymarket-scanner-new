@@ -13,8 +13,8 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
     generatedAt,
     source: "Polymarket Data API v2 /leaderboard",
     scope: {
-      periods: ["week", "month"],
-      categories: ["sports", "esports", "crypto"],
+      periods: ["month"],
+      categories: ["overall"],
       sortBy: "PNL",
       pageSize: 1000,
       maxCandidates: 20000,
@@ -37,6 +37,7 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
 
 export async function runDiscovery({ outputPath = "data/discovery.json" } = {}) {
   const result = await discoverLeaderboardCandidates({
+    categories: ["overall"], periods: ["month"],
     limit: 1000, maxCandidates: 20000, maxPagesPerPartition: 20,
   });
   const payload = buildDiscoveryPayload(result);

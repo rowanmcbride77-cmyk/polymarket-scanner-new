@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { auditWallet, qualifyWalletAudit } from "./audit-wallet.js";
 
-test("qualification requires complete audit and 20 settled markets at 90 percent", () => {
+test("qualification requires complete audit and 10 settled markets at 90 percent", () => {
   assert.deepEqual(qualifyWalletAudit({
     complete: true, summary: { resolvedMarkets: 20, winRate: 0.9, integrityPassed: true },
   }), { qualified: true, reason: "all_thresholds_met" });
@@ -13,7 +13,7 @@ test("qualification rejects incomplete, undersampled and low-win-rate wallets", 
     complete: false, summary: { resolvedMarkets: 100, winRate: 1, integrityPassed: true },
   }).reason, "incomplete_audit");
   assert.equal(qualifyWalletAudit({
-    complete: true, summary: { resolvedMarkets: 19, winRate: 1, integrityPassed: true },
+    complete: true, summary: { resolvedMarkets: 9, winRate: 1, integrityPassed: true },
   }).reason, "insufficient_resolved_markets");
   assert.equal(qualifyWalletAudit({
     complete: true, summary: { resolvedMarkets: 20, winRate: 0.89, integrityPassed: true },

@@ -1,20 +1,16 @@
-name: Publish scanner dashboard
-
+name: Publish 30-day Top 100 leaderboard
 on:
   workflow_run:
-    workflows: ["Qualified consensus"]
+    workflows: ["Live candidate discovery and qualification"]
     types: [completed]
-
 permissions:
   actions: read
   contents: read
   pages: write
   id-token: write
-
 concurrency:
   group: github-pages
   cancel-in-progress: true
-
 jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -23,20 +19,17 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Download final validated scanner output
+      - uses: actions/checkout@v4
+      - name: Download validated leaderboard data
         uses: actions/download-artifact@v4
         with:
-          name: polymarket-final-output
+          name: polymarket-qualified-scanner-output
           path: site/data
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           run-id: ${{ github.event.workflow_run.id }}
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: site
       - name: Deploy to GitHub Pages

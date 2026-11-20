@@ -15,7 +15,7 @@ function validateBoard(rows, label) {
     seen.add(wallet);
     if (row.rank !== index + 1) fail(`${label} rank sequence`);
     if (!Number.isFinite(row.winRate) || row.winRate < 0.9 ||
-        !Number.isInteger(row.resolvedMarkets) || row.resolvedMarkets < 20 ||
+        !Number.isInteger(row.resolvedMarkets) || row.resolvedMarkets < 10 ||
         !Number.isInteger(row.wins) || !Number.isInteger(row.losses) ||
         row.wins + row.losses !== row.resolvedMarkets ||
         Math.abs(row.winRate - row.wins / row.resolvedMarkets) > 0.000001) {
@@ -32,7 +32,7 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
     }
   }
   if (status.state !== "success") fail("status is not successful");
-  if (qualification.qualification?.minimumResolvedMarkets !== 20 ||
+  if (qualification.qualification?.minimumResolvedMarkets !== 10 ||
       qualification.qualification?.minimumWinRate !== 0.9 ||
       qualification.qualification?.lookbackDays !== 30 ||
       qualification.qualification?.earlyExitsCounted !== false ||
@@ -63,7 +63,7 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
   }
   for (const row of qualification.qualifiedWallets) {
     if (!/^0x[0-9a-f]{40}$/i.test(String(row.wallet ?? "")) || row.summary?.integrityPassed !== true ||
-        !Number.isInteger(row.summary.resolvedMarkets) || row.summary.resolvedMarkets < 20 ||
+        !Number.isInteger(row.summary.resolvedMarkets) || row.summary.resolvedMarkets < 10 ||
         !Number.isInteger(row.summary.wins) || !Number.isInteger(row.summary.losses) ||
         row.summary.wins + row.summary.losses !== row.summary.resolvedMarkets ||
         !Number.isFinite(row.summary.winRate) || row.summary.winRate < 0.9 ||

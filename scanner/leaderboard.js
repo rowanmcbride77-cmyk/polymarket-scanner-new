@@ -1,7 +1,7 @@
 import { createDataApiClient } from "./data-api.js";
 
 const VALID_PERIODS = new Set(["week", "month"]);
-const VALID_CATEGORIES = new Set(["sports", "esports", "crypto"]);
+const VALID_CATEGORIES = new Set(["overall", "sports", "esports", "crypto"]);
 const VALID_SORTS = new Set(["PNL", "VOLUME"]);
 const WALLET_RE = /^0x[a-fA-F0-9]{40}$/;
 
@@ -80,8 +80,8 @@ export async function fetchLeaderboardPartition(client, {
 /** Fetches the three target verticals for both windows, without politics/overall. */
 export async function discoverLeaderboardCandidates({
   client = createDataApiClient(),
-  categories = ["sports", "esports", "crypto"],
-  periods = ["week", "month"],
+  categories = ["overall"],
+  periods = ["month"],
   limit = 1000,
   maxCandidates = 20000,
   maxPagesPerPartition = 20,

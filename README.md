@@ -1,46 +1,21 @@
-# Polymarket Consensus Scanner
+# Polymarket 30-Day Top 100
+A focused, fail-closed leaderboard of Polymarket wallets.
 
-A fail-closed Polymarket trader scanner and consensus dashboard. It does not publish placeholder rankings or partially validated runs.
+## Qualification
+- Candidate pool: Polymarket Data API v2 **overall monthly leaderboard**.
+- Measure settlement performance over the trailing 30 days.
+- Require at least **90% wins** and **10 closed markets**.
+- Count only positions verifiably held through market resolution.
+- Exclude early exits from both wins and losses.
+- Do not publish incomplete wallet audits or unverifiable settlement evidence.
+
+Qualifying wallets are ranked by their Polymarket monthly leaderboard P&L.
 
 ## Pipeline
+1. Discover up to 20,000 wallets from the overall monthly leaderboard.
+2. Audit each wallet's 30-day closed positions, current redeemable wins/losses, token payout facts and resolution timestamps.
+3. Exclude early exits and ambiguous or unverifiable settlements.
+4. Require 90%+ win rate and 10+ verified resolved markets.
+5. Publish the monthly Top 100 only after every candidate audit completes and validation passes.
 
-1. Discover up to **20,000 unique wallets** from the Polymarket Data API v2 weekly/monthly leaderboards across sports, esports and crypto.
-2. Audit each wallet's last 30 days of settled outcomes using:
-   - `CLOSED` positions whose first acquisition occurred before resolution and whose last economic event occurred strictly after the market's verified resolution time;
-   - current unredeemed winners queried with `REDEEMABLE` and current unredeemed losers queried separately with `REDEEMABLE_LOST`;
-   - token final-payout facts from `/v2/tokens`;
-   - actual resolution timestamps from `/v2/resolutions`.
-3. Exclude early exits: a trade that was sold before resolution is neither a redemption nor a current redeemable holding, so it is not counted as a win or loss.
-4. Require at least **20 verified resolved markets** and at least **90% win rate**. Unverifiable settlement evidence blocks qualification.
-5. Build weekly and monthly Top 100 lists only after every candidate wallet audit completes.
-6. Check recent BUY activity for qualified wallets and build same-outcome consensus only when:
-   - the buy occurred within the last 60 minutes and the wallet still holds that exact token;
-   - each counted wallet has at least $10 of recent BUY notional;
-   - at least 8 qualified wallets bought the exact same outcome token;
-   - the market is active, open, order-book enabled, sports/esports/crypto, and scheduled to resolve within 24 hours;
-   - any market with qualified buys or current holdings on opposing outcomes is excluded;
-   - duplicate representations of the same event and market title are not published.
-
-## Safety and publication
-
-- Cursor pagination is used throughout; no offset-based pagination.
-- API retries honor `Retry-After` for 429/503 responses.
-- Incomplete histories, missing token facts, missing resolution times, payout mismatches and inconsistent positions fail closed.
-- Dashboard data is published only after the complete qualification and consensus workflows pass.
-- Failed or incomplete runs never replace validated website data.
-
-## Run it
-
-In GitHub Actions, run **Live candidate discovery and qualification**. On success, the **Qualified consensus** workflow checks current BUY activity, then **Publish scanner dashboard** deploys the validated site to GitHub Pages.
-
-## Local checks
-
-```sh
-npm test
-npm run check
-npm run scan
-npm run qualify
-npm run consensus
-```
-
-Node.js 20 or newer is required.
+No consensus signals or extra market-category filters are part of this version.

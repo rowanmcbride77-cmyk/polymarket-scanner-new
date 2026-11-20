@@ -59,7 +59,7 @@ export async function runQualification({
     auditWallet: (wallet) => auditWallet(wallet, {
       nowSeconds,
       lookbackDays: 30,
-      minimumResolvedMarkets: 20,
+      minimumResolvedMarkets: 10,
       minimumWinRate: 0.9,
     }),
     onProgress: ({ completed, total, failed, commonErrors = [], errorSamples = [] }) => {
@@ -129,7 +129,7 @@ export async function runQualification({
     generatedAt,
     source: "Polymarket Data API v2 closed positions, redeemable positions, tokens and resolutions",
     qualification: {
-      minimumResolvedMarkets: 20,
+      minimumResolvedMarkets: 10,
       minimumWinRate: 0.9,
       lookbackDays: 30,
       earlyExitsCounted: false,
@@ -175,7 +175,7 @@ export async function runQualification({
     schemaVersion: 1, generatedAt, validation: { passed: true },
     count: boards.monthly.length, traders: boards.monthly,
   });
-  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; weekly Top ${boards.weekly.length}; monthly Top ${boards.monthly.length}.\n`);
+  await writeJsonAtomic("data/status.json", {\n    schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),\n    validation: { passed: true }, state: "success",\n    discoveredWallets: discovery.candidates.length, auditedWallets: batch.completed,\n    qualifiedWallets: boards.qualifiedWalletCount, earlyExitsExcluded,\n    monthlyCount: boards.monthly.length,\n  });\n  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; monthly Top ${boards.monthly.length}.\\n`);
   process.stdout.write(`Output: ${target}\n`);
   return payload;
 }
