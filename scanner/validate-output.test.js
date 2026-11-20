@@ -4,7 +4,7 @@ import { validatePublishedOutput } from "./validate-output.js";
 
 const qualified = {
   wallet:"0x" + "a".repeat(40),
-  summary:{integrityPassed:true,resolvedMarkets:20,wins:19,losses:1,winRate:0.95},
+  summary:{integrityPassed:true,resolvedMarkets:20,wins:19,losses:1,winRate:0.95,earlyExitCount:0,earlyExitRate:0},
 };
 function fixtures() {
   const trader = {
