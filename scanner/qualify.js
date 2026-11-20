@@ -45,11 +45,14 @@ export async function runQualification({
     throw new Error("Candidate discovery input failed validation");
   }
 
+  const diagnosticLimit = Number(process.env.SCANNER_DIAGNOSTIC_LIMIT ?? 0);
+  if (!Number.isInteger(diagnosticLimit) || diagnosticLimit < 0) throw new Error("SCANNER_DIAGNOSTIC_LIMIT must be a non-negative integer");
+  const candidates = diagnosticLimit > 0 ? discovery.candidates.slice(0, diagnosticLimit) : discovery.candidates;
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
   const auditWallet = createWalletAuditor(client);
-  process.stdout.write(`Auditing ${discovery.candidates.length} candidate wallets; 30-day settlement window; concurrency ${concurrency}.\n`);
-  const batch = await auditCandidates(discovery.candidates, {
+  process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\\n`);
+  const batch = await auditCandidates(candidates, {
     concurrency,
     auditWallet: (wallet) => auditWallet(wallet, {
       nowSeconds,
@@ -69,6 +72,23 @@ export async function runQualification({
   });
 
   const generatedAt = new Date(nowSeconds * 1000).toISOString();
+  if (diagnosticLimit > 0) {
+    const diagnostic = {
+      schemaVersion: 1,
+      generatedAt,
+      sampleSize: candidates.length,
+      discoveredWallets: discovery.candidates.length,
+      completed: batch.completed,
+      failed: batch.failed,
+      complete: batch.complete,
+      errorCounts: batch.errorCounts,
+      errorSamples: batch.errorSamples,
+      results: batch.results,
+    };
+    const path = await writeJsonAtomic("data/qualification-diagnostic.json", diagnostic);
+    process.stdout.write(`Diagnostic sample finished: ${batch.completed}/${candidates.length}; failures ${batch.failed}. Output: ${path}\\n`);
+    return diagnostic;
+  }
   if (!batch.complete) {
     const incomplete = {
       schemaVersion: 1,
