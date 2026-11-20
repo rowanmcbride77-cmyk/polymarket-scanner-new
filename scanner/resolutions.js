@@ -6,7 +6,7 @@ function parseResolvedAt(value) {
     return Number.isFinite(milliseconds) ? milliseconds : NaN;
   }
   if (typeof value === "string" && value.trim()) {
-    if (/^\\d+(?:\\.\\d+)?$/.test(value.trim())) {
+    if (/^\d+(?:\.\d+)?$/.test(value.trim())) {
       const numeric = Number(value);
       return numeric > 1e12 ? numeric : numeric * 1000;
     }
