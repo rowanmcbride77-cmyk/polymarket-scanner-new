@@ -3,14 +3,14 @@
 A static dashboard for settlement-verified trader performance, same-side consensus and low-cost high-multiplier combo opportunities.
 
 ## Trader qualification
-- Discover up to **20,000** wallets from the overall monthly leaderboard.
+- The initial production pass audits up to **1,000** unique wallets selected from the overall weekly and monthly leaderboard pages. The cap can be raised to 20,000 with the `SCANNER_MAX_CANDIDATES` workflow environment variable after throughput is proven.
 - Audit the trailing **30 days** of settlement evidence.
 - Require **90%+ verified settlement win rate** and at least **10 resolved markets**.
 - Count only positions verifiably held through market resolution.
 - Exclude early exits from wins/losses and allow no more than **20% observed early exits** among classifiable resolved/early-exit positions.
 - Reject incomplete wallet audits, ambiguous same-second events and unverifiable settlement evidence.
 
-The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket leaderboard P&L, but eligibility is based on the same verified settlement criteria.
+The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket leaderboard P&L, but eligibility is based on the same verified settlement criteria. A board can contain fewer than 100 traders if fewer pass.
 
 ## Consensus markets
 - Only qualified wallets are considered.
@@ -21,7 +21,7 @@ The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket lea
 - Exclude politics/government and duplicate representations of the same event/market.
 
 ## Combo opportunities
-- Fetch public combo-position records for the qualified wallet universe.
+- Fetch public combo-position records for the qualified-wallet universe.
 - Show currently held combos with a verified **$5–$100 entry**.
 - Default to at least **10× potential gross payout**; the dashboard allows 5×, 10×, 20× and 50× filters.
 - Calculate the potential payout as current combo shares × $1 per winning share. Do not use undocumented payout fields.
@@ -29,11 +29,11 @@ The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket lea
 - Label potential payout/profit as estimates, never realized returns.
 
 ## Pipeline
-1. Discover up to 20,000 overall monthly leaderboard wallets.
+1. Discover up to 1,000 overall weekly/monthly leaderboard wallets for the initial production pass.
 2. Audit 30-day settlement evidence and build weekly/monthly Top 100.
 3. Check qualified wallets' last-hour BUY activity and current holdings.
 4. Verify Gamma market state, outcome token, category and 24-hour resolution window.
 5. Fetch combo positions and calculate verified entry/potential payout multiples.
 6. Validate output schemas and publish the dashboard only from the workflow artifact.
 
-A zero-signal result is valid if no market meets the filters. It must not be replaced with fabricated signals.
+A zero-signal result is valid if no market meets the filters. It must not be replaced with fabricated signals. The dashboard publishes only a fully completed, validated scan; partial runs are never presented as current results.
