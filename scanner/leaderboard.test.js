@@ -56,22 +56,19 @@ test("malformed rows fail closed rather than publishing a partial partition", as
   );
 });
 
-test("discovery seeds all sports, esports and crypto week/month partitions", async () => {
+test("discovery defaults to the overall monthly leaderboard", async () => {
   const shared = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
   const unique = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
   const client = fakeClient({
-    "week:sports": [row(shared)],
-    "week:esports": [row(unique)],
-    "week:crypto": [],
-    "month:sports": [row(shared, 2)],
-    "month:esports": [],
-    "month:crypto": [],
+    "month:overall": [row(shared), row(unique, 2)],
   });
   const result = await discoverLeaderboardCandidates({ client });
   assert.equal(result.complete, true);
   assert.equal(result.candidates.length, 2);
-  assert.equal(result.candidates.find(x => x.wallet === shared).appearances.length, 2);
-  assert.equal(client.calls.filter(x => x.mode === "page").length, 6);
+  assert.equal(result.candidates.find(x => x.wallet === shared).appearances.length, 1);
+  assert.equal(client.calls.filter(x => x.mode === "page").length, 1);
+  assert.equal(client.calls[0].params.category, "overall");
+  assert.equal(client.calls[0].params.time_period, "month");
   assert.ok(client.calls.every(x => !("offset" in x.params)));
 });
 
