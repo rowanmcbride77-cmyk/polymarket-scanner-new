@@ -36,8 +36,8 @@ jobs:
       - name: Verify settlements and build qualified monthly Top 100
         run: npm run qualify
         env:
-          SCANNER_CONCURRENCY: 6
-          SCANNER_API_INTERVAL_MS: 200
+          SCANNER_CONCURRENCY: 12
+          SCANNER_API_INTERVAL_MS: 100
           NODE_OPTIONS: --max-old-space-size=6144
       - name: Upload validated scanner outputs and diagnostics
         if: always()

@@ -59,16 +59,18 @@ export async function auditWallet(client, wallet, {
   const missingClosedTokenIds = closedSnapshot.records
     .map((record) => record.position.token_id)
     .filter((tokenId) => !tokenFacts.has(String(tokenId)));
-  const closedTokenFacts = await atStage("closed_position_token_facts",
-    fetchTokenFacts(client, missingClosedTokenIds));
-  for (const [tokenId, fact] of closedTokenFacts) tokenFacts.set(tokenId, fact);
-
   const conditionIds = [
     ...closedSnapshot.records.map((record) => record.position.condition_id),
     ...positionSnapshot.records.map((record) => record.position.condition_id),
   ];
-  const resolutions = await atStage("market_resolutions",
-    fetchMarketResolutions(client, conditionIds));
+  // These lookups are independent after both position snapshots are complete.
+  // Run them together rather than making every wallet wait for token facts
+  // before beginning its resolution lookup.
+  const [closedTokenFacts, resolutions] = await Promise.all([
+    atStage("closed_position_token_facts", fetchTokenFacts(client, missingClosedTokenIds)),
+    atStage("market_resolutions", fetchMarketResolutions(client, conditionIds)),
+  ]);
+  for (const [tokenId, fact] of closedTokenFacts) tokenFacts.set(tokenId, fact);
   const summary = summarizeSettledEvidence({
     closedPositions: closedSnapshot.records,
     currentPositions: positionSnapshot.records,
