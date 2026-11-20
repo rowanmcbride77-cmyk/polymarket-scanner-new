@@ -8,7 +8,7 @@ import { auditCandidates, buildQualifiedLeaderboards } from "./qualification-run
 function createPacedFetch({
   fetchImpl = globalThis.fetch,
   sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms)),
-  intervalMs = 80,
+  intervalMs = Number(process.env.SCANNER_API_INTERVAL_MS ?? 250),
 } = {}) {
   // Pace each endpoint independently. A single global queue needlessly
   // serialized positions, tokens, and resolutions requests and made a
