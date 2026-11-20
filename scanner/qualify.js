@@ -8,16 +8,15 @@ import { auditCandidates, buildQualifiedLeaderboards } from "./qualification-run
 function createPacedFetch({
   fetchImpl = globalThis.fetch,
   sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms)),
+  intervalMs = 80,
 } = {}) {
-  const nextStartByLane = new Map();
+  // Polymarket applies a per-client allowance across endpoints, not one
+  // independent allowance per route. Keep every Data API request on one lane.
+  let nextStartAt = 0;
   return async (input, init) => {
-    const url = new URL(typeof input === "string" ? input : input.url ?? String(input));
-    const lane = url.pathname === "/v2/activity" ? "activity"
-      : url.pathname === "/v2/positions" ? "positions" : "general";
-    const interval = lane === "activity" || lane === "positions" ? 50 : 30;
     const now = Date.now();
-    const startAt = Math.max(now, nextStartByLane.get(lane) ?? now);
-    nextStartByLane.set(lane, startAt + interval);
+    const startAt = Math.max(now, nextStartAt);
+    nextStartAt = startAt + intervalMs;
     if (startAt > now) await sleep(startAt - now);
     return fetchImpl(input, init);
   };
