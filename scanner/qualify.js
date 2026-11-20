@@ -131,6 +131,8 @@ export async function runQualification({
     qualification: {
       minimumResolvedMarkets: 10,
       minimumWinRate: 0.9,
+      minimumResolvedMarkets: 10,
+      maximumEarlyExitRate: 0.2,
       lookbackDays: 30,
       earlyExitsCounted: false,
       settlementIntegrityRequired: true,
