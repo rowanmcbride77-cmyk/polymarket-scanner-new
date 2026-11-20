@@ -14,7 +14,7 @@ function fixtures() {
   const monthly = {schemaVersion:1,validation:{passed:true},count:1,traders:[trader]};
   const qualification = {
     schemaVersion:1,
-    qualification:{minimumResolvedMarkets:10,minimumWinRate:0.9,lookbackDays:30,earlyExitsCounted:false,settlementIntegrityRequired:true},
+    qualification:{minimumResolvedMarkets:10,minimumWinRate:0.9,maximumEarlyExitRate:0.2,lookbackDays:30,earlyExitsCounted:false,settlementIntegrityRequired:true},
     validation:{
       passed:true,allWalletAuditsComplete:true,discoveredWallets:1,auditedWallets:1,qualifiedWallets:1,
     },qualifiedWallets:[qualified],
@@ -22,6 +22,15 @@ function fixtures() {
   const consensus = {
     schemaVersion:1,validation:{passed:true},signalCount:1,
     thresholds:{windowMinutes:60,maxResolutionHours:24,minWallets:8,minUsdPerWallet:10,requireCurrentHoldings:true,sameSideOnly:true,excludeDuplicateRepresentations:true},
+    combos:{
+      validation:{passed:true,complete:true,failedWallets:0},
+      thresholds:{minEntryUsd:5,maxEntryUsd:100,minMultiplier:10,requireCurrentHolding:true,recordLookbackDays:30,traderWinRateRequired:false},
+      opportunities:[{
+        wallet:"0x"+"b".repeat(40),comboPositionId:"combo-1",status:"OPEN",
+        entryCostUsd:10,potentialPayoutUsd:120,multiplier:12,legs:[],
+        traderComboRecord:{wins:1,losses:2,partial:0,resolved:3,winRate:1/3},
+      }],
+    },
     signals:[{
       category:"sports",conditionId:"0xcondition",tokenId:"token-1",outcome:"Yes",
       minutesToResolution:60,endDate:"2026-11-19T06:00:00.000Z",
@@ -34,7 +43,7 @@ function fixtures() {
   const status = {
     schemaVersion:1,validation:{passed:true},state:"success",
     discoveredWallets:1,auditedWallets:1,qualifiedWallets:1,
-    consensusCount:1,weeklyCount:1,monthlyCount:1,
+    consensusCount:1,comboCount:1,weeklyCount:1,monthlyCount:1,
   };
   return {qualification,weekly,monthly,consensus,status};
 }
