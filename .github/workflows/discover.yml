@@ -36,7 +36,8 @@ jobs:
       - name: Audit settlements and build qualified weekly/monthly Top 100
         run: npm run qualify
         env:
-          SCANNER_CONCURRENCY: 16
+          SCANNER_CONCURRENCY: 2
+          SCANNER_API_INTERVAL_MS: 250
           NODE_OPTIONS: --max-old-space-size=6144
       - name: Upload validated scanner outputs and diagnostics
         if: always()
