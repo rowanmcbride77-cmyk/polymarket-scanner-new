@@ -51,7 +51,8 @@ export async function auditCandidates(candidates, {
         };
       }
       completed += 1;
-      if (onProgress && (completed % 100 === 0 || completed === candidates.length)) {
+      // Emit progress for small diagnostic samples as well as full scans.
+      if (onProgress && (completed % 5 === 0 || completed === candidates.length)) {
         const commonErrors = [...errorCounts.entries()]
           .sort((a, b) => b[1] - a[1])
           .slice(0, 8)

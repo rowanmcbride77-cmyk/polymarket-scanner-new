@@ -59,15 +59,15 @@ export function createDataApiClient({
         await sleep(Math.min(maxDelayMs, baseDelayMs * (2 ** attempt)));
         continue;
       }
-      clearTimeout(timeout);
-
       if (RETRYABLE_STATUSES.has(response.status) && attempt < maxRetries) {
+        clearTimeout(timeout);
         await sleep(retryDelayMs(response, attempt, baseDelayMs, maxDelayMs));
         continue;
       }
       if (!response.ok) {
         let body = null;
         try { body = await response.json(); } catch {}
+        clearTimeout(timeout);
         throw new DataApiError(
           body?.error || `Polymarket Data API returned HTTP ${response.status}`,
           {
@@ -83,10 +83,12 @@ export function createDataApiClient({
       let body;
       try { body = await response.json(); }
       catch (error) {
+        clearTimeout(timeout);
         throw new DataApiError("Polymarket Data API returned invalid JSON", {
           cause: error, url: url.toString(), status: response.status,
         });
       }
+      clearTimeout(timeout);
       if (!body || typeof body !== "object" || !Object.hasOwn(body, "data")) {
         throw new DataApiError("Unexpected Data API envelope: expected a data field", {
           url: url.toString(), status: response.status,
