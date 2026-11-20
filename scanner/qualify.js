@@ -50,7 +50,7 @@ export async function runQualification({
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
   const auditWallet = createWalletAuditor(client);
-  process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\\n`);
+  process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\n`);
   const batch = await auditCandidates(candidates, {
     concurrency,
     auditWallet: (wallet) => auditWallet(wallet, {
@@ -85,7 +85,7 @@ export async function runQualification({
       results: batch.results,
     };
     const path = await writeJsonAtomic("data/qualification-diagnostic.json", diagnostic);
-    process.stdout.write(`Diagnostic sample finished: ${batch.completed}/${candidates.length}; failures ${batch.failed}. Output: ${path}\\n`);
+    process.stdout.write(`Diagnostic sample finished: ${batch.completed}/${candidates.length}; failures ${batch.failed}. Output: ${path}\n`);
     return diagnostic;
   }
   if (!batch.complete) {
