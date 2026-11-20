@@ -34,6 +34,7 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
   if (status.state !== "success") fail("status is not successful");
   if (qualification.qualification?.minimumResolvedMarkets !== 10 ||
       qualification.qualification?.minimumWinRate !== 0.9 ||
+      qualification.qualification?.maximumEarlyExitRate !== 0.2 ||
       qualification.qualification?.lookbackDays !== 30 ||
       qualification.qualification?.earlyExitsCounted !== false ||
       qualification.qualification?.settlementIntegrityRequired !== true) {
@@ -77,6 +78,23 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
     fail("leaderboard count mismatch");
   }
   if (!Array.isArray(consensus.signals)) fail("consensus signal list");
+  const combos = consensus.combos;
+  if (!combos || combos.thresholds?.maxEntryUsd !== 100 ||
+      combos.thresholds?.minEntryUsd !== 5 || combos.thresholds?.minMultiplier !== 10 ||
+      combos.thresholds?.requireCurrentHolding !== true ||
+      combos.thresholds?.traderWinRateRequired !== false ||
+      !Array.isArray(combos.opportunities)) fail("combo opportunity thresholds or shape");
+  for (const combo of combos.opportunities) {
+    if (!/^0x[0-9a-f]{40}$/.test(String(combo.wallet ?? "")) ||
+        !combo.comboPositionId || !["OPEN","REDEEMABLE","PARTIAL"].includes(combo.status) ||
+        !Number.isFinite(combo.entryCostUsd) || combo.entryCostUsd < 5 || combo.entryCostUsd > 100 ||
+        !Number.isFinite(combo.potentialPayoutUsd) || !Number.isFinite(combo.multiplier) ||
+        combo.multiplier < 10 || Math.abs(combo.multiplier - combo.potentialPayoutUsd / combo.entryCostUsd) > 0.0001 ||
+        !Array.isArray(combo.legs) || !Number.isInteger(combo.traderComboRecord?.resolved) ||
+        !Number.isInteger(combo.traderComboRecord?.wins) || !Number.isInteger(combo.traderComboRecord?.losses)) {
+      fail("combo opportunity data or payout math");
+    }
+  }
   const duplicateKeys = new Set();
   const seenConditions = new Set();
   for (const signal of consensus.signals) {
@@ -114,6 +132,7 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
   }
   if (consensus.signalCount !== consensus.signals.length ||
       status.consensusCount !== consensus.signals.length ||
+      status.comboCount !== combos.opportunities.length ||
       status.weeklyCount !== weekly.traders.length ||
       status.monthlyCount !== monthly.traders.length) {
     fail("published count mismatch");
