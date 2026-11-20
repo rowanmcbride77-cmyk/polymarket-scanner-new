@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "node --test",
-    "check": "for f in scanner/*.js; do node --check \"$f\" || exit 1; done",
+    "check": "for f in scanner/*.js; do node --check \"$f\" || exit 1; done; node --check site/app.js",
     "scan": "node scanner/index.js",
     "scan:discover": "node scanner/index.js",
     "qualify": "node scanner/qualify.js",
