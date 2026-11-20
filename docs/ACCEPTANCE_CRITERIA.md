@@ -1,7 +1,7 @@
 # Acceptance criteria
 
 ## Trader qualification
-- Discover up to 20,000 unique wallets from the overall monthly leaderboard.
+- Initial production run discovers up to 1,000 unique wallets from the overall weekly/monthly leaderboard pages; the configurable ceiling remains 20,000.
 - Use a trailing 30-day verified settlement sample.
 - Require 90%+ win rate and 10+ resolved markets.
 - Count only positions verifiably held through resolution; early exits are excluded from W/L.
