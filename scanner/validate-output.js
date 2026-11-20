@@ -68,6 +68,7 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
         !Number.isInteger(row.summary.wins) || !Number.isInteger(row.summary.losses) ||
         row.summary.wins + row.summary.losses !== row.summary.resolvedMarkets ||
         !Number.isFinite(row.summary.winRate) || row.summary.winRate < 0.9 ||
+        !Number.isFinite(row.summary.earlyExitRate) || row.summary.earlyExitRate > 0.2 ||
         Math.abs(row.summary.winRate - row.summary.wins / row.summary.resolvedMarkets) > 0.000001) {
       fail("qualified wallet lacks verified settlement thresholds");
     }
