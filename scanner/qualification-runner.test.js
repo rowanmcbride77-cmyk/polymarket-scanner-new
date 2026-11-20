@@ -83,3 +83,15 @@ test("leaderboard refuses a wallet marked qualified without settlement integrity
   };
   assert.throws(() => buildQualifiedLeaderboards(discovery,auditBatch), /Missing complete audit/);
 });
+
+test("preserves current holdings and combo rows from audit workers", async () => {
+  const currentPositions = [{conditionId:"condition-1",tokenId:"yes",currentSize:25}];
+  const comboRows = [{combo_position_id:"combo-1",_wallet:"wallet-1"}];
+  const result = await auditCandidates([{wallet:"wallet-1"}], {
+    async auditWallet() {
+      return {complete:true,qualification:{qualified:true},currentPositions,comboRows};
+    },
+  });
+  assert.deepEqual(result.results[0].currentPositions,currentPositions);
+  assert.deepEqual(result.results[0].comboRows,comboRows);
+});
