@@ -85,7 +85,7 @@ export function buildQualifiedLeaderboards(discovery, auditBatch, { topN = 100 }
   if (!auditBatch || auditBatch.complete !== true ||
       !Array.isArray(auditBatch.results) ||
       auditBatch.results.length !== discovery.candidates.length) {
-    throw new Error("Every discovered wallet must have a complete audit before ranking");
+    throw new Error("Every discovered wallet must have an audit result before ranking");
   }
   if (!Number.isInteger(topN) || topN < 1) throw new RangeError("topN must be positive");
 
