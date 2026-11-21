@@ -1,4 +1,4 @@
-name: Refresh Polymarket Top 100
+name: Build Settlement-Qualified Top 100
 
 on:
   workflow_dispatch:
@@ -7,9 +7,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "scanner/top100.js"
-      - "scanner/data-api.js"
+      - "scanner/**"
       - "site/**"
+      - "package.json"
       - ".github/workflows/top100.yml"
 
 permissions:
@@ -18,53 +18,72 @@ permissions:
   id-token: write
 
 concurrency:
-  group: polymarket-top100-pages
-  cancel-in-progress: true
+  group: polymarket-qualified-top100-pages
+  cancel-in-progress: false
 
 jobs:
-  refresh-and-deploy:
+  qualify-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 360
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      SCANNER_MAX_CANDIDATES: 1000
+      SCANNER_CONCURRENCY: 16
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Check Top 100 scanner and dashboard syntax
+      - name: Check scanner and dashboard syntax
+        run: npm run check
+      - name: Run scanner unit tests
+        run: npm test
+      - name: Discover candidate wallets from Polymarket weekly and monthly leaderboards
+        run: npm run scan:discover
+      - name: Audit candidates against 30-day settlement evidence and qualification rules
+        run: npm run qualify
+      - name: Publish qualified weekly and monthly boards into the new dashboard
         run: |
-          node --check scanner/top100.js
-          node --check site/app.js
-      - name: Fetch weekly and monthly Polymarket Top 100
-        run: npm run top100
-      - name: Validate weekly and monthly leaderboards
-        run: |
+          mkdir -p site/data
+          cp data/week.json site/data/week.json
+          cp data/month.json site/data/month.json
+          cp data/status.json site/data/status.json
+          cp data/qualification.json site/data/qualification.json
           node --input-type=module <<'NODE'
           import { readFileSync } from "node:fs";
-          for (const period of ["week", "month"]) {
-            const data = JSON.parse(readFileSync(`site/data/${period}.json`, "utf8"));
-            if (data.validation?.passed !== true || data.traders?.length !== 100) {
-              throw new Error(`${period}: expected exactly 100 validated leaderboard entries`);
-            }
-            const wallets = data.traders.map(row => row.wallet);
-            if (wallets.some(wallet => !/^0x[a-f0-9]{40}$/i.test(wallet)) ||
-                new Set(wallets).size !== 100 ||
-                data.traders.some(row => !Number.isFinite(row.pnl) || !Number.isFinite(row.volume))) {
-              throw new Error(`${period}: invalid or duplicate leaderboard rows`);
-            }
-          }
+          const qualification = JSON.parse(readFileSync("site/data/qualification.json", "utf8"));
           const status = JSON.parse(readFileSync("site/data/status.json", "utf8"));
-          if (status.state !== "success" || status.validation?.passed !== true ||
-              status.weeklyCount !== 100 || status.monthlyCount !== 100) {
-            throw new Error("Top 100 status did not pass validation");
+          for (const period of ["week", "month"]) {
+            const board = JSON.parse(readFileSync(`site/data/${period}.json`, "utf8"));
+            if (board.validation?.passed !== true || !Array.isArray(board.traders) ||
+                board.traders.length > 100 || board.count !== board.traders.length) {
+              throw new Error(`${period}: malformed qualified leaderboard`);
+            }
+            for (const trader of board.traders) {
+              if (!/^0x[a-f0-9]{40}$/i.test(trader.wallet) ||
+                  !Number.isFinite(trader.winRate) || trader.winRate < 0.9 ||
+                  !Number.isInteger(trader.resolvedMarkets) || trader.resolvedMarkets < 10 ||
+                  trader.wins + trader.losses !== trader.resolvedMarkets ||
+                  !Number.isFinite(trader.leaderboardPnl)) {
+                throw new Error(`${period}: trader did not pass settlement qualification`);
+              }
+            }
           }
-          console.log("Validated exactly 100 weekly and 100 monthly Polymarket leaderboard traders.");
+          if (qualification.qualification?.lookbackDays !== 30 ||
+              qualification.qualification?.minimumWinRate !== 0.9 ||
+              qualification.qualification?.minimumResolvedMarkets !== 10 ||
+              qualification.qualification?.earlyExitsCounted !== false ||
+              qualification.validation?.passed !== true ||
+              status.qualifiedWallets !== qualification.validation.qualifiedWallets) {
+            throw new Error("Qualification output or status failed final validation");
+          }
+          console.log(`Qualified Top 100 ready: weekly=${JSON.parse(readFileSync("site/data/week.json","utf8")).traders.length}; monthly=${JSON.parse(readFileSync("site/data/month.json","utf8")).traders.length}; qualified wallets=${qualification.validation.qualifiedWallets}`);
           NODE
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload new scanner layout and Top 100 data
+      - name: Upload qualified dashboard and data
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
