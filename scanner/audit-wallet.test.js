@@ -94,13 +94,9 @@ test("qualification rejects uncertain settlement accounting", () => {
   }).reason, "settlement_integrity_not_verified");
 });
 
-test("qualification permits limited early exits but rejects more than 20 percent", () => {
+test("early exits are excluded from settlement stats but do not add an extra qualification cap", () => {
   assert.equal(qualifyWalletAudit({
     complete: true,
-    summary: { resolvedMarkets: 10, winRate: 0.9, integrityPassed: true, exclusions: { early_exit_excluded: 2 } },
+    summary: { resolvedMarkets: 10, winRate: 1, integrityPassed: true, exclusions: { early_exit_excluded: 100 } },
   }).qualified, true);
-  assert.equal(qualifyWalletAudit({
-    complete: true,
-    summary: { resolvedMarkets: 10, winRate: 1, integrityPassed: true, exclusions: { early_exit_excluded: 3 } },
-  }).reason, "early_exit_rate_above_20_percent");
 });
