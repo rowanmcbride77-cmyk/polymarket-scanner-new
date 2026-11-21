@@ -52,6 +52,22 @@ test("accepts a fully qualified, same-side consensus output", () => {
   assert.equal(validatePublishedOutput(fixtures()).passed,true);
 });
 
+test("accepts complete publication when isolated incomplete wallets are explicitly excluded", () => {
+  const data=fixtures();
+  data.qualification.validation.discoveredWallets=3;
+  data.qualification.validation.auditedWallets=3;
+  data.qualification.validation.fullyAuditedWallets=2;
+  data.qualification.validation.failedWalletAudits=1;
+  data.qualification.validation.allWalletAuditsComplete=false;
+  data.qualification.auditSummary={incompleteWalletAudits:1};
+  data.status.discoveredWallets=3;
+  data.status.auditedWallets=3;
+  data.status.fullyAuditedWallets=2;
+  data.status.failedWalletAudits=1;
+  data.status.allWalletAuditsComplete=false;
+  assert.equal(validatePublishedOutput(data).passed,true);
+});
+
 test("rejects a leaderboard row below win-rate qualification", () => {
   const data=fixtures();
   data.weekly.traders[0].winRate=0.89;
