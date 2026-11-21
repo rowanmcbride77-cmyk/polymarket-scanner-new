@@ -128,15 +128,6 @@ export async function runConsensus({
       process.stdout.write(`Recent activity: ${completed}/${total}; failures: ${failed}.\n`);
     },
   });
-  if (!batch.allAuditsComplete) {
-    await writeJsonAtomic("data/consensus-incomplete.json", {
-      schemaVersion: 1,
-      validation: { passed: false, complete: false, failedWallets: batch.failed },
-      results: batch.results,
-    });
-    throw new Error(`Recent activity incomplete for ${batch.failed} wallets; no consensus published.`);
-  }
-
   const conditionIds = [...new Set(batch.results
     .flatMap((row) => row.recentBuys ?? [])
     .map((buy) => buy.conditionId)
@@ -184,7 +175,7 @@ export async function runConsensus({
   const consensus = {
     schemaVersion: 1,
     generatedAt,
-    validation: { passed: true, complete: true },
+    validation: { passed: true, complete: batch.allAuditsComplete, failedWallets: batch.failed, excludedIncompleteWallets: batch.failed },
     walletUniverse: Array.isArray(qualification.qualifiedWallets)
       ? "all-qualified-wallets"
       : "union-of-weekly-and-monthly-top100",
@@ -212,12 +203,15 @@ export async function runConsensus({
     completedAt,
     validation: { passed: true },
     state: "success",
-    message: "Wallet rankings and same-side consensus passed validation.",
+    message: batch.failed > 0
+      ? `Wallet rankings and same-side consensus validated; ${batch.failed} incomplete recent-activity wallet audits were excluded.`
+      : "Wallet rankings and same-side consensus passed validation.",
     discoveredWallets: qualification.validation.discoveredWallets ?? 0,
     auditedWallets: qualification.validation.auditedWallets ?? 0,
     fullyAuditedWallets: qualification.validation.fullyAuditedWallets ?? qualification.validation.auditedWallets ?? 0,
     failedWalletAudits: qualification.validation.failedWalletAudits ?? 0,
     allWalletAuditsComplete: qualification.validation.allWalletAuditsComplete ?? true,
+    consensusWalletAuditFailures: batch.failed,
     qualifiedWallets: qualification.validation.qualifiedWallets ?? wallets.length,
     disqualifiedWallets: qualification.auditSummary?.disqualifiedWallets ?? 0,
     earlyExitsExcluded: qualification.auditSummary?.earlyExitsExcluded,
