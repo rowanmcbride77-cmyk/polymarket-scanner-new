@@ -7,6 +7,7 @@ const WALLET_RE = /^0x[a-fA-F0-9]{40}$/;
 export async function fetchRedeemablePositionSnapshot(client, wallet, {
   limit = 1000,
   maxPages = 100,
+  includeTokenFacts = true,
 } = {}) {
   if (!WALLET_RE.test(wallet ?? "")) throw new TypeError("A valid proxy wallet address is required");
   const statuses = ["REDEEMABLE", "REDEEMABLE_LOST"];
@@ -38,7 +39,9 @@ export async function fetchRedeemablePositionSnapshot(client, wallet, {
     error.complete = false;
     throw error;
   }
-  const tokenFacts = await fetchTokenFacts(client, rows.map(({position}) => position.token_id));
+  const tokenFacts = includeTokenFacts
+    ? await fetchTokenFacts(client, rows.map(({position}) => position.token_id))
+    : new Map();
   const records = rows.map(({position, sourceStatusFilter}) => ({
     position,
     sourceStatusFilter,
