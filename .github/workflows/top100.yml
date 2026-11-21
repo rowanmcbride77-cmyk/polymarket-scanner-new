@@ -1,0 +1,73 @@
+name: Refresh Polymarket Top 100
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "scanner/top100.js"
+      - "scanner/data-api.js"
+      - "site/**"
+      - ".github/workflows/top100.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: polymarket-top100-pages
+  cancel-in-progress: true
+
+jobs:
+  refresh-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check Top 100 scanner and dashboard syntax
+        run: |
+          node --check scanner/top100.js
+          node --check site/app.js
+      - name: Fetch weekly and monthly Polymarket Top 100
+        run: npm run top100
+      - name: Validate weekly and monthly leaderboards
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          for (const period of ["week", "month"]) {
+            const data = JSON.parse(readFileSync(`site/data/${period}.json`, "utf8"));
+            if (data.validation?.passed !== true || data.traders?.length !== 100) {
+              throw new Error(`${period}: expected exactly 100 validated leaderboard entries`);
+            }
+            const wallets = data.traders.map(row => row.wallet);
+            if (wallets.some(wallet => !/^0x[a-f0-9]{40}$/i.test(wallet)) ||
+                new Set(wallets).size !== 100 ||
+                data.traders.some(row => !Number.isFinite(row.pnl) || !Number.isFinite(row.volume))) {
+              throw new Error(`${period}: invalid or duplicate leaderboard rows`);
+            }
+          }
+          const status = JSON.parse(readFileSync("site/data/status.json", "utf8"));
+          if (status.state !== "success" || status.validation?.passed !== true ||
+              status.weeklyCount !== 100 || status.monthlyCount !== 100) {
+            throw new Error("Top 100 status did not pass validation");
+          }
+          console.log("Validated exactly 100 weekly and 100 monthly Polymarket leaderboard traders.");
+          NODE
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload new scanner layout and Top 100 data
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy new scanner dashboard
+        id: deployment
+        uses: actions/deploy-pages@v4
