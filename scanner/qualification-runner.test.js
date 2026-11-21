@@ -99,7 +99,7 @@ test("leaderboard refuses a wallet marked qualified without settlement integrity
       summary:{wins:20,losses:0,winRate:1,resolvedMarkets:20,integrityPassed:false},
     }],
   };
-  assert.throws(() => buildQualifiedLeaderboards(discovery,auditBatch), /Missing complete audit/);
+  assert.throws(() => buildQualifiedLeaderboards(discovery,auditBatch), /Invalid completed audit/);
 });
 
 test("preserves current holdings and combo rows from audit workers", async () => {
