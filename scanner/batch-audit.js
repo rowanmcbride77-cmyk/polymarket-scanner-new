@@ -105,8 +105,10 @@ export async function auditCandidatesBatch(candidates, {
   let tokenFacts;
   let resolutions;
   try {
-    tokenFacts = await fetchTokenFacts(client, [...tokenIds]);
-    resolutions = await fetchMarketResolutions(client, [...conditionIds]);
+    [tokenFacts, resolutions] = await Promise.all([
+      fetchTokenFacts(client, [...tokenIds]),
+      fetchMarketResolutions(client, [...conditionIds]),
+    ]);
   } catch (error) {
     const stage = error?.auditStage ?? "shared_settlement_facts";
     const message = error?.message ?? String(error);
