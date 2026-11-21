@@ -28,9 +28,27 @@ test("one failed wallet makes the batch incomplete", async () => {
       return { complete:true, qualification:{qualified:true}, summary:{winRate:1,resolvedMarkets:20,wins:20,losses:0,integrityPassed:true} };
     },
   });
-  assert.equal(result.complete, false);
+  assert.equal(result.complete, true);
+  assert.equal(result.allAuditsComplete, false);
+  assert.equal(result.completed, 2);
   assert.equal(result.failed, 1);
   assert.equal(result.results[1].error, "upstream unavailable");
+});
+
+test("an incomplete wallet is excluded without blocking fully audited leaderboard rows", () => {
+  const discovery = { validation:{passed:true}, candidates:[
+    {wallet:"good",username:"good",appearances:[{timePeriod:"month",category:"sports",pnl:100,rank:1}]},
+    {wallet:"incomplete",username:"incomplete",appearances:[{timePeriod:"month",category:"sports",pnl:999,rank:1}]},
+  ]};
+  const batch = {complete:true,allAuditsComplete:false,results:[
+    {wallet:"good",complete:true,qualification:{qualified:true},summary:{wins:19,losses:1,winRate:.95,resolvedMarkets:20,integrityPassed:true}},
+    {wallet:"incomplete",complete:false,qualification:{qualified:false,reason:"audit_error"},error:"pagination limit"},
+  ]};
+  const result=buildQualifiedLeaderboards(discovery,batch);
+  assert.equal(result.monthly.length,1);
+  assert.equal(result.monthly[0].wallet,"good");
+  assert.equal(result.qualifiedWalletCount,1);
+  assert.equal(result.auditedWalletCount,2);
 });
 
 test("weekly and monthly leaderboards contain only fully audited qualified wallets", () => {
