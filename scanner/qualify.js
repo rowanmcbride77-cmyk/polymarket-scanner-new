@@ -36,7 +36,7 @@ async function writeJsonAtomic(path, value) {
 
 export async function runQualification({
   discoveryPath = "data/discovery.json",
-  outputPath = "data/qualification.json",
+  outputPath = "site/data/qualification.json",
   concurrency = Number(process.env.SCANNER_CONCURRENCY ?? 16),
   nowSeconds = Math.floor(Date.now() / 1000),
 } = {}) {
@@ -176,23 +176,31 @@ export async function runQualification({
     monthly: boards.monthly,
   };
   const target = await writeJsonAtomic(outputPath, payload);
-  await writeJsonAtomic("data/week.json", {
-    schemaVersion: 1, generatedAt, validation: { passed: true },
+  await writeJsonAtomic("site/data/qualified-week.json", {
+    schemaVersion: 1, generatedAt, period: "week",
+    qualification: payload.qualification,
+    validation: { passed: true, complete: batch.complete, allAuditsComplete: batch.allAuditsComplete },
     count: boards.weekly.length, traders: boards.weekly,
   });
-  await writeJsonAtomic("data/month.json", {
-    schemaVersion: 1, generatedAt, validation: { passed: true },
+  await writeJsonAtomic("site/data/qualified-month.json", {
+    schemaVersion: 1, generatedAt, period: "month",
+    qualification: payload.qualification,
+    validation: { passed: true, complete: batch.complete, allAuditsComplete: batch.allAuditsComplete },
     count: boards.monthly.length, traders: boards.monthly,
   });
-  await writeJsonAtomic("data/status.json", {
+  await writeJsonAtomic("site/data/qualification-status.json", {
     schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
-    validation: { passed: true }, state: "success",
-    discoveredWallets: discovery.candidates.length, auditedWallets: batch.completed,
+    validation: { passed: true, complete: batch.complete, allAuditsComplete: batch.allAuditsComplete },
+    state: "success",
+    discoveredWallets: discovery.candidates.length,
+    auditedWallets: batch.completed,
     fullyAuditedWallets: batch.completed - batch.failed,
     failedWalletAudits: batch.failed,
-    allWalletAuditsComplete: batch.allAuditsComplete,
-    qualifiedWallets: boards.qualifiedWalletCount, earlyExitsExcluded,
+    qualifiedWallets: boards.qualifiedWalletCount,
+    earlyExitsExcluded,
+    weeklyCount: boards.weekly.length,
     monthlyCount: boards.monthly.length,
+    qualification: payload.qualification,
   });
   process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; ${batch.failed} incomplete wallet audits excluded; monthly Top ${boards.monthly.length}.\\n`);
   process.stdout.write(`Output: ${target}\n`);
