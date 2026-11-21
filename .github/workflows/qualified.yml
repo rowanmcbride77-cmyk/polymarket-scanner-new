@@ -2,6 +2,11 @@ name: Build Settlement-Qualified Top 100
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scanner/**"
+      - ".github/workflows/qualified.yml"
   schedule:
     - cron: "47 */6 * * *"
 
