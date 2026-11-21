@@ -100,7 +100,7 @@ async function loadDashboard(){
       monthly.schemaVersion===1&&monthly.validation?.passed===true&&Array.isArray(monthly.traders)&&
       consensus.schemaVersion===1&&consensus.validation?.passed===true;
     if(!valid)throw new Error("The latest scanner generation did not pass validation");
-    statusPanel.classList.add("status-success");statusTitle.textContent="Latest scanner generation validated";
+    statusPanel.classList.add("status-success");statusTitle.textContent=(status.failedWalletAudits??0)>0?"Validated scan · incomplete wallets excluded":"Latest scanner generation validated";
     statusDetail.textContent=status.discoveredWallets.toLocaleString()+" wallets processed · "+(status.fullyAuditedWallets??status.auditedWallets??status.discoveredWallets).toLocaleString()+" fully audited · "+(status.failedWalletAudits??0).toLocaleString()+" incomplete audits excluded · "+status.qualifiedWallets.toLocaleString()+" qualified · "+(status.consensusCount??0)+" consensus markets · "+(status.comboCount??0)+" combo opportunities.";
     lastScan.textContent=status.completedAt?new Date(status.completedAt).toLocaleString():new Date(status.generatedAt).toLocaleString();
     renderLeaderboard(monthly.traders);renderConsensus(consensus);renderCombos(consensus.combos);
