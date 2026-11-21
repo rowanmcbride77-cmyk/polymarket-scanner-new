@@ -46,9 +46,9 @@ function renderConsensus(consensus) {
     card.append(node("p",market.outcome+" · "+market.category+" · resolves in "+market.minutesToResolution+" minutes"));
     card.append(node("p",usd(market.totalUsd)+" combined recent BUY volume · "+market.wallets.length+" qualified wallets"));
     const participants=node("div",undefined,"signal-wallets");
-    for(const trader of market.wallets.slice(0,20)){
+    for(const [index,trader] of market.wallets.slice(0,20).entries()){
       const item=node("span");
-      item.append(link("https://polymarket.com/profile/"+trader.wallet,trader.username||trader.wallet.slice(0,6)+"…"+trader.wallet.slice(-4)));
+      item.append(node("strong","Trader #"+(index+1)));
       item.append(document.createTextNode(" "+usd(trader.usdSize)+" · "));
       participants.append(item);
     }
@@ -76,7 +76,7 @@ function renderCombos(comboData) {
     const record=combo.traderComboRecord||{};
     card.append(node("p","Trader's 30-day combo record: "+record.wins+"W–"+record.losses+"L"+(record.partial?" · "+record.partial+" partial":"")+" · "+record.resolved+" settled · "+pct(record.winRate)));
     const trader=node("div",undefined,"combo-trader");
-    trader.append(link("https://polymarket.com/profile/"+combo.wallet,combo.username||combo.wallet.slice(0,6)+"…"+combo.wallet.slice(-4)));
+    trader.append(node("strong",combo.username||"Trader"));
     card.append(trader);
     const legs=node("ol",undefined,"combo-legs");
     for(const leg of combo.legs||[]){
