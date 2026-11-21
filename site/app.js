@@ -13,102 +13,61 @@ function node(tag, text, className) {
 function usd(value) {
   return Number.isFinite(value) ? new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(value) : "—";
 }
-function pct(value) { return Number.isFinite(value) ? (value*100).toFixed(1)+"%" : "No settled sample"; }
-function link(url, label) {
-  const a=node("a",label); a.href=url; a.target="_blank"; a.rel="noopener noreferrer"; return a;
-}
 async function fetchJson(path) {
-  const response=await fetch(path,{cache:"no-store"});
-  if(!response.ok) throw new Error("Could not load "+path);
+  const response = await fetch(path,{cache:"no-store"});
+  if (!response.ok) throw new Error("Could not load "+path);
   return response.json();
 }
+let currentBoards = { week: [], month: [] };
+let currentPeriod = "week";
+
 function renderLeaderboard(rows) {
   const target=$("#leaderboard"); target.replaceChildren(); target.className="table-wrap";
-  if(!Array.isArray(rows)||!rows.length){target.className="empty";target.textContent="No traders currently meet the settlement qualification rules.";return;}
+  if(!Array.isArray(rows)||rows.length!==100){target.className="empty";target.textContent="The latest leaderboard did not contain a complete Top 100.";return;}
   const table=node("table"),head=node("thead"),header=node("tr");
-  for(const label of ["Rank","Trader","30d win rate","Resolved","Wins","Losses","Monthly P&L"])header.append(node("th",label));
+  for(const label of ["#","Trader","Polymarket rank","Period P&L","Volume"])header.append(node("th",label));
   head.append(header);table.append(head);const body=node("tbody");
   for(const trader of rows){
-    const tr=node("tr");tr.append(node("td",trader.rank));
-    const who=node("td");who.append(node("strong","Trader #"+trader.rank));
-    tr.append(who,node("td",pct(trader.winRate)),node("td",trader.resolvedMarkets),node("td",trader.wins),node("td",trader.losses),node("td",usd(trader.leaderboardPnl)));body.append(tr);
+    const tr=node("tr");
+    tr.append(node("td",trader.rank));
+    const who=node("td");who.append(node("strong",trader.username||("Trader #"+trader.rank)));
+    tr.append(who,node("td",trader.leaderboardRank??"—"),node("td",usd(trader.pnl)),node("td",usd(trader.volume)));
+    body.append(tr);
   }
   table.append(body);target.append(table);
+  $("#totalPnl").textContent=usd(rows.reduce((sum,row)=>sum+(row.pnl||0),0));
+  $("#totalVolume").textContent=usd(rows.reduce((sum,row)=>sum+(row.volume||0),0));
+  $("#avgWinRate").textContent="Not included";
 }
-function renderConsensus(consensus) {
-  const target=$("#consensus");target.replaceChildren();target.className="signal-list";
-  const rows=consensus?.signals;
-  if(!Array.isArray(rows)||!rows.length){target.className="empty";target.textContent="No consensus markets currently meet all filters. The scan records the exact exclusion reasons in consensus.json.";return;}
-  for(const market of rows){
-    const card=node("div",undefined,"signal");
-    const heading=node("div",undefined,"signal-heading");
-    heading.append(node("strong",market.marketTitle||"Untitled market"),node("span",market.qualifiedWalletCount+" traders","signal-count"));card.append(heading);
-    card.append(node("p",market.outcome+" · "+market.category+" · resolves in "+market.minutesToResolution+" minutes"));
-    card.append(node("p",usd(market.totalUsd)+" combined recent BUY volume · "+market.wallets.length+" qualified wallets"));
-    const participants=node("div",undefined,"signal-wallets");
-    for(const [index,trader] of market.wallets.slice(0,20).entries()){
-      const item=node("span");
-      item.append(node("strong","Trader #"+(index+1)));
-      item.append(document.createTextNode(" "+usd(trader.usdSize)+" · "));
-      participants.append(item);
-    }
-    card.append(participants);
-    if(market.eventSlug)card.append(link("https://polymarket.com/event/"+market.eventSlug,"Open market ↗"));
-    target.append(card);
-  }
-}
-function renderCombos(comboData) {
-  const target=$("#combos");target.replaceChildren();target.className="signal-list";
-  const budget=Number($("#combo-budget").value||100),minimum=Number($("#combo-multiplier").value||10);
-  const rows=(comboData?.opportunities||[]).filter(row=>row.entryCostUsd<=budget&&row.multiplier>=minimum)
-    .sort((a,b)=>b.multiplier-a.multiplier||a.entryCostUsd-b.entryCostUsd);
-  const scan=comboData?.validation;
-  $("#combo-status").textContent=scan?.complete===true
-    ? "Complete scan · "+(comboData.walletsWithComboData??0)+" wallets returned combo data"
-    : "Partial scan · "+(scan?.failedWallets??"unknown")+" wallet requests failed; results may be incomplete";
-  if(!rows.length){target.className="empty";target.textContent="No active combos match these budget and multiplier filters in the latest scan.";return;}
-  for(const combo of rows){
-    const card=node("div",undefined,"signal combo");
-    const title=node("div",undefined,"signal-heading");
-    title.append(node("strong",(combo.legCount||combo.legs?.length||"Multi")+"-leg combo"),node("span",combo.multiplier.toFixed(1)+"×","signal-count"));card.append(title);
-    card.append(node("p",usd(combo.entryCostUsd)+" entry · "+usd(combo.potentialPayoutUsd)+" potential gross payout · "+usd(combo.potentialProfitUsd)+" potential profit"));
-    card.append(node("p",combo.timing?.label||"Event timing unavailable"));
-    const record=combo.traderComboRecord||{};
-    card.append(node("p","Trader's 30-day combo record: "+record.wins+"W–"+record.losses+"L"+(record.partial?" · "+record.partial+" partial":"")+" · "+record.resolved+" settled · "+pct(record.winRate)));
-    const trader=node("div",undefined,"combo-trader");
-    trader.append(node("strong",combo.username||"Trader"));
-    card.append(trader);
-    const legs=node("ol",undefined,"combo-legs");
-    for(const leg of combo.legs||[]){
-      const li=node("li",(leg.title||"Market leg")+" — "+(leg.outcome||"Outcome unavailable"));
-      if(leg.eventSlug)li.append(document.createTextNode(" "),link("https://polymarket.com/event/"+leg.eventSlug,"Open ↗"));
-      legs.append(li);
-    }
-    if(combo.legs?.length)card.append(legs);
-    target.append(card);
-  }
+function selectPeriod(period) {
+  currentPeriod=period;
+  $("#leader-period").value=period;
+  $("#leaderPeriod").textContent=period==="week"?"Week":"Month";
+  renderLeaderboard(currentBoards[period]);
 }
 async function loadDashboard(){
   try{
-    const [status,qualification,weekly,monthly,consensus]=await Promise.all([
-      fetchJson("./data/status.json"),fetchJson("./data/qualification.json"),
-      fetchJson("./data/week.json"),fetchJson("./data/month.json"),fetchJson("./data/consensus.json"),
+    const [status,weekly,monthly]=await Promise.all([
+      fetchJson("./data/status.json"),fetchJson("./data/week.json"),fetchJson("./data/month.json")
     ]);
-    const valid=status.schemaVersion===1&&status.validation?.passed===true&&status.state==="success"&&
-      qualification.schemaVersion===1&&qualification.validation?.passed===true&&
-      monthly.schemaVersion===1&&monthly.validation?.passed===true&&Array.isArray(monthly.traders)&&
-      consensus.schemaVersion===1&&consensus.validation?.passed===true;
-    if(!valid)throw new Error("The latest scanner generation did not pass validation");
-    statusPanel.classList.add("status-success");statusTitle.textContent=((status.failedWalletAudits??0)>0||(status.consensusWalletAuditFailures??0)>0)?"Validated scan · incomplete wallets excluded":"Latest scanner generation validated";
-    statusDetail.textContent=status.discoveredWallets.toLocaleString()+" wallets processed · "+(status.fullyAuditedWallets??status.auditedWallets??status.discoveredWallets).toLocaleString()+" fully audited · "+(status.failedWalletAudits??0).toLocaleString()+" settlement audits excluded · "+(status.consensusWalletAuditFailures??0).toLocaleString()+" recent-activity audits excluded · "+status.qualifiedWallets.toLocaleString()+" qualified · "+(status.consensusCount??0)+" consensus markets · "+(status.comboCount??0)+" combo opportunities.";
-    lastScan.textContent=status.completedAt?new Date(status.completedAt).toLocaleString():new Date(status.generatedAt).toLocaleString();
-    renderLeaderboard(monthly.traders);renderConsensus(consensus);renderCombos(consensus.combos);
+    const valid=status.schemaVersion===1&&status.state==="success"&&status.validation?.passed===true&&
+      weekly.schemaVersion===1&&weekly.validation?.passed===true&&Array.isArray(weekly.traders)&&weekly.traders.length===100&&
+      monthly.schemaVersion===1&&monthly.validation?.passed===true&&Array.isArray(monthly.traders)&&monthly.traders.length===100;
+    if(!valid)throw new Error("The latest weekly/monthly Top 100 data did not pass validation");
+    currentBoards={week:weekly.traders,month:monthly.traders};
+    statusPanel.classList.add("status-success");
+    statusTitle.textContent="Weekly and monthly Top 100 validated";
+    statusDetail.textContent="100 weekly traders and 100 monthly traders loaded directly from Polymarket's public leaderboard, ranked by period P&L. This leaderboard does not claim verified settlement win rates.";
+    lastScan.textContent=new Date(status.completedAt||status.generatedAt).toLocaleString();
+    selectPeriod(currentPeriod);
+    $("#consensus").textContent="Consensus is separate from the Top 100 leaderboard and is not being scanned in this version.";
+    $("#combos").textContent="Combo scanning is separate and is not being scanned in this version.";
+    $("#combo-status").textContent="Top 100 refresh only";
   }catch(error){
-    statusPanel.classList.remove("status-success");statusTitle.textContent="Waiting for complete validated scan";
+    statusPanel.classList.remove("status-success");statusTitle.textContent="Waiting for a complete Top 100 refresh";
     statusDetail.textContent=error.message;lastScan.textContent="Not yet available";
-    for(const id of ["leaderboard","consensus","combos"]){const target=$("#"+id);target.className="empty";target.textContent="Awaiting validated data";}
+    $("#leaderboard").className="empty";$("#leaderboard").textContent="Awaiting validated weekly and monthly Top 100 data.";
   }
 }
-$("#combo-budget").addEventListener("change",()=>fetchJson("./data/consensus.json").then(data=>renderCombos(data.combos)).catch(()=>{}));
-$("#combo-multiplier").addEventListener("change",()=>fetchJson("./data/consensus.json").then(data=>renderCombos(data.combos)).catch(()=>{}));
+$("#leader-period").addEventListener("change",event=>selectPeriod(event.target.value));
 loadDashboard();
