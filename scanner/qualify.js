@@ -84,6 +84,10 @@ export async function runQualification({
       allAuditsComplete: batch.allAuditsComplete,
       errorCounts: batch.errorCounts,
       errorSamples: batch.errorSamples,
+      sharedTokenFacts: batch.sharedTokenFacts,
+      sharedResolutionFacts: batch.sharedResolutionFacts,
+      uniqueTokens: batch.uniqueTokens,
+      uniqueMarkets: batch.uniqueMarkets,
       results: batch.results,
     };
     const path = await writeJsonAtomic("data/qualification-diagnostic.json", diagnostic);
