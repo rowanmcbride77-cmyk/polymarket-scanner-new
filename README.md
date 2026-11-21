@@ -8,7 +8,7 @@ A static dashboard for settlement-verified trader performance, same-side consens
 - Require **90%+ verified settlement win rate** and at least **10 resolved markets**.
 - Count only positions verifiably held through market resolution.
 - Exclude early exits from wins/losses and allow no more than **20% observed early exits** among classifiable resolved/early-exit positions.
-- Reject incomplete wallet audits, ambiguous same-second events and unverifiable settlement evidence.
+- Exclude incomplete wallet audits from qualification and ranking; never treat missing evidence as a win or loss. Ambiguous same-second events and unverifiable settlement evidence also disqualify the affected wallet.
 
 The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket leaderboard P&L, but eligibility is based on the same verified settlement criteria. A board can contain fewer than 100 traders if fewer pass.
 
@@ -34,6 +34,6 @@ The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket lea
 3. Check qualified wallets' last-hour BUY activity and current holdings.
 4. Verify Gamma market state, outcome token, category and 24-hour resolution window.
 5. Fetch combo positions and calculate verified entry/potential payout multiples.
-6. Validate output schemas and publish the dashboard only from the workflow artifact.
+6. Validate output schemas and publish the dashboard only after every candidate has a terminal audit result. Any individual incomplete audit is excluded from ranking and reported in the dashboard; fully audited wallets can still be published.
 
-A zero-signal result is valid if no market meets the filters. It must not be replaced with fabricated signals. The dashboard publishes only a fully completed, validated scan; partial runs are never presented as current results.
+A zero-signal result is valid if no market meets the filters. It must not be replaced with fabricated signals. The dashboard publishes only after the full candidate batch and consensus scan finish and pass output validation. Wallets with incomplete individual audits are excluded and counted explicitly; their partial data is never used to qualify or rank them.
