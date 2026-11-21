@@ -22,6 +22,6 @@ test("discovery refuses incomplete partitions and never builds a publishable Top
   }), /incomplete/);
   const payload = buildDiscoveryPayload({ complete: true, candidates: [], partitions: [] });
   assert.equal(payload.validation.allPageRequestsComplete, true);
-  assert.equal(payload.scope.maxCandidates, 1000);
+  assert.equal(payload.scope.maxCandidates, 20000);
   assert.equal("top100" in payload, false);
 });
