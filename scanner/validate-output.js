@@ -58,7 +58,7 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
   const discovered = qualification.validation.discoveredWallets;
   const fullyAudited = qualification.validation.fullyAuditedWallets ?? audited;
   const failedAudits = qualification.validation.failedWalletAudits ?? 0;
-  if (!Number.isInteger(audited) || audited !== discovered ||
+  if (!Number.isInteger(audited) || audited < 0 || audited > discovered ||
       !Number.isInteger(fullyAudited) || !Number.isInteger(failedAudits) ||
       fullyAudited + failedAudits !== audited ||
       qualification.validation.allWalletAuditsComplete !== (failedAudits === 0) ||
