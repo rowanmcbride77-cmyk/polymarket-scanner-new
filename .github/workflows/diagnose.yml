@@ -1,11 +1,6 @@
 name: Small-sample wallet qualification
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/diagnose.yml"
-      - "scanner/**"
   workflow_dispatch:
 
 permissions:
