@@ -56,23 +56,42 @@ export async function runQualification({
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
   process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\n`);
-  const batch = await auditCandidatesBatch(candidates, {
-    client,
-    concurrency,
-    nowSeconds,
-    lookbackDays: 30,
-    minimumResolvedMarkets: 10,
-    minimumWinRate: 0.9,
-    onProgress: ({ completed, total, failed, commonErrors = [], errorSamples = [] }) => {
-      process.stdout.write(`Wallet audits: ${completed}/${total}; failures: ${failed}.\n`);
-      for (const item of commonErrors) {
-        process.stdout.write(`  Failure ${item.count}x: ${item.error}\n`);
-      }
-      for (const sample of errorSamples) {
-        process.stdout.write(`  Sample wallet ${sample.wallet}: [${sample.stage}] ${sample.message}\n`);
-      }
-    },
-  });
+  // Bound memory: raw histories from all 1,000 wallets must not coexist in
+  // memory. The previous all-at-once batch exceeded the runner's 6 GB heap.
+  const chunkSize = Number(process.env.SCANNER_AUDIT_CHUNK_SIZE ?? 10);
+  if (!Number.isInteger(chunkSize) || chunkSize < 1 || chunkSize > 100) {
+    throw new Error("SCANNER_AUDIT_CHUNK_SIZE must be 1..100");
+  }
+  const combined = {
+    results: [], complete: true, allAuditsComplete: true, completed: 0, failed: 0,
+    errorCounts: {}, errorSamples: [], sharedTokenFacts: 0, sharedResolutionFacts: 0,
+    uniqueTokens: 0, uniqueMarkets: 0,
+  };
+  for (let offset = 0; offset < candidates.length; offset += chunkSize) {
+    const chunk = candidates.slice(offset, offset + chunkSize);
+    const part = await auditCandidatesBatch(chunk, {
+      client, concurrency, nowSeconds, lookbackDays: 30,
+      minimumResolvedMarkets: 10, minimumWinRate: 0.9,
+      onProgress: ({ completed, failed, commonErrors = [], errorSamples = [] }) => {
+        process.stdout.write(`Wallet audits: ${combined.completed + completed}/${candidates.length}; failures: ${combined.failed + failed}.\\n`);
+        for (const item of commonErrors) process.stdout.write(`  Failure ${item.count}x: ${item.error}\\n`);
+        for (const sample of errorSamples) process.stdout.write(`  Sample wallet ${sample.wallet}: [${sample.stage}] ${sample.message}\\n`);
+      },
+    });
+    combined.results.push(...part.results);
+    combined.completed += part.completed;
+    combined.failed += part.failed;
+    combined.complete = combined.complete && part.complete;
+    combined.allAuditsComplete = combined.allAuditsComplete && part.allAuditsComplete;
+    for (const [key, count] of Object.entries(part.errorCounts)) combined.errorCounts[key] = (combined.errorCounts[key] ?? 0) + count;
+    for (const sample of part.errorSamples) if (combined.errorSamples.length < 12) combined.errorSamples.push(sample);
+    combined.sharedTokenFacts += part.sharedTokenFacts;
+    combined.sharedResolutionFacts += part.sharedResolutionFacts;
+    combined.uniqueTokens += part.uniqueTokens;
+    combined.uniqueMarkets += part.uniqueMarkets;
+    if (global.gc) global.gc();
+  }
+  const batch = combined;
 
   const generatedAt = new Date(nowSeconds * 1000).toISOString();
   if (diagnosticLimit > 0) {
