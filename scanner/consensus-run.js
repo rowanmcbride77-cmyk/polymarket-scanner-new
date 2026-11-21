@@ -48,7 +48,7 @@ function qualifiedUniverse(qualification, weekly, monthly) {
   }
   const byWallet = new Map();
   for (const row of [...weekly.traders, ...monthly.traders]) {
-    if (!row.wallet || row.winRate < 0.9 || row.resolvedMarkets < 20) continue;
+    if (!row.wallet || row.winRate < 0.9 || row.resolvedMarkets < 10) continue;
     byWallet.set(row.wallet.toLowerCase(), {
       wallet: row.wallet, username: row.username,
       summary: {
@@ -66,9 +66,9 @@ export async function runConsensus({
   concurrency = Number(process.env.SCANNER_CONCURRENCY ?? 16),
 } = {}) {
   const [qualification, weekly, monthly] = await Promise.all([
-    readFile(resolve("data/qualification.json"), "utf8").then(JSON.parse),
-    readFile(resolve("data/week.json"), "utf8").then(JSON.parse),
-    readFile(resolve("data/month.json"), "utf8").then(JSON.parse),
+    readFile(resolve("site/data/qualification.json"), "utf8").then(JSON.parse),
+    readFile(resolve("site/data/qualified-week.json"), "utf8").then(JSON.parse),
+    readFile(resolve("site/data/qualified-month.json"), "utf8").then(JSON.parse),
   ]);
   for (const data of [qualification, weekly, monthly]) {
     if (data.schemaVersion !== 1 || data.validation?.passed !== true) {
@@ -228,8 +228,8 @@ export async function runConsensus({
   };
   const finalValidation = validatePublishedOutput({ qualification, weekly, monthly, consensus, status });
   process.stdout.write(`Final publication validation passed: ${finalValidation.weekly} weekly, ${finalValidation.monthly} monthly, ${finalValidation.signals} consensus signals.\n`);
-  await writeJsonAtomic("data/consensus.json", consensus);
-  await writeJsonAtomic("data/status.json", status);
+  await writeJsonAtomic("site/data/consensus.json", consensus);
+  await writeJsonAtomic("site/data/consensus-status.json", status);
   process.stdout.write(`Consensus complete: ${result.signals.length} signals from ${wallets.length} qualified wallets.\n`);
   return consensus;
 }
