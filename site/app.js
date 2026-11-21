@@ -30,8 +30,7 @@ function renderLeaderboard(rows) {
   head.append(header);table.append(head);const body=node("tbody");
   for(const trader of rows){
     const tr=node("tr");tr.append(node("td",trader.rank));
-    const who=node("td");who.append(node("strong",trader.username||"Unknown trader"),node("small",trader.wallet?trader.wallet.slice(0,6)+"…"+trader.wallet.slice(-4):""));
-    if(trader.wallet)who.append(link("https://polymarket.com/profile/"+trader.wallet,"Profile ↗"));
+    const who=node("td");who.append(node("strong","Trader #"+trader.rank));
     tr.append(who,node("td",pct(trader.winRate)),node("td",trader.resolvedMarkets),node("td",trader.wins),node("td",trader.losses),node("td",usd(trader.leaderboardPnl)));body.append(tr);
   }
   table.append(body);target.append(table);
