@@ -35,14 +35,15 @@ function renderLeaderboard(rows) {
     body.append(tr);
   }
   table.append(body);target.append(table);
-  $("#totalPnl").textContent=usd(rows.reduce((sum,row)=>sum+(row.pnl||0),0));
-  $("#totalVolume").textContent=usd(rows.reduce((sum,row)=>sum+(row.volume||0),0));
-  $("#avgWinRate").textContent="Not included";
+  // This layout has no legacy summary-metric elements; render only into elements that exist.
+  const totalPnl=$("#totalPnl"); if(totalPnl) totalPnl.textContent=usd(rows.reduce((sum,row)=>sum+(row.pnl||0),0));
+  const totalVolume=$("#totalVolume"); if(totalVolume) totalVolume.textContent=usd(rows.reduce((sum,row)=>sum+(row.volume||0),0));
+  const avgWinRate=$("#avgWinRate"); if(avgWinRate) avgWinRate.textContent="Not included";
 }
 function selectPeriod(period) {
   currentPeriod=period;
   $("#leader-period").value=period;
-  $("#leaderPeriod").textContent=period==="week"?"Week":"Month";
+  const leaderPeriod=$("#leaderPeriod"); if(leaderPeriod) leaderPeriod.textContent=period==="week"?"Week":"Month";
   renderLeaderboard(currentBoards[period]);
 }
 async function loadDashboard(){
@@ -60,14 +61,15 @@ async function loadDashboard(){
     statusDetail.textContent="100 weekly traders and 100 monthly traders loaded directly from Polymarket's public leaderboard, ranked by period P&L. This leaderboard does not claim verified settlement win rates.";
     lastScan.textContent=new Date(status.completedAt||status.generatedAt).toLocaleString();
     selectPeriod(currentPeriod);
-    $("#consensus").textContent="Consensus is separate from the Top 100 leaderboard and is not being scanned in this version.";
-    $("#combos").textContent="Combo scanning is separate and is not being scanned in this version.";
-    $("#combo-status").textContent="Top 100 refresh only";
+    const consensus=$("#consensus"); if(consensus) consensus.textContent="Consensus is separate from the Top 100 leaderboard and is not being scanned in this version.";
+    const combos=$("#combos"); if(combos) combos.textContent="Combo scanning is separate from the Top 100 leaderboard and is not being scanned in this version.";
+    const comboStatus=$("#combo-status"); if(comboStatus) comboStatus.textContent="Top 100 refresh only";
   }catch(error){
     statusPanel.classList.remove("status-success");statusTitle.textContent="Waiting for a complete Top 100 refresh";
     statusDetail.textContent=error.message;lastScan.textContent="Not yet available";
-    $("#leaderboard").className="empty";$("#leaderboard").textContent="Awaiting validated weekly and monthly Top 100 data.";
+    const leaderboard=$("#leaderboard"); if(leaderboard){leaderboard.className="empty";leaderboard.textContent="Awaiting validated weekly and monthly Top 100 data.";}
   }
 }
-$("#leader-period").addEventListener("change",event=>selectPeriod(event.target.value));
+const periodSelect=$("#leader-period");
+if(periodSelect) periodSelect.addEventListener("change",event=>selectPeriod(event.target.value));
 loadDashboard();
