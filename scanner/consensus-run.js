@@ -164,7 +164,9 @@ export async function runConsensus({
       process.stdout.write(`Combo positions: ${completed}/${total}; failures: ${failed}.\\n`);
     },
   });
-  const comboRows = comboBatch.results.flatMap((row) => row.comboRows ?? []);
+  const comboRows = comboBatch.results
+    .filter((row) => row.complete === true)
+    .flatMap((row) => row.comboRows ?? []);
   const comboResult = buildComboOpportunities(comboRows, {
     nowMs: nowSeconds * 1000,
     minEntryUsd: 5,
