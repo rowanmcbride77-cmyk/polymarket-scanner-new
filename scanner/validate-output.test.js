@@ -14,7 +14,7 @@ function fixtures() {
   const monthly = {schemaVersion:1,validation:{passed:true},count:1,traders:[trader]};
   const qualification = {
     schemaVersion:1,
-    qualification:{minimumResolvedMarkets:10,minimumWinRate:0.9,maximumEarlyExitRate:0.2,lookbackDays:30,earlyExitsCounted:false,settlementIntegrityRequired:true},
+    qualification:{minimumResolvedMarkets:10,minimumWinRate:0.9,maximumEarlyExitRate:null,lookbackDays:30,earlyExitsCounted:false,settlementIntegrityRequired:true},
     validation:{
       passed:true,allWalletAuditsComplete:true,discoveredWallets:1,auditedWallets:1,qualifiedWallets:1,
     },qualifiedWallets:[qualified],
@@ -85,4 +85,11 @@ test("rejects duplicate participants in one signal", () => {
   const data=fixtures();
   data.consensus.signals[0].wallets[1].wallet=data.consensus.signals[0].wallets[0].wallet;
   assert.throws(()=>validatePublishedOutput(data),/consensus participant threshold or duplicate/);
+});
+
+
+test("does not disqualify a wallet for early exits when settled-market stats qualify", () => {
+  const data = fixtures();
+  data.qualification.qualifiedWallets[0].summary.earlyExitRate = 0.95;
+  assert.equal(validatePublishedOutput(data).passed, true);
 });
