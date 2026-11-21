@@ -1,75 +1,42 @@
-const $ = (selector) => document.querySelector(selector);
-const statusTitle = $("#status-title");
-const statusDetail = $("#status-detail");
-const lastScan = $("#last-scan");
-const statusPanel = $(".status");
-
-function node(tag, text, className) {
-  const element = document.createElement(tag);
-  if (text !== undefined && text !== null) element.textContent = String(text);
-  if (className) element.className = className;
-  return element;
+const $ = (s) => document.querySelector(s);
+const set = (s,v) => { const e=$(s); if(e) e.textContent=String(v); };
+const node=(tag,value)=>{const e=document.createElement(tag);e.textContent=String(value??"");return e;};
+const money=v=>Number.isFinite(Number(v))?new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(Number(v)):"—";
+async function json(path){const r=await fetch(path,{cache:"no-store"});if(!r.ok)throw new Error("Could not load "+path);return r.json();}
+let boards={week:[],month:[]};
+function render(period){
+ const target=$("#leaderboard"); if(!target)throw new Error("Dashboard markup is missing #leaderboard");
+ const rows=boards[period]; target.replaceChildren();target.className="table-wrap";
+ if(!Array.isArray(rows)||rows.length!==100){target.className="empty";target.textContent="A complete Top 100 is not available.";return;}
+ const table=node("table",""),thead=node("thead",""),hr=node("tr","");
+ for(const label of ["#","Trader","Polymarket rank","Period P&L","Volume"])hr.append(node("th",label));
+ thead.append(hr);table.append(thead);const body=node("tbody","");
+ for(const t of rows){const tr=node("tr","");tr.append(node("td",t.rank),node("td",t.username||("Trader #"+t.rank)),node("td",t.leaderboardRank??"—"),node("td",money(t.pnl)),node("td",money(t.volume)));body.append(tr);}
+ table.append(body);target.append(table);
 }
-function usd(value) {
-  return Number.isFinite(value) ? new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(value) : "—";
+async function start(){
+ try{
+  const [status,week,month]=await Promise.all([json("./data/status.json"),json("./data/week.json"),json("./data/month.json")]);
+  const valid=status.schemaVersion===1&&status.state==="success"&&status.validation?.passed===true&&
+   week.validation?.passed===true&&week.traders?.length===100&&month.validation?.passed===true&&month.traders?.length===100;
+  if(!valid)throw new Error("Weekly/monthly Top 100 data failed validation.");
+  boards={week:week.traders,month:month.traders};
+  const panel=$(".status");if(panel)panel.classList.add("status-success");
+  set("#status-title","Weekly and monthly Top 100 validated");
+  set("#status-detail","100 weekly and 100 monthly traders loaded from Polymarket public leaderboard, ranked by period P&L. Settlement win rates are not included.");
+  set("#last-scan",new Date(status.completedAt||status.generatedAt).toLocaleString());
+  const period=$("#leader-period");const selected=period?.value==="month"?"month":"week";
+  render(selected);
+  if(period)period.addEventListener("change",()=>render(period.value==="month"?"month":"week"));
+  set("#consensus","Consensus is separate and is not included in this Top 100 refresh.");
+  set("#combos","Combo scanning is separate and is not included in this Top 100 refresh.");
+  set("#combo-status","Top 100 refresh only");
+ }catch(error){
+  const panel=$(".status");if(panel)panel.classList.remove("status-success");
+  set("#status-title","Waiting for a complete Top 100 refresh");
+  set("#status-detail",error?.message||"Unknown dashboard error");
+  set("#last-scan","Not yet available");
+  const target=$("#leaderboard");if(target){target.className="empty";target.textContent="Awaiting validated weekly and monthly Top 100 data.";}
+ }
 }
-async function fetchJson(path) {
-  const response = await fetch(path,{cache:"no-store"});
-  if (!response.ok) throw new Error("Could not load "+path);
-  return response.json();
-}
-let currentBoards = { week: [], month: [] };
-let currentPeriod = "week";
-
-function renderLeaderboard(rows) {
-  const target=$("#leaderboard"); target.replaceChildren(); target.className="table-wrap";
-  if(!Array.isArray(rows)||rows.length!==100){target.className="empty";target.textContent="The latest leaderboard did not contain a complete Top 100.";return;}
-  const table=node("table"),head=node("thead"),header=node("tr");
-  for(const label of ["#","Trader","Polymarket rank","Period P&L","Volume"])header.append(node("th",label));
-  head.append(header);table.append(head);const body=node("tbody");
-  for(const trader of rows){
-    const tr=node("tr");
-    tr.append(node("td",trader.rank));
-    const who=node("td");who.append(node("strong",trader.username||("Trader #"+trader.rank)));
-    tr.append(who,node("td",trader.leaderboardRank??"—"),node("td",usd(trader.pnl)),node("td",usd(trader.volume)));
-    body.append(tr);
-  }
-  table.append(body);target.append(table);
-  // This layout has no legacy summary-metric elements; render only into elements that exist.
-  const totalPnl=$("#totalPnl"); if(totalPnl) totalPnl.textContent=usd(rows.reduce((sum,row)=>sum+(row.pnl||0),0));
-  const totalVolume=$("#totalVolume"); if(totalVolume) totalVolume.textContent=usd(rows.reduce((sum,row)=>sum+(row.volume||0),0));
-  const avgWinRate=$("#avgWinRate"); if(avgWinRate) avgWinRate.textContent="Not included";
-}
-function selectPeriod(period) {
-  currentPeriod=period;
-  $("#leader-period").value=period;
-  const leaderPeriod=$("#leaderPeriod"); if(leaderPeriod) leaderPeriod.textContent=period==="week"?"Week":"Month";
-  renderLeaderboard(currentBoards[period]);
-}
-async function loadDashboard(){
-  try{
-    const [status,weekly,monthly]=await Promise.all([
-      fetchJson("./data/status.json"),fetchJson("./data/week.json"),fetchJson("./data/month.json")
-    ]);
-    const valid=status.schemaVersion===1&&status.state==="success"&&status.validation?.passed===true&&
-      weekly.schemaVersion===1&&weekly.validation?.passed===true&&Array.isArray(weekly.traders)&&weekly.traders.length===100&&
-      monthly.schemaVersion===1&&monthly.validation?.passed===true&&Array.isArray(monthly.traders)&&monthly.traders.length===100;
-    if(!valid)throw new Error("The latest weekly/monthly Top 100 data did not pass validation");
-    currentBoards={week:weekly.traders,month:monthly.traders};
-    statusPanel.classList.add("status-success");
-    statusTitle.textContent="Weekly and monthly Top 100 validated";
-    statusDetail.textContent="100 weekly traders and 100 monthly traders loaded directly from Polymarket's public leaderboard, ranked by period P&L. This leaderboard does not claim verified settlement win rates.";
-    lastScan.textContent=new Date(status.completedAt||status.generatedAt).toLocaleString();
-    selectPeriod(currentPeriod);
-    const consensus=$("#consensus"); if(consensus) consensus.textContent="Consensus is separate from the Top 100 leaderboard and is not being scanned in this version.";
-    const combos=$("#combos"); if(combos) combos.textContent="Combo scanning is separate from the Top 100 leaderboard and is not being scanned in this version.";
-    const comboStatus=$("#combo-status"); if(comboStatus) comboStatus.textContent="Top 100 refresh only";
-  }catch(error){
-    statusPanel.classList.remove("status-success");statusTitle.textContent="Waiting for a complete Top 100 refresh";
-    statusDetail.textContent=error.message;lastScan.textContent="Not yet available";
-    const leaderboard=$("#leaderboard"); if(leaderboard){leaderboard.className="empty";leaderboard.textContent="Awaiting validated weekly and monthly Top 100 data.";}
-  }
-}
-const periodSelect=$("#leader-period");
-if(periodSelect) periodSelect.addEventListener("change",event=>selectPeriod(event.target.value));
-loadDashboard();
+start();
