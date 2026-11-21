@@ -42,7 +42,7 @@ function fixtures() {
   };
   const status = {
     schemaVersion:1,validation:{passed:true},state:"success",
-    discoveredWallets:1,auditedWallets:1,qualifiedWallets:1,
+    discoveredWallets:1,auditedWallets:1,fullyAuditedWallets:1,failedWalletAudits:0,allWalletAuditsComplete:true,qualifiedWallets:1,
     consensusCount:1,comboCount:1,weeklyCount:1,monthlyCount:1,
   };
   return {qualification,weekly,monthly,consensus,status};
