@@ -41,6 +41,9 @@ export async function auditCandidatesBatch(candidates, {
   if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 32) {
     throw new RangeError("concurrency must be 1..32");
   }
+  if (!Number.isInteger(nowSeconds) || !Number.isInteger(lookbackDays) || lookbackDays < 1) {
+    throw new TypeError("Invalid audit time window");
+  }
   const windowStartSeconds = nowSeconds - lookbackDays * 86400;
   let completed = 0;
   const failures = new Map();
