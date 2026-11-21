@@ -31,7 +31,7 @@ export function qualifyWalletAudit(audit, {
 export async function auditWallet(client, wallet, {
   nowSeconds = Math.floor(Date.now() / 1000),
   lookbackDays = 30,
-  minimumResolvedMarkets = 20,
+  minimumResolvedMarkets = 10,
   minimumWinRate = 0.9,
 } = {}) {
   if (!Number.isInteger(nowSeconds) || !Number.isInteger(lookbackDays) || lookbackDays < 1) {
