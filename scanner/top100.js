@@ -77,11 +77,7 @@ export async function runTop100() {
     validation: { passed: true }, weeklyCount: week.length, monthlyCount: month.length,
     message: "Weekly and monthly public Top 100 leaderboards refreshed successfully.",
   });
-  await writeJson("site/data/consensus.json", {
-    schemaVersion: 1, generatedAt, validation: { passed: true },
-    signals: [], combos: { validation: { passed: true }, opportunities: [] },
-    message: "Consensus scanning is not part of this Top 100 refresh.",
-  });
+
   console.log(`Published-ready Top 100: week=${week.length}, month=${month.length}`);
 }
 
