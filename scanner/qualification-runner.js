@@ -115,6 +115,7 @@ export function buildQualifiedLeaderboards(discovery, auditBatch, { topN = 100 }
         verified: candidate.verified === true,
         category: appearance.category,
         leaderboardPnl: appearance.pnl,
+        volumeShares: appearance.volumeShares,
         sourceRank: appearance.rank,
         winRate: audit.summary.winRate,
         resolvedMarkets: audit.summary.resolvedMarkets,
