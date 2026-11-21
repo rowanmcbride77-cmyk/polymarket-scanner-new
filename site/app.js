@@ -14,7 +14,8 @@ function render(period){
  thead.append(hr);table.append(thead);const body=node("tbody","");
  for(const t of rows){
   const tr=node("tr","");
-  tr.append(node("td",t.rank),node("td",t.username||("Trader #"+t.rank)),node("td",percent(t.winRate)),node("td",t.resolvedMarkets),node("td",String(t.wins)+"–"+String(t.losses)),node("td",money(t.leaderboardPnl)));
+  const displayName=t.username&& !/^0x[a-f0-9]{40}$/i.test(t.username) ? t.username : "Trader #"+t.rank;
+  tr.append(node("td",t.rank),node("td",displayName),node("td",percent(t.winRate)),node("td",t.resolvedMarkets),node("td",String(t.wins)+"–"+String(t.losses)),node("td",money(t.leaderboardPnl)));
   body.append(tr);
  }
  table.append(body);target.append(table);
