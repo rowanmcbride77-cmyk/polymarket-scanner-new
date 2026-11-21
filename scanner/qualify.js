@@ -83,6 +83,7 @@ export async function runQualification({
       completed: batch.completed,
       failed: batch.failed,
       complete: batch.complete,
+      allAuditsComplete: batch.allAuditsComplete,
       errorCounts: batch.errorCounts,
       errorSamples: batch.errorSamples,
       results: batch.results,
@@ -139,17 +140,22 @@ export async function runQualification({
     },
     auditSummary: {
       disqualifiedWallets: batch.results.length - boards.qualifiedWalletCount,
+      incompleteWalletAudits: batch.failed,
+      incompleteAuditErrors: batch.errorCounts,
       disqualificationReasons,
+      incompleteWalletAudits: batch.failed,
+      incompleteAuditErrors: batch.errorCounts,
       earlyExitsExcluded,
       ambiguousSameSecondExcluded,
       postResolutionAcquisitionsExcluded,
     },
     validation: {
       passed: true,
-      allWalletAuditsComplete: true,
+      allWalletAuditsComplete: batch.allAuditsComplete,
       discoveredWallets: discovery.candidates.length,
       auditedWallets: batch.completed,
-      failedWalletAudits: 0,
+      fullyAuditedWallets: batch.completed - batch.failed,
+      failedWalletAudits: batch.failed,
       qualifiedWallets: boards.qualifiedWalletCount,
     },
     qualifiedWallets: batch.results
@@ -187,10 +193,13 @@ export async function runQualification({
     schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
     validation: { passed: true }, state: "success",
     discoveredWallets: discovery.candidates.length, auditedWallets: batch.completed,
+    fullyAuditedWallets: batch.completed - batch.failed,
+    failedWalletAudits: batch.failed,
+    allWalletAuditsComplete: batch.allAuditsComplete,
     qualifiedWallets: boards.qualifiedWalletCount, earlyExitsExcluded,
     monthlyCount: boards.monthly.length,
   });
-  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; monthly Top ${boards.monthly.length}.\\n`);
+  process.stdout.write(`Qualification complete. ${boards.qualifiedWalletCount} wallets passed; ${batch.failed} incomplete wallet audits excluded; monthly Top ${boards.monthly.length}.\\n`);
   process.stdout.write(`Output: ${target}\n`);
   return payload;
 }
