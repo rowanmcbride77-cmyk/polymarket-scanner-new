@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: polymarket-settlement-qualification
@@ -72,4 +73,8 @@ jobs:
           else
             git commit -m "Publish verified settlement-qualified trader boards"
             git push
+      - name: Trigger the fast Pages refresh with the newly committed qualification data
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run top100.yml --ref main
           fi
