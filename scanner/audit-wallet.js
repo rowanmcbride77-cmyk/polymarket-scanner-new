@@ -22,10 +22,6 @@ export function qualifyWalletAudit(audit, {
   if (audit.summary.resolvedMarkets < minimumResolvedMarkets) {
     return { qualified: false, reason: "insufficient_resolved_markets" };
   }
-  const earlyExits = audit.summary.exclusions?.early_exit_excluded ?? 0;
-  const classifiedClosed = audit.summary.resolvedMarkets + earlyExits;
-  const earlyExitRate = classifiedClosed > 0 ? earlyExits / classifiedClosed : 0;
-  if (earlyExitRate > 0.20) return { qualified: false, reason: "early_exit_rate_above_20_percent" };
   if (audit.summary.winRate === null || audit.summary.winRate < minimumWinRate) {
     return { qualified: false, reason: "win_rate_below_threshold" };
   }
