@@ -20,7 +20,7 @@ test("audits candidates with bounded concurrency and preserves every result", as
   assert.equal(result.failed, 0);
 });
 
-test("one failed wallet makes the batch incomplete", async () => {
+test("one failed wallet is recorded while the candidate batch completes", async () => {
   const result = await auditCandidates([{wallet:"ok"},{wallet:"bad"}], {
     concurrency: 2,
     async auditWallet(wallet) {
@@ -78,7 +78,7 @@ test("weekly and monthly leaderboards contain only fully audited qualified walle
   assert.equal(result.monthly[0].rank,1);
 });
 
-test("leaderboard build refuses any incomplete audit batch", () => {
+test("leaderboard build refuses a candidate batch that did not finish", () => {
   assert.throws(() => buildQualifiedLeaderboards(
     {validation:{passed:true},candidates:[]},
     {complete:false,results:[]},
