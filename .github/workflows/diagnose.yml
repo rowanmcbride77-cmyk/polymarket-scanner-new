@@ -28,8 +28,8 @@ jobs:
       - name: Audit a diagnostic sample of 100 wallets
         run: npm run qualify
         env:
-          SCANNER_CONCURRENCY: 2
-          SCANNER_API_INTERVAL_MS: 250
+          SCANNER_CONCURRENCY: 16
+          SCANNER_API_INTERVAL_MS: 60
           SCANNER_DIAGNOSTIC_LIMIT: 100
           NODE_OPTIONS: --max-old-space-size=6144
       - name: Upload diagnostic report
