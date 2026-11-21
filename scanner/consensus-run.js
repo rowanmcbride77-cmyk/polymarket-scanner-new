@@ -128,7 +128,7 @@ export async function runConsensus({
       process.stdout.write(`Recent activity: ${completed}/${total}; failures: ${failed}.\n`);
     },
   });
-  if (!batch.complete) {
+  if (!batch.allAuditsComplete) {
     await writeJsonAtomic("data/consensus-incomplete.json", {
       schemaVersion: 1,
       validation: { passed: false, complete: false, failedWallets: batch.failed },
@@ -196,7 +196,7 @@ export async function runConsensus({
     exclusions: result.exclusions,
     signals: result.signals,
     combos: {
-      validation: { passed: comboBatch.complete, complete: comboBatch.complete, failedWallets: comboBatch.failed },
+      validation: { passed: comboBatch.allAuditsComplete, complete: comboBatch.allAuditsComplete, failedWallets: comboBatch.failed },
       walletsChecked: wallets.length,
       walletsWithComboData: new Set(comboRows.map((row) => row._wallet)).size,
       count: comboResult.opportunities.length,
@@ -215,6 +215,9 @@ export async function runConsensus({
     message: "Wallet rankings and same-side consensus passed validation.",
     discoveredWallets: qualification.validation.discoveredWallets ?? 0,
     auditedWallets: qualification.validation.auditedWallets ?? 0,
+    fullyAuditedWallets: qualification.validation.fullyAuditedWallets ?? qualification.validation.auditedWallets ?? 0,
+    failedWalletAudits: qualification.validation.failedWalletAudits ?? 0,
+    allWalletAuditsComplete: qualification.validation.allWalletAuditsComplete ?? true,
     qualifiedWallets: qualification.validation.qualifiedWallets ?? wallets.length,
     disqualifiedWallets: qualification.auditSummary?.disqualifiedWallets ?? 0,
     earlyExitsExcluded: qualification.auditSummary?.earlyExitsExcluded,
@@ -224,7 +227,7 @@ export async function runConsensus({
     monthlyCount: monthly.traders.length,
     consensusCount: result.signals.length,
     comboCount: comboResult.opportunities.length,
-    comboScanComplete: comboBatch.complete,
+    comboScanComplete: comboBatch.allAuditsComplete,
     comboScanFailures: comboBatch.failed,
   };
   const finalValidation = validatePublishedOutput({ qualification, weekly, monthly, consensus, status });
