@@ -132,7 +132,6 @@ export async function runQualification({
     qualification: {
       minimumResolvedMarkets: 10,
       minimumWinRate: 0.9,
-      minimumResolvedMarkets: 10,
       maximumEarlyExitRate: 0.2,
       lookbackDays: 30,
       earlyExitsCounted: false,
@@ -143,8 +142,6 @@ export async function runQualification({
       incompleteWalletAudits: batch.failed,
       incompleteAuditErrors: batch.errorCounts,
       disqualificationReasons,
-      incompleteWalletAudits: batch.failed,
-      incompleteAuditErrors: batch.errorCounts,
       earlyExitsExcluded,
       ambiguousSameSecondExcluded,
       postResolutionAcquisitionsExcluded,
@@ -156,6 +153,7 @@ export async function runQualification({
       auditedWallets: batch.completed,
       fullyAuditedWallets: batch.completed - batch.failed,
       failedWalletAudits: batch.failed,
+      incompleteAuditErrors: batch.errorCounts,
       qualifiedWallets: boards.qualifiedWalletCount,
     },
     qualifiedWallets: batch.results
