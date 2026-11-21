@@ -157,7 +157,7 @@ export async function runQualification({
       qualifiedWallets: boards.qualifiedWalletCount,
     },
     qualifiedWallets: batch.results
-      .filter((row) => row.qualification.qualified)
+      .filter((row) => row.complete === true && row.qualification?.qualified)
       .map((row) => ({
         wallet: row.wallet,
         username: row.username,
