@@ -1,0 +1,75 @@
+name: Build Settlement-Qualified Top 100
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "47 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: polymarket-settlement-qualification
+  cancel-in-progress: false
+
+jobs:
+  qualify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check scanner and dashboard syntax
+        run: npm run check
+      - name: Run scanner unit tests
+        run: npm test
+      - name: Discover candidate wallets from Polymarket
+        run: npm run scan
+        env:
+          SCANNER_MAX_CANDIDATES: 1000
+          NODE_OPTIONS: --max-old-space-size=6144
+      - name: Qualify candidates using 30-day settlement evidence
+        run: npm run qualify
+        env:
+          SCANNER_CONCURRENCY: 16
+          SCANNER_API_INTERVAL_MS: 60
+          SCANNER_DIAGNOSTIC_LIMIT: 0
+          NODE_OPTIONS: --max-old-space-size=6144
+      - name: Validate settlement-qualified dashboard data
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const status = JSON.parse(readFileSync("site/data/qualification-status.json", "utf8"));
+          if (status.state !== "success" || status.validation?.passed !== true) {
+            throw new Error("Qualification status failed validation");
+          }
+          for (const period of ["week", "month"]) {
+            const board = JSON.parse(readFileSync(`site/data/qualified-${period}.json`, "utf8"));
+            if (board.period !== period || board.validation?.passed !== true ||
+                board.validation?.complete !== true || !Array.isArray(board.traders) ||
+                board.count !== board.traders.length ||
+                !board.traders.every((t, i) => t.rank === i + 1 &&
+                  Number.isFinite(t.winRate) && t.winRate >= 0.9 &&
+                  Number.isInteger(t.resolvedMarkets) && t.resolvedMarkets >= 10 &&
+                  Number.isInteger(t.wins) && Number.isInteger(t.losses) &&
+                  t.wins + t.losses === t.resolvedMarkets &&
+                  Math.abs(t.winRate - t.wins / t.resolvedMarkets) < 1e-9 &&
+                  Number.isFinite(t.leaderboardPnl))) {
+              throw new Error(`${period}: settlement-qualified board failed validation`);
+            }
+          }
+          console.log("Validated weekly and monthly boards: every displayed trader meets 90% / 10 resolved markets.");
+          NODE
+      - name: Commit qualified data for the fast Pages deploy
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/qualification.json site/data/qualified-week.json site/data/qualified-month.json site/data/qualification-status.json
+          if git diff --cached --quiet; then
+            echo "Qualified data is unchanged; no commit needed."
+          else
+            git commit -m "Publish verified settlement-qualified trader boards"
+            git push
+          fi
