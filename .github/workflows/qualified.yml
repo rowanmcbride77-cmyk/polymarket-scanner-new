@@ -39,6 +39,11 @@ jobs:
           SCANNER_API_INTERVAL_MS: 60
           SCANNER_DIAGNOSTIC_LIMIT: 0
           NODE_OPTIONS: --max-old-space-size=6144
+      - name: Build same-side consensus from verified qualified wallets
+        run: npm run consensus
+        env:
+          SCANNER_CONCURRENCY: 16
+          NODE_OPTIONS: --max-old-space-size=6144
       - name: Validate settlement-qualified dashboard data
         run: |
           node --input-type=module <<'NODE'
@@ -68,7 +73,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data/qualification.json site/data/qualified-week.json site/data/qualified-month.json site/data/qualification-status.json
+          git add site/data/qualification.json site/data/qualified-week.json site/data/qualified-month.json site/data/qualification-status.json site/data/consensus.json site/data/consensus-status.json
           if git diff --cached --quiet; then
             echo "Qualified data is unchanged; no commit needed."
           else
