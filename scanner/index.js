@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { discoverLeaderboardCandidates } from "./leaderboard.js";
 
-const DEFAULT_MAX_CANDIDATES = 1000;
+const DEFAULT_MAX_CANDIDATES = 20000;
 
 function candidateLimitFromEnv() {
   const value = Number(process.env.SCANNER_MAX_CANDIDATES ?? DEFAULT_MAX_CANDIDATES);
@@ -48,7 +48,7 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
 export async function runDiscovery({ outputPath = "data/discovery.json" } = {}) {
   const maxCandidates = candidateLimitFromEnv();
   const result = await discoverLeaderboardCandidates({
-    categories: ["overall"], periods: ["week", "month"],
+    categories: ["sports", "esports", "crypto", "overall"], periods: ["week", "month"],
     limit: 1000, maxCandidates, maxPagesPerPartition: 20,
   });
   const payload = buildDiscoveryPayload(result);
