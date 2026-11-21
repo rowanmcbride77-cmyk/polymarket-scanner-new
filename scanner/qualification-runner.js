@@ -106,7 +106,7 @@ export function buildQualifiedLeaderboards(discovery, auditBatch, { topN = 100 }
     const rows = [];
     for (const candidate of discovery.candidates) {
       const audit = audits.get(candidate.wallet.toLowerCase());
-      if (!audit.qualification.qualified) continue;
+      if (audit.complete !== true || !audit.qualification?.qualified) continue;
       const appearance = periodAppearance(candidate, period);
       if (!appearance) continue;
       rows.push({
@@ -133,7 +133,7 @@ export function buildQualifiedLeaderboards(discovery, auditBatch, { topN = 100 }
   return {
     weekly: buildPeriod("week"),
     monthly: buildPeriod("month"),
-    qualifiedWalletCount: auditBatch.results.filter((row) => row.qualification.qualified).length,
+    qualifiedWalletCount: auditBatch.results.filter((row) => row.complete === true && row.qualification?.qualified).length,
     auditedWalletCount: auditBatch.results.length,
     complete: true,
   };
