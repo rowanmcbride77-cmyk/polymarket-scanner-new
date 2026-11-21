@@ -22,10 +22,11 @@ function render(period){
 }
 async function start(){
  try{
-  const [status,week,month]=await Promise.all([
+  const [status,week,month,consensus]=await Promise.all([
    json("./data/qualification-status.json"),
    json("./data/qualified-week.json"),
-   json("./data/qualified-month.json")
+   json("./data/qualified-month.json"),
+   json("./data/consensus.json").catch(()=>({schemaVersion:1,signals:[]}))
   ]);
   const validBoard=board=>board.schemaVersion===1&&board.validation?.passed===true&&board.validation?.complete===true&&Array.isArray(board.traders)&&
    board.traders.every((t,i)=>t.rank===i+1&&Number.isFinite(t.winRate)&&t.winRate>=0.9&&Number.isInteger(t.resolvedMarkets)&&t.resolvedMarkets>=10&&
@@ -43,7 +44,18 @@ async function start(){
   set("#last-scan",new Date(status.completedAt||status.generatedAt).toLocaleString());
   const period=$("#leader-period");render(period?.value==="month"?"month":"week");
   if(period)period.addEventListener("change",()=>render(period.value==="month"?"month":"week"));
-  set("#consensus","Consensus market scanning runs separately from settlement qualification.");
+  const signals=Array.isArray(consensus.signals)?consensus.signals:[];
+  const consensusNode=$("#consensus");
+  if(consensusNode){
+   consensusNode.replaceChildren();
+   consensusNode.append(node("strong",signals.length+" active same-side consensus markets"));
+   if(!signals.length) consensusNode.append(node("p","No markets currently meet the consensus thresholds."));
+   for(const signal of signals.slice(0,12)){
+    const item=node("p","");
+    item.textContent=(signal.marketTitle||"Market")+" — "+(signal.outcome||"")+" · "+signal.qualifiedWalletCount+" traders · "+money(signal.totalUsd);
+    consensusNode.append(item);
+   }
+  }
   set("#combos","Combo scanning runs separately from settlement qualification.");
   set("#combo-status","Settlement-qualified leaderboard refresh");
  }catch(error){
