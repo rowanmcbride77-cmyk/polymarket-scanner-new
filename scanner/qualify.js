@@ -47,9 +47,12 @@ export async function runQualification({
     throw new Error("Candidate discovery input failed validation");
   }
 
+  const auditLimit = Number(process.env.SCANNER_AUDIT_LIMIT ?? 1000);
+  if (!Number.isInteger(auditLimit) || auditLimit < 1) throw new Error("SCANNER_AUDIT_LIMIT must be a positive integer");
+  const auditCandidates = discovery.candidates.slice(0, auditLimit);
   const diagnosticLimit = Number(process.env.SCANNER_DIAGNOSTIC_LIMIT ?? 0);
   if (!Number.isInteger(diagnosticLimit) || diagnosticLimit < 0) throw new Error("SCANNER_DIAGNOSTIC_LIMIT must be a non-negative integer");
-  const candidates = diagnosticLimit > 0 ? discovery.candidates.slice(0, diagnosticLimit) : discovery.candidates;
+  const candidates = (diagnosticLimit > 0 ? auditCandidates.slice(0, diagnosticLimit) : auditCandidates);
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
   process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\n`);
@@ -113,7 +116,8 @@ export async function runQualification({
     throw new Error(`Wallet audit incomplete (${batch.failed} failed). No Top 100 was generated. Diagnostic: ${path}`);
   }
 
-  const boards = buildQualifiedLeaderboards(discovery, batch, { topN: 100 });
+  const qualificationDiscovery = { ...discovery, candidates };
+  const boards = buildQualifiedLeaderboards(qualificationDiscovery, batch, { topN: 100 });
   const disqualificationReasons = {};
   let earlyExitsExcluded = 0;
   let ambiguousSameSecondExcluded = 0;
