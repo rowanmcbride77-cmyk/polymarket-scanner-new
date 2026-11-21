@@ -24,7 +24,7 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
     source: "Polymarket Data API v2 /leaderboard",
     scope: {
       periods: ["week", "month"],
-      categories: ["overall"],
+      categories: ["sports", "esports", "crypto", "overall"],
       sortBy: "PNL",
       pageSize: 1000,
       maxCandidates: result.maxCandidates ?? DEFAULT_MAX_CANDIDATES,
