@@ -68,7 +68,7 @@ export async function auditCandidates(candidates, {
   }
 
   await Promise.all(Array.from({ length: Math.min(concurrency, candidates.length) }, worker));
-  return { results, complete: failed === 0, completed, failed,
+  return { results, complete: completed === candidates.length, allAuditsComplete: failed === 0, completed, failed,
     errorCounts: Object.fromEntries(errorCounts), errorSamples };
 }
 
@@ -92,10 +92,13 @@ export function buildQualifiedLeaderboards(discovery, auditBatch, { topN = 100 }
   const audits = new Map(auditBatch.results.map((row) => [row.wallet.toLowerCase(), row]));
   for (const candidate of discovery.candidates) {
     const audit = audits.get(candidate.wallet.toLowerCase());
-    if (!audit || audit.complete !== true || !audit.summary ||
-        audit.qualification?.qualified === undefined ||
+    if (!audit) throw new Error(`Missing audit result for wallet ${candidate.wallet}`);
+    // An individual failed/incomplete audit disqualifies only that wallet.
+    // It must never be ranked, but it must not block every other verified wallet.
+    if (audit.complete !== true) continue;
+    if (!audit.summary || audit.qualification?.qualified === undefined ||
         (audit.qualification.qualified && audit.summary.integrityPassed !== true)) {
-      throw new Error(`Missing complete audit for wallet ${candidate.wallet}`);
+      throw new Error(`Invalid completed audit for wallet ${candidate.wallet}`);
     }
   }
 
