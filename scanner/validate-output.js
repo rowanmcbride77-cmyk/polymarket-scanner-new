@@ -54,9 +54,21 @@ export function validatePublishedOutput({ qualification, weekly, monthly, consen
       status.qualifiedWallets !== qualification.validation.qualifiedWallets) {
     fail("status/qualification count mismatch");
   }
-  if (qualification.validation.allWalletAuditsComplete !== true ||
-      qualification.validation.auditedWallets !== qualification.validation.discoveredWallets) {
-    fail("candidate wallet audit coverage");
+  const audited = qualification.validation.auditedWallets;
+  const discovered = qualification.validation.discoveredWallets;
+  const fullyAudited = qualification.validation.fullyAuditedWallets ?? audited;
+  const failedAudits = qualification.validation.failedWalletAudits ?? 0;
+  if (!Number.isInteger(audited) || audited !== discovered ||
+      !Number.isInteger(fullyAudited) || !Number.isInteger(failedAudits) ||
+      fullyAudited + failedAudits !== audited ||
+      qualification.validation.allWalletAuditsComplete !== (failedAudits === 0) ||
+      (failedAudits > 0 && qualification.auditSummary?.incompleteWalletAudits !== failedAudits)) {
+    fail("candidate wallet audit coverage or incomplete-audit accounting");
+  }
+  if (status.fullyAuditedWallets !== fullyAudited ||
+      status.failedWalletAudits !== failedAudits ||
+      status.allWalletAuditsComplete !== (failedAudits === 0)) {
+    fail("status/qualification audit coverage mismatch");
   }
   if (!Array.isArray(qualification.qualifiedWallets) ||
       qualification.qualifiedWallets.length !== qualification.validation.qualifiedWallets) {
