@@ -2,13 +2,13 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createDataApiClient } from "./data-api.js";
-import { createWalletAuditor } from "./audit-wallet.js";
-import { auditCandidates, buildQualifiedLeaderboards } from "./qualification-runner.js";
+import { auditCandidatesBatch } from "./batch-audit.js";
+import { buildQualifiedLeaderboards } from "./qualification-runner.js";
 
 function createPacedFetch({
   fetchImpl = globalThis.fetch,
   sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms)),
-  intervalMs = Number(process.env.SCANNER_API_INTERVAL_MS ?? 250),
+  intervalMs = Number(process.env.SCANNER_API_INTERVAL_MS ?? 60),
 } = {}) {
   // Pace each endpoint independently. A single global queue needlessly
   // serialized positions, tokens, and resolutions requests and made a
@@ -52,16 +52,14 @@ export async function runQualification({
   const candidates = diagnosticLimit > 0 ? discovery.candidates.slice(0, diagnosticLimit) : discovery.candidates;
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
-  const auditWallet = createWalletAuditor(client);
   process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\n`);
-  const batch = await auditCandidates(candidates, {
+  const batch = await auditCandidatesBatch(candidates, {
+    client,
     concurrency,
-    auditWallet: (wallet) => auditWallet(wallet, {
-      nowSeconds,
-      lookbackDays: 30,
-      minimumResolvedMarkets: 10,
-      minimumWinRate: 0.9,
-    }),
+    nowSeconds,
+    lookbackDays: 30,
+    minimumResolvedMarkets: 10,
+    minimumWinRate: 0.9,
     onProgress: ({ completed, total, failed, commonErrors = [], errorSamples = [] }) => {
       process.stdout.write(`Wallet audits: ${completed}/${total}; failures: ${failed}.\n`);
       for (const item of commonErrors) {
