@@ -15,8 +15,8 @@ permissions:
   actions: write
 
 concurrency:
-  group: polymarket-discovery-consensus
-  cancel-in-progress: true
+  group: polymarket-pipeline
+  cancel-in-progress: false
 
 jobs:
   discover-and-publish:
