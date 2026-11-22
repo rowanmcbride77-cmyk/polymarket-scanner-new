@@ -74,8 +74,11 @@ async function start(){
   set("#combo-status","Settlement-qualified leaderboard refresh");
  }catch(error){
   const panel=$(".status");if(panel)panel.classList.remove("status-success");
-  set("#status-title","Waiting for verified settlement qualification");
-  set("#status-detail",error?.message||"Unknown dashboard error");
+  const missingQualificationFiles=/Could not load \.\/data\/(qualified-week|qualified-month|qualification-status)\.json/.test(error?.message||"");
+  set("#status-title",missingQualificationFiles?"Top 100 data not published yet":"Waiting for verified settlement qualification");
+  set("#status-detail",missingQualificationFiles
+   ?"The settlement-qualified leaderboard files have not been published yet. The 20,000-wallet consensus scan runs separately and will appear above as soon as its data is published."
+   :(error?.message||"Unknown dashboard error"));
   set("#last-scan","Not yet available");
   const target=$("#leaderboard");if(target){target.className="empty";target.textContent="Awaiting the first validated 90% / 10-market qualification run.";}
  }
