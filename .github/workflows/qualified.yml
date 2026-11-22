@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "scanner/**"
+      - "!scanner/qualify.js"
       - ".github/workflows/qualified.yml"
   schedule:
     - cron: "47 */6 * * *"
