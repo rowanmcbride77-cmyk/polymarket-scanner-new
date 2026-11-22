@@ -30,7 +30,7 @@ async function writeJson(path, value) {
   await rename(tmp, target);
 }
 
-export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000), concurrency = Number(process.env.SCANNER_CONCURRENCY ?? 20) } = {}) {
+export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000), concurrency = Number(process.env.SCANNER_CONCURRENCY ?? 32) } = {}) {
   const discovery = JSON.parse(await readFile(resolve("data/discovery.json"), "utf8"));
   if (discovery.schemaVersion !== 1 || discovery.validation?.passed !== true ||
       !Array.isArray(discovery.candidates) || discovery.validation.candidateCount !== discovery.candidates.length) {
@@ -38,7 +38,7 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   }
   const wallets = discovery.candidates;
   const candidateByWallet = new Map(wallets.map(row => [row.wallet.toLowerCase(), row]));
-  process.stdout.write(`Fast consensus scan: checking current open positions for ${wallets.length} discovered wallets; no settlement audit or per-wallet activity-history lookup.\\n`);
+  process.stdout.write(`Fast consensus scan: checking current open positions for ${wallets.length} discovered wallets; no settlement audit or per-wallet activity-history lookup.\n`);
 
   const scanWalletBatch = async (walletRows, { intervalMs, workers, label }) => {
     const pacedFetch = createPacedFetch({ intervalMs });
@@ -47,20 +47,19 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
       concurrency: workers,
       auditWallet: async (wallet) => {
         const candidate = candidateByWallet.get(wallet.toLowerCase());
-        const sports = candidate?.appearances?.some(row => row.category === "sports") === true;
-        const snapshot = await fetchCurrentPositionSnapshot(client, wallet, { limit: 100, maxPages: sports ? 4 : 2 });
+        const snapshot = await fetchCurrentPositionSnapshot(client, wallet, { limit: 500, maxPages: 1 });
         return { complete: snapshot.complete, qualification: { qualified: true, reason: "broad_discovery_consensus_pool" }, currentPositions: snapshot.records, recentBuys: [], coverage: "BOUNDED_CURRENT_OPEN_POSITION_SNAPSHOT" };
       },
       onProgress: ({ completed, total, failed, commonErrors, errorSamples }) => {
-        process.stdout.write(`${label}: ${completed}/${total}; failures: ${failed}; common errors: ${JSON.stringify(commonErrors ?? [])}; samples: ${JSON.stringify(errorSamples ?? [])}\\n`);
+        process.stdout.write(`${label}: ${completed}/${total}; failures: ${failed}; common errors: ${JSON.stringify(commonErrors ?? [])}; samples: ${JSON.stringify(errorSamples ?? [])}\n`);
       },
     });
   };
 
-  let batch = await scanWalletBatch(wallets, { intervalMs: 35, workers: concurrency, label: "Open-position wallets" });
+  let batch = await scanWalletBatch(wallets, { intervalMs: 55, workers: concurrency, label: "Open-position wallets" });
   if (!batch.allAuditsComplete) {
     const failedWallets = batch.results.filter(row => row?.complete !== true).map(row => candidateByWallet.get(row.wallet.toLowerCase())).filter(Boolean);
-    process.stdout.write(`Retrying ${failedWallets.length} failed wallet requests with a slower 125ms request interval and four workers.\\n`);
+    process.stdout.write(`Retrying ${failedWallets.length} failed wallet requests with a slower 125ms request interval and four workers.\n`);
     if (failedWallets.length) {
       const retryBatch = await scanWalletBatch(failedWallets, { intervalMs: 125, workers: 4, label: "Failed-wallet retry" });
       const retryByWallet = new Map(retryBatch.results.map(row => [row.wallet.toLowerCase(), row]));
@@ -68,18 +67,18 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
       batch.failed = batch.results.filter(row => row?.complete !== true).length;
       batch.completed = wallets.length;
       batch.allAuditsComplete = batch.failed === 0;
-      process.stdout.write(`Retry result: recovered ${failedWallets.length - retryBatch.failed}/${failedWallets.length}; remaining failures: ${batch.failed}.\\n`);
+      process.stdout.write(`Retry result: recovered ${failedWallets.length - retryBatch.failed}/${failedWallets.length}; remaining failures: ${batch.failed}.\n`);
     }
   }
   if (!batch.allAuditsComplete) {
     const remaining = batch.results.filter(row => row?.complete !== true);
     const reasons = remaining.reduce((acc, row) => { const key = `${row.auditStage ?? "unknown"}: ${row.error ?? "incomplete"}`; acc[key] = (acc[key] ?? 0) + 1; return acc; }, {});
-    process.stdout.write(`Unrecovered wallet failure breakdown: ${JSON.stringify(reasons)}\\n`);
+    process.stdout.write(`Unrecovered wallet failure breakdown: ${JSON.stringify(reasons)}\n`);
     throw new Error(`Consensus position scan incomplete after retry: ${batch.failed}/${wallets.length} wallet requests failed; refusing to publish partial consensus.`);
   }
 
   const conditionIds = [...new Set(batch.results.flatMap(row => row.currentPositions ?? []).map(row => row.conditionId).filter(Boolean))];
-  process.stdout.write(`Fetched ${conditionIds.length} distinct active market conditions from ${wallets.length} wallets. Enriching markets in batches.\\n`);
+  process.stdout.write(`Fetched ${conditionIds.length} distinct active market conditions from ${wallets.length} wallets. Enriching markets in batches.\n`);
   const marketFetch = createPacedFetch({ intervalMs: 100 });
   const marketFacts = await fetchGammaMarkets(conditionIds, { fetchImpl: marketFetch, batchSize: 100 });
   const result = buildConsensusSignals({
@@ -103,9 +102,9 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     scanDiagnostics: {
       discoveredWallets: wallets.length,
       positionWalletsChecked: batch.completed,
-      positionPagesCapSports: 4,
-      positionPagesCapOther: 2,
-      positionPageSize: 100,
+      positionPagesPerWallet: 1,
+      positionPageSize: 500,
+      positionSnapshotMayBeTruncated: true,
       uniqueConditions: conditionIds.length,
       marketMetadataReturned: marketFacts.size,
       failedWallets: batch.failed,
@@ -130,13 +129,13 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   };
   await writeJson("site/data/consensus.json", consensus);
   await writeJson("site/data/consensus-status.json", status);
-  process.stdout.write(`Full-pool consensus complete: ${result.signals.length} signals from ${batch.completed}/${wallets.length} wallets.\\n`);
+  process.stdout.write(`Full-pool consensus complete: ${result.signals.length} signals from ${batch.completed}/${wallets.length} wallets.\n`);
   return consensus;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   runConsensus().catch(error => {
-    process.stderr.write(`Consensus failed: ${error.message}\\n`);
+    process.stderr.write(`Consensus failed: ${error.message}\n`);
     process.exitCode = 1;
   });
 }
