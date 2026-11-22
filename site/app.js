@@ -49,8 +49,16 @@ async function loadConsensus(){
 async function start(){
  loadConsensus();
  try{
-  const [status,week,month]=await Promise.all([
-   json("./data/qualification-status.json"),
+  let status;
+  try {
+   status=await json("./data/qualification-status.json");
+  } catch {
+   throw new Error("Settlement-qualified Top 100 has not been published yet. Consensus scanning is independent and appears above.");
+  }
+  if(status.schemaVersion!==1||status.state!=="success"||status.validation?.passed!==true) {
+   throw new Error("Settlement-qualified Top 100 is still being built. Consensus scanning is independent and appears above.");
+  }
+  const [week,month]=await Promise.all([
    json("./data/qualified-week.json"),
    json("./data/qualified-month.json")
   ]);
