@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: polymarket-settlement-qualification
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   qualify-and-publish:
