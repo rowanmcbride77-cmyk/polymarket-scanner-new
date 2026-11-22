@@ -2,6 +2,13 @@ name: Settlement Qualification
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scanner/wallet-positions.js"
+      - "scanner/batch-audit.js"
+      - "scanner/audit-wallet.js"
+      - ".github/workflows/settlement.yml"
   workflow_run:
     workflows: ["Discover Polymarket Wallets & Consensus"]
     types: [completed]
@@ -13,7 +20,7 @@ permissions:
 
 concurrency:
   group: polymarket-pipeline
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   qualify-and-publish:
@@ -52,7 +59,8 @@ jobs:
         env:
           SCANNER_CONCURRENCY: 16
           SCANNER_AUDIT_LIMIT: 1000
-          SCANNER_API_INTERVAL_MS: 75
+          SCANNER_API_INTERVAL_MS: 50
+          SCANNER_POSITION_MAX_PAGES: 10
           SCANNER_DIAGNOSTIC_LIMIT: 0
           SCANNER_AUDIT_CHUNK_SIZE: 25
           SCANNER_PERSIST_CHECKPOINTS: 1
