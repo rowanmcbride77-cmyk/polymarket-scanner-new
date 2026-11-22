@@ -4,7 +4,7 @@
   "candidateCount": 1000,
   "auditLimit": 1000,
   "nowSeconds": 1795377015,
-  "nextOffset": 250,
+  "nextOffset": 260,
   "results": [
     {
       "wallet": "0x032eb1bc893940263ad0b01889f262fc232f2a9e",
@@ -1594761,6 +1594761,3345 @@
         },
         "integrityPassed": true,
         "integrityFailures": [],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0x3642e17a929a87ec51f06af1d11388a48068757d",
+      "username": "QuantMcLovin",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0x23a03783dea7193df8afc1e8a8f15eb54193a706f0cf1a90f4ace9a4c13a75b8",
+            "tokenId": "65145375650244944599892485077245020565451866289239847465897058026883954687333",
+            "result": "win",
+            "resolvedAt": "2026-11-08T01:39:48.000Z",
+            "resolvedAtSeconds": 1794101988,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa52bb22da0176bfa5d3a81543607fdbfe40e97f21b2d02757212d0f9558635c6",
+            "tokenId": "28156904623076154614179097302620738301875355066925565476247332070367770411438",
+            "result": "win",
+            "resolvedAt": "2026-11-01T18:24:03.000Z",
+            "resolvedAtSeconds": 1793557443,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xbeff47eb631f0e11539d034aa583a17c66448beebbcfbf0f13d37d14dcff1561",
+            "tokenId": "34887540230976319397576122353549818832109237678653695406029105429259284391369",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T18:22:29.000Z",
+            "resolvedAtSeconds": 1795285349,
+            "currentShares": 5219.9631,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x1b8379d12dd751a114020741e148e65b0ca6ee561381ec0fa2b98a537a578fc9",
+            "tokenId": "22151760339848875130573340961940440923034837885529581163757976218405062195140",
+            "result": "loss",
+            "resolvedAt": "2026-11-04T22:24:34.000Z",
+            "resolvedAtSeconds": 1793831074,
+            "currentShares": 2343.75,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5b58b1b41eb7888d34da5b2e7813db9b3085860eb455508c47264102055bddcf",
+            "tokenId": "36731221996572952205049900504126805571885007688765068438944350697450393026727",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T21:53:34.000Z",
+            "resolvedAtSeconds": 1793656414,
+            "currentShares": 1429.99,
+            "source": "current_redeemable_position"
+          }
+        ],
+        "wins": 2,
+        "losses": 3,
+        "resolvedMarkets": 5,
+        "winRate": 0.4,
+        "exclusions": {
+          "early_exit_excluded": 29,
+          "missing_resolution_timestamp": 24,
+          "redeemable_status_payout_mismatch": 3
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0xde44891c8d31b14701892ad932c36429b05f751f",
+      "username": "niceqqqqq3",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0x23a03783dea7193df8afc1e8a8f15eb54193a706f0cf1a90f4ace9a4c13a75b8",
+            "tokenId": "65145375650244944599892485077245020565451866289239847465897058026883954687333",
+            "result": "win",
+            "resolvedAt": "2026-11-08T01:39:48.000Z",
+            "resolvedAtSeconds": 1794101988,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x8053575189fdeecb76b7d35b089f24ab5ea2ad23057ad8321507c5a19f9f72eb",
+            "tokenId": "76665005774758959967169410677673284618128560248686221012549239538039305755377",
+            "result": "win",
+            "resolvedAt": "2026-11-05T01:18:27.000Z",
+            "resolvedAtSeconds": 1793841507,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x47bb6f9a21086559e91a8e780d01d2393b127b2f834a62c087fcfededeb42f55",
+            "tokenId": "52638360098575054211095325727913750036082661228460237481873455108329538514289",
+            "result": "win",
+            "resolvedAt": "2026-11-01T00:56:19.000Z",
+            "resolvedAtSeconds": 1793494579,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xd01e0d8aa432c2e7402ddcbaf30c0ed58aefc0a9930abc451b21ad9bea2844da",
+            "tokenId": "69207066948565637325229121843268993151364783988658696410610854438894359945501",
+            "result": "win",
+            "resolvedAt": "2026-11-01T00:46:21.000Z",
+            "resolvedAtSeconds": 1793493981,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xae5cb157081e45fa1258205f028f10b38fc7c3e59f2e56d111f7fb433014d2be",
+            "tokenId": "40293056937228969718220567816024167717956251968129140976617768285800018195447",
+            "result": "win",
+            "resolvedAt": "2026-11-01T00:41:19.000Z",
+            "resolvedAtSeconds": 1793493679,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xd6a9370b22ae8775a9a349ed94ab06fadacb2924ea90862a88d6881c4f2f6348",
+            "tokenId": "114562936024425553598572621216543702482436093029530103724598762395392595713171",
+            "result": "win",
+            "resolvedAt": "2026-11-01T00:36:21.000Z",
+            "resolvedAtSeconds": 1793493381,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x0103217bfe2d49130214144d11a754cb9218259d773b24a328066ea5c2eedc2f",
+            "tokenId": "62489329853907568064171303285595302072568976036995862963406649946784445725409",
+            "result": "win",
+            "resolvedAt": "2026-11-01T00:31:19.000Z",
+            "resolvedAtSeconds": 1793493079,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc7db36794c62024a534e102bc83c9b5bf7c3ac80ca59106aec8816b57ec4c6f8",
+            "tokenId": "33565980366170242965510720771768873559146153779020999207012338059026390225512",
+            "result": "win",
+            "resolvedAt": "2026-10-29T04:21:49.000Z",
+            "resolvedAtSeconds": 1793247709,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x41f94101d57bf028eff62f2cc3714adb79722553dc59c1676071459c0b009e45",
+            "tokenId": "48974242814467521111377166073091419940430166730559094118660552642380044929668",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T01:17:49.000Z",
+            "resolvedAtSeconds": 1794705469,
+            "currentShares": 44621.2863,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5e05533be232a3db1c0d0bd0d31e03e92f23d49c76cb3858f36c76137160a993",
+            "tokenId": "98615893786261546194112226668411462993744755737413789888380961434249362713883",
+            "result": "loss",
+            "resolvedAt": "2026-11-05T03:35:19.000Z",
+            "resolvedAtSeconds": 1793849719,
+            "currentShares": 378.2955,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xc94d2d36ea4b02d121cf9dd446fe61f0ffbc4b54053cf9f0e771ae4e4eec08b5",
+            "tokenId": "93900650644393811260295734684819651906144639299835601693887525128244230534105",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T03:59:04.000Z",
+            "resolvedAtSeconds": 1793678344,
+            "currentShares": 500,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x707e10a85a5fc0e13763c308374ade4b318bbbf5fbaf8f1755217b49afc84b88",
+            "tokenId": "3186679453432343362752731534155915456173816311487078722554344625705205143733",
+            "result": "loss",
+            "resolvedAt": "2026-11-01T11:56:19.000Z",
+            "resolvedAtSeconds": 1793534179,
+            "currentShares": 99.9816,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x0b151e8bb79ad798e6e6a0fc8e987b67fc09772894d820ffe5966a10cd908c9b",
+            "tokenId": "71569180221126063616004612200084772323778794736115581229249060474562648758131",
+            "result": "loss",
+            "resolvedAt": "2026-11-01T01:01:19.000Z",
+            "resolvedAtSeconds": 1793494879,
+            "currentShares": 1000,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x3bdfd063b9a63a71b35114f0d84cfcd6e4e718cc672389ce5cd32d2a5de9102d",
+            "tokenId": "93580457204238388291884164335435680149146736738922304813494233241383589245128",
+            "result": "loss",
+            "resolvedAt": "2026-10-30T14:29:48.000Z",
+            "resolvedAtSeconds": 1793370588,
+            "currentShares": 960,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x88900410384f185817fd8c8bf6265b209444957af452405dddd3a9d1c5d936e6",
+            "tokenId": "70156971823281204614226469716676288025284354017071493727888863750760134630863",
+            "result": "loss",
+            "resolvedAt": "2026-10-28T19:06:49.000Z",
+            "resolvedAtSeconds": 1793214409,
+            "currentShares": 233,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xa526f0a79a742ddbce178b2f64bfa20d2ca3c0144e98107198e961b6cb2bd234",
+            "tokenId": "40879973503770986032295466410057270554037904112866161847448603100430579483341",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T02:52:48.000Z",
+            "resolvedAtSeconds": 1793069568,
+            "currentShares": 4799.9841,
+            "source": "current_redeemable_position"
+          }
+        ],
+        "wins": 8,
+        "losses": 8,
+        "resolvedMarkets": 16,
+        "winRate": 0.5,
+        "exclusions": {
+          "early_exit_excluded": 7,
+          "missing_resolution_timestamp": 78,
+          "same_second_as_resolution_ambiguous": 1,
+          "redeemable_status_payout_mismatch": 8
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0xda164a1aa5a166021fd2bb6dc1e54881f58aac2b",
+      "username": "gxzzy",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0x8045cbc5e564fb705352aaf4421544f346851009cfae0b0d94e44005d095d499",
+            "tokenId": "34509149061887861550188420479085765395704315181156142247990490087814172743376",
+            "result": "win",
+            "resolvedAt": "2026-11-21T02:33:40.000Z",
+            "resolvedAtSeconds": 1795228420,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x43cd2b241bfa0a17f1835ea5600c3018cd059eebd73ed30299b70922426b043b",
+            "tokenId": "52061469463616939350512532874085767851717386474295822997159755811510486619005",
+            "result": "win",
+            "resolvedAt": "2026-11-18T07:18:31.000Z",
+            "resolvedAtSeconds": 1794986311,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xd89caa6e08266e51834d64b67e4d8148d1f421c94bf8e6978008d695400059ad",
+            "tokenId": "95877231163239349262745883337232477264454535097033271147722873563574868710392",
+            "result": "win",
+            "resolvedAt": "2026-11-15T01:16:23.000Z",
+            "resolvedAtSeconds": 1794705383,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xf20cb5106e675ff9ce2c2ee8ecffec367ca39e243efa2e6b4d8516b71aa93484",
+            "tokenId": "10612237073856702563962545995283146579196258306909957398393659196510305933599",
+            "result": "win",
+            "resolvedAt": "2026-11-06T05:52:54.000Z",
+            "resolvedAtSeconds": 1793944374,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x08125ec1c875f4cb999df306961ca62e031f5d237883efa0032c289f47fad359",
+            "tokenId": "4818280115786594840469169988990123772230759082983751838506931059965200386943",
+            "result": "win",
+            "resolvedAt": "2026-10-31T04:49:30.000Z",
+            "resolvedAtSeconds": 1793422170,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9cbbb5e3a1648f19c7f16de0bb8e1b7834ee4197dbc58b85a71fa1f1bf965edb",
+            "tokenId": "5043817493714186206185562641517401905517387839659959817906756945644312510790",
+            "result": "loss",
+            "resolvedAt": "2026-11-18T17:44:25.000Z",
+            "resolvedAtSeconds": 1795023865,
+            "currentShares": 400,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x6a14965298ff31012f31e97f4a660af3183ab557e8af0bd61425688e4eaad6d8",
+            "tokenId": "33186894119926981375911045506657416352501075782037836868441763463487573710659",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T05:47:19.000Z",
+            "resolvedAtSeconds": 1794462439,
+            "currentShares": 1000,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x6efed37de29bf22cb445caf8eb9496b758baaec32301968c905f52a67065a8a7",
+            "tokenId": "110851177665493136942332419810269490130531550769640415897097763850937424035796",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T14:25:48.000Z",
+            "resolvedAtSeconds": 1794407148,
+            "currentShares": 6.6,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9f8e09b4773b6056096b3c40b388b0a727a9fbc8de88fa8b423375643156c3fe",
+            "tokenId": "34798906455965321095872953983101154145972728019603914884273136619988629413907",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T09:32:48.000Z",
+            "resolvedAtSeconds": 1794389568,
+            "currentShares": 1053,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x976e35b2d3bf476e3fd84a4162a831a613a7102dd156b85d964f47e9302df828",
+            "tokenId": "58272366432627583374640322002424589039763055311014419863200130653036323274822",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T04:07:49.000Z",
+            "resolvedAtSeconds": 1794283669,
+            "currentShares": 1000,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9df3a4ac14aa91d88f83d6e740242a4f454432de8530b0854d41aa7b69d71d4c",
+            "tokenId": "95925888873018679830803815086905784068229941729943579604241272453075308214452",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T01:45:19.000Z",
+            "resolvedAtSeconds": 1794102319,
+            "currentShares": 2000,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5d875d502f998e9e3f491922f5d8831d9135fc54538dc872c74bb191aa45bee9",
+            "tokenId": "106000555800242834779579421330415922427988649684292026519610720041305465593720",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T02:40:19.000Z",
+            "resolvedAtSeconds": 1794019219,
+            "currentShares": 484,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x357e435a4bce8257b9c96b6a711aa269676692f6c1ce14c4fbc76a8d29ec7ed6",
+            "tokenId": "108193980373571650730097740102009453972974202915410814564701335765950553729601",
+            "result": "loss",
+            "resolvedAt": "2026-11-04T03:04:06.000Z",
+            "resolvedAtSeconds": 1793761446,
+            "currentShares": 1000,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xd56e40b0c4edaf8802fbf18d85da12906a47dc77f64321924056c14f143be117",
+            "tokenId": "98496153424258704662780177520152086915154355031523360832399391423133954628660",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T04:41:04.000Z",
+            "resolvedAtSeconds": 1793680864,
+            "currentShares": 21.35,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x8c32c0a5d464c20b1188b723dd5c7342ec155928f35d26fce1fe6e0c2e48ddae",
+            "tokenId": "27281101801221197107910883994631851460013086420226153553784848463793853776271",
+            "result": "loss",
+            "resolvedAt": "2026-11-01T00:57:19.000Z",
+            "resolvedAtSeconds": 1793494639,
+            "currentShares": 443.66,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xb50a479e7dce2014c3804f9910ade7ee179e195c527f103d4a00ff89bb481c40",
+            "tokenId": "110956546469791351722585475905707489527668367602539815959459156434989478223238",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T22:38:49.000Z",
+            "resolvedAtSeconds": 1793486329,
+            "currentShares": 600,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x853af8b36e26092009319f2951f7bd325aea1af901d874a43f4abb62806d2664",
+            "tokenId": "41318453478792074347098694400816242808662297064931868517496381003076196819260",
+            "result": "loss",
+            "resolvedAt": "2026-10-28T00:57:05.000Z",
+            "resolvedAtSeconds": 1793149025,
+            "currentShares": 123.49,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x7a44f1dac96043dffbe6db5eb8bb0d1fbef281de8c7565eb6bf3b157aae37495",
+            "tokenId": "103372206744369399162819536901802686637147031071616251432707100724959042344970",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T18:23:48.000Z",
+            "resolvedAtSeconds": 1793125428,
+            "currentShares": 465.5,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x0c8c7e418f7527b0f91501eaedf5f93d636b35ef64f74105061af6115f3e6bca",
+            "tokenId": "108529256474525238875097276542348954173274831189506296246205865707474239804256",
+            "result": "loss",
+            "resolvedAt": "2026-10-26T23:36:53.000Z",
+            "resolvedAtSeconds": 1793057813,
+            "currentShares": 1499.9942,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x88d1c1408871058777b139a8360f279f803403bde7107ad326ecf74bff6e4897",
+            "tokenId": "57966890314733973852304223254779169934109473114971684744312668116925070405541",
+            "result": "loss",
+            "resolvedAt": "2026-10-26T16:44:33.000Z",
+            "resolvedAtSeconds": 1793033073,
+            "currentShares": 85.5,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xee382461657355b417a3ba3f75e6de8f898a2a633157641e18d70262fc12b6f8",
+            "tokenId": "30051129446975232867464299337725750907576805990947358309957306096585423437729",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T23:52:50.000Z",
+            "resolvedAtSeconds": 1792972370,
+            "currentShares": 999.9971,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xc99c2b274092d314bcab69f562d2faa8099dc5b4760444de4c4d634bfcd5c44e",
+            "tokenId": "85119559522805420335914395771503727449632631677628317405010224221544803268900",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T19:37:18.000Z",
+            "resolvedAtSeconds": 1792957038,
+            "currentShares": 3000.0079,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x3dc6f8d4511551b90f209dda220fb7de03d4a40e7b49623e5c201177d9f1d7fb",
+            "tokenId": "37300951364824173457769516798330345429608084517296400248469916059440641031361",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T00:59:18.000Z",
+            "resolvedAtSeconds": 1792889958,
+            "currentShares": 699.99,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xad2b65e87cf7d112c002812e266309dca563ae245147784f353906d09da7fc82",
+            "tokenId": "41442811723810386501930528018849327654230894621611452313882432123263216564392",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T20:18:50.000Z",
+            "resolvedAtSeconds": 1792873130,
+            "currentShares": 999.99,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x325459ac058b50618f5f6a0116079b4c8baaed234d16126b015a944d3956f08c",
+            "tokenId": "25254383287130426656176153294689261022971513354701733211726258646065618778842",
+            "result": "loss",
+            "resolvedAt": "2026-10-23T22:39:48.000Z",
+            "resolvedAtSeconds": 1792795188,
+            "currentShares": 2000,
+            "source": "current_redeemable_position"
+          }
+        ],
+        "wins": 5,
+        "losses": 20,
+        "resolvedMarkets": 25,
+        "winRate": 0.2,
+        "exclusions": {
+          "early_exit_excluded": 117,
+          "same_second_as_resolution_ambiguous": 3,
+          "missing_resolution_timestamp": 13,
+          "redeemable_status_payout_mismatch": 20
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0x14c32680ffc318892e0d019181e4161aa34cdf68",
+      "username": "borntoolate.eth",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0xe02767c74a9e6a1634ad7bda1497295d8a07d291ff0b7bd7c2883a09cc95664d",
+            "tokenId": "4565469707890454913408178462902863280207752213196386925607914421082686695386",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T23:23:49.000Z",
+            "resolvedAtSeconds": 1794698629,
+            "currentShares": 104.82,
+            "source": "current_redeemable_position"
+          }
+        ],
+        "wins": 0,
+        "losses": 1,
+        "resolvedMarkets": 1,
+        "winRate": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 68,
+          "early_exit_excluded": 2,
+          "redeemable_status_payout_mismatch": 1
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0x635cfc3676fcd4bc65d177214eb5f9fdf73645c6",
+      "username": "jumpsquad",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [],
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "exclusions": {
+          "early_exit_excluded": 1,
+          "missing_resolution_timestamp": 38
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0x970998da056e60c707d9b1fc55cfdf3d68c252ab",
+      "username": "LuccaF7",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0xa483c85c21f0ce4d42eb25b51dd8d3ce19921d6e930162a6a8bcec5942c17572",
+            "tokenId": "111475682229657810723160134943343633268815943625302526247531708302327053204471",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T22:19:04.000Z",
+            "resolvedAtSeconds": 1795299544,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x267037791f7bc5feba41895eef583ddfca1e89343190e50365b8f8ff17f92119",
+            "tokenId": "42755531411563270358650554131651057998601177811350848971010484017472093557954",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T21:43:37.000Z",
+            "resolvedAtSeconds": 1795297417,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xb35190f837d7e62d126ba288fc76cfe992d19b2d2b1175a04a81a779d0d5d6da",
+            "tokenId": "97647250115348126122469804136271984958362050159497871474403805051143799660193",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T21:42:02.000Z",
+            "resolvedAtSeconds": 1795297322,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xe673861005d68fac87f2e5211b73b450878c71484c21a2bfc0ab60d4dc3d1b2b",
+            "tokenId": "20514583343511546844527399149379230089005607825213433780562720266367426773460",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T20:52:17.000Z",
+            "resolvedAtSeconds": 1795294337,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xe1e1fc5d97f100c95d9a77e71d49ce6746f401acf54a3b86fe22cf510da5cc11",
+            "tokenId": "21582939066287813209150536182371347715519705176291230578158657431458705193729",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T17:33:04.000Z",
+            "resolvedAtSeconds": 1795282384,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x025eb37a34144aff1081fa53834ce5178279b8b6736118566550d6f927fcb2c9",
+            "tokenId": "74715875514923545201741736069124781174568012881864882217011625772613337574019",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T23:21:47.000Z",
+            "resolvedAtSeconds": 1795216907,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x73d58d8535df0a3f5efb1d5baaf81a44845de8108d6173b03d703cd1a4daadf9",
+            "tokenId": "29013435408328525457442232002460289304173581213868105980166181679557737474629",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T14:48:43.000Z",
+            "resolvedAtSeconds": 1795186123,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xb19d50ffcb80554abdb9c00f33a777448eaca128d72cb25bc3f9dcefa2091c45",
+            "tokenId": "49071121090575433411661635997452787780566139342635734011741558137692347239975",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T14:49:02.000Z",
+            "resolvedAtSeconds": 1795186142,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xdf22a9d7f8b773539e9b23a5a772eef13d28626fae68ee64d467efeefb0a76c7",
+            "tokenId": "37333245301593252058779895056221512571034788544325775029673527455769238816077",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T07:03:26.000Z",
+            "resolvedAtSeconds": 1795158206,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x5bbddc3af411382156bdb5c8a8bc50aaa17956fc169cbbbb81226f0af871f5ad",
+            "tokenId": "67448181636052230366721808003254042090444736437000436929678965286928773802218",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T00:50:34.000Z",
+            "resolvedAtSeconds": 1795135834,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x670700e49ea3b51b8ab2574d61ce913a3e4146fa2e65bded6c893b208cc4cad5",
+            "tokenId": "75759985477441662583004111006253518053344963254744890188303216465140524052024",
+            "result": "win",
+            "resolvedAt": "2026-11-17T05:20:34.000Z",
+            "resolvedAtSeconds": 1794892834,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9b547f0b5c24a008dc72892470509cf66f9cc93e3246cc37ce3c0a2d35c52e88",
+            "tokenId": "33668042206515621551886459041042538541830510537559739682358831625506524056899",
+            "result": "win",
+            "resolvedAt": "2026-11-17T05:17:43.000Z",
+            "resolvedAtSeconds": 1794892663,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa647943b18d1093f59906b80a9966982d7c4e01babe7045f39b46b8df197debb",
+            "tokenId": "104502371338798920374497366346520677669398411951574454433764556165990954141799",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T00:30:34.000Z",
+            "resolvedAtSeconds": 1794702634,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x5eaabed34359977a2a838e2da4d20b0fc9100cadb145c3d64812d8926a41c385",
+            "tokenId": "105496501608140302171545652699487966702546677176455123275568650896771297084987",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T00:39:49.000Z",
+            "resolvedAtSeconds": 1794703189,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x23a920c8311c72a711e56e1c0c13c728f78e3423c56ca41b0efabdc40e263b0f",
+            "tokenId": "109435884596942164780023278448619104809546220858618763540767376183413152580557",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T00:30:19.000Z",
+            "resolvedAtSeconds": 1794702619,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x75a4dae34bcdefb09246ef4a07c51408fead24505afffe06989d4bc43706b2e0",
+            "tokenId": "115437999501376437356399681318215794799965208365288677204944194500034538537877",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T00:30:04.000Z",
+            "resolvedAtSeconds": 1794702604,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x7891acafba4825ca626d63212a7553ff7bbe9a375ccbfb4e6569eafd18f2ae3a",
+            "tokenId": "4024402223603143889082386189944466797359116658009917914855127381605468247056",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T00:42:19.000Z",
+            "resolvedAtSeconds": 1794703339,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x64c39caf74298d8082d9b10385885d893cffc6984edc2753cf2f7d595c924c08",
+            "tokenId": "53427822746016683070345884213046386789886142349631001819018742604248209053714",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T00:40:19.000Z",
+            "resolvedAtSeconds": 1794703219,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x7d382dcda4d7b7bef035d3db98f9fae4106326fa76a58d17eff7f71a71120426",
+            "tokenId": "85431761584508785068208145038294175274377204628582349356327271129006036615816",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T00:30:34.000Z",
+            "resolvedAtSeconds": 1794702634,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x4d52d092921ded85ca7d45bc6cc579e39511c550fd2673c87192f148540538c4",
+            "tokenId": "8975920900551993196674221989401352164642566333296070788029183152710047065367",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T00:30:04.000Z",
+            "resolvedAtSeconds": 1794702604,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xb3dc5ded7220ea322851dcebc4a5cf23c476b8caee3ae79971889de12ae0654c",
+            "tokenId": "31022961264617966736197986261183161762345647601634612170159290049576569937649",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T16:07:01.000Z",
+            "resolvedAtSeconds": 1794672421,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x68646cd23e47adf5624ac18cac890d6f4a8abc9ce618ae05bb27a08e9030ed3d",
+            "tokenId": "47797650289023187213591333418289038928729511646379959150591269374893319669721",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T16:06:41.000Z",
+            "resolvedAtSeconds": 1794672401,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9e766e024f3f77574da676b4e37f5313f19d5cc27350790d87482bdd72da835f",
+            "tokenId": "73954500407636401505549017098905372848244964272651971997686020672883078803269",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T16:07:35.000Z",
+            "resolvedAtSeconds": 1794672455,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x3bd0c1613a280ce7bce6f9ded8024572250a2287976cc26475f11b8b7b006141",
+            "tokenId": "21184164796082176740301268859725177601185778921318696763593696498344780563400",
+            "result": "loss",
+            "resolvedAt": "2026-11-13T17:13:34.000Z",
+            "resolvedAtSeconds": 1794590014,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x2843f4a9606398c4fbff4193b077f7978de2eb815a7633d496251b750ac09e36",
+            "tokenId": "32076005975266701576946574223702003015119441351357079675703928236145200393792",
+            "result": "loss",
+            "resolvedAt": "2026-11-13T00:00:04.000Z",
+            "resolvedAtSeconds": 1794528004,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xfdebe53e7e3dfa67d135a220290cf3e3e4c949ce74f383193874677f54f87d5a",
+            "tokenId": "88606596842896716879024149664860444006382568752143530405934168267636039661959",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T23:59:18.000Z",
+            "resolvedAtSeconds": 1794527958,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa1cf4416583d04f0cc9d9663b5a876572f147a4d503c3f156f5be477ebf3a97e",
+            "tokenId": "64370669228594788707444110468818425890082739569736826892779216997949073789021",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T07:01:03.000Z",
+            "resolvedAtSeconds": 1794380463,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x7a89b5581f2e9eed12795c295d5224b4f7caccb1a712e0f3473780e02ce96569",
+            "tokenId": "23462372011442814281144954006629347387056000296947333073290782139202706284712",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T21:08:03.000Z",
+            "resolvedAtSeconds": 1794344883,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x0ffca3f6e31e514dfcbac86b0242a6719c955ca58bc2412fafcf99d04917af16",
+            "tokenId": "55239062102118131685252791260310870846692455262887939672865826843395568308614",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T17:23:48.000Z",
+            "resolvedAtSeconds": 1794245028,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x752fff415b11f2a3d667ace3da996d48eba751c24bde39d147fd51c9f06e96cf",
+            "tokenId": "29155161935722219084530134653927200409283559658030337941734385799883356971567",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T07:04:19.000Z",
+            "resolvedAtSeconds": 1794121459,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x5b4ecf20919139ba888fc0e96c2c30bf5be506ec6a3c5185b143407b0633486a",
+            "tokenId": "80371337236873199397139531103984619218264149026130331857890858777138610561664",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T19:43:19.000Z",
+            "resolvedAtSeconds": 1794080599,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x2432b09b0b048dde04a51fa9332f40d691b448ca4194e35d58c33cbf3ae9f926",
+            "tokenId": "84358380810761340747200077427541402809391797357521151740425369263769489252345",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T20:17:04.000Z",
+            "resolvedAtSeconds": 1794082624,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x034b5417bb5eee2bcabc7a14b16f62fb6b7b697860a25d30aa5581be8bda6315",
+            "tokenId": "89819783675669052802175080696669804162950137062108388340303337604537456464420",
+            "result": "loss",
+            "resolvedAt": "2026-11-04T20:45:19.000Z",
+            "resolvedAtSeconds": 1793825119,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xcbcfb18040c99e47976411503bbd82989ebee44ea82f51681edb9c8d935ad6ad",
+            "tokenId": "79848002317693425408174126743363366298429941694000690034257070302399759706773",
+            "result": "loss",
+            "resolvedAt": "2026-11-04T17:31:49.000Z",
+            "resolvedAtSeconds": 1793813509,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa5be40592d4e10fff7edc8a4da3ac9538c7dd61c56d8c63ea8077f196377ccee",
+            "tokenId": "112017875244280986475888540512850113470892529590371919220246231219965332459003",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T22:46:48.000Z",
+            "resolvedAtSeconds": 1793746008,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xf9168f73ccd9db6c86df919cbb107e784247a9e83774dacfd8103cc8ba0a5573",
+            "tokenId": "91319699611478772993405229731244556776715826489815051674468865946896694026316",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T19:53:03.000Z",
+            "resolvedAtSeconds": 1793735583,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x89c09e7ce97d3f35e9d2b84dcd32b3ae81f0612950b20c90d2496adf52cfd48c",
+            "tokenId": "113589282559746824977163092356010790880392322335273052677162368300396751638480",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T22:13:04.000Z",
+            "resolvedAtSeconds": 1793657584,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x23ca5fba3cac278c4386d78f3d2cee4a50d69b12095d881dffdf3488d988dc85",
+            "tokenId": "109985806308320747730817287203863707524287463399488142039141222570179664766194",
+            "result": "win",
+            "resolvedAt": "2026-11-02T21:04:36.000Z",
+            "resolvedAtSeconds": 1793653476,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9dee5f53bc2915113142c59fd6c60751fa4663dff843db206beebdad10a5c78a",
+            "tokenId": "43518893116975333420679348342053804331473550255681046178387237948604401587640",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T00:48:04.000Z",
+            "resolvedAtSeconds": 1793580484,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa3e8ef111c104c3b3d56ca06d6aa42dd0b28b3ba319c169ac5a836170be4b353",
+            "tokenId": "45463031587643898702894668287248815084865106924121842112881957196373127480262",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T00:54:04.000Z",
+            "resolvedAtSeconds": 1793580844,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x7a2b02c5616c276466c60b08f6a126de1ac02f994d7e9732a0b1047ce5fb97b9",
+            "tokenId": "43604300700675128495524608605122325077798191789620200548005247756353319209428",
+            "result": "loss",
+            "resolvedAt": "2026-11-01T23:03:33.000Z",
+            "resolvedAtSeconds": 1793574213,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa54108c7e2c9764f25d43aaa84a1a389a0ad27d4a7396f72e2195c32f7dca7b2",
+            "tokenId": "63066883240502395157907848966581056033418482625131124489143915905261888331687",
+            "result": "loss",
+            "resolvedAt": "2026-11-01T00:56:33.000Z",
+            "resolvedAtSeconds": 1793494593,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x795e770ea5a653a25c6be5bfebfb7a2ea9729fe772c52f39e77e484933d86e73",
+            "tokenId": "11876703303173865042533624215072650960141020256097028785713765449539960408361",
+            "result": "loss",
+            "resolvedAt": "2026-11-01T00:17:18.000Z",
+            "resolvedAtSeconds": 1793492238,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x54a1bfbab3a9ebd2761ec2bc5f06b6c7b03aa06eae0de40f25c2bcfec1723673",
+            "tokenId": "42356562910850310722772587374429042669248036407566323679593011382225452967645",
+            "result": "win",
+            "resolvedAt": "2026-10-31T23:39:19.000Z",
+            "resolvedAtSeconds": 1793489959,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x1a1a099da002ab355b76314512318d1a5e273e19ee0d7a818c707758723887fd",
+            "tokenId": "15624308387259310156109183040221768582974466064975396682466497208823076666622",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T19:49:04.000Z",
+            "resolvedAtSeconds": 1793476144,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x2bd5c25765941f0569035b6a335235bcdd58ea9831cbd42ce2dc8ba6881d1c0d",
+            "tokenId": "12935745435867709144067234693592347797061951464965965969159330437059203470274",
+            "result": "loss",
+            "resolvedAt": "2026-10-29T19:32:19.000Z",
+            "resolvedAtSeconds": 1793302339,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x1ff5bbf1a4ec5526364689d4475ba8f4af231086a032ce6433b4b9cc4f4562b2",
+            "tokenId": "94083247771065810465640292469093825159997786575610839557949116312137728240083",
+            "result": "loss",
+            "resolvedAt": "2026-10-28T20:56:04.000Z",
+            "resolvedAtSeconds": 1793220964,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa22ed04ddcc2c5763f9de6c8dbea01b71206bee1fe9a8fb10cff72cd84908a94",
+            "tokenId": "32649978658254040692494201691747427505147649345806343076616100889906045922764",
+            "result": "loss",
+            "resolvedAt": "2026-10-28T02:29:48.000Z",
+            "resolvedAtSeconds": 1793154588,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x082b1a3158b1ca7c433a95989f06ac0b21d5e6ae9a2f59aad1dc475bca60d3f9",
+            "tokenId": "45849296435572594978919502961896073494984282199629861159302360662888284172500",
+            "result": "loss",
+            "resolvedAt": "2026-10-28T02:28:06.000Z",
+            "resolvedAtSeconds": 1793154486,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xb76b3d46ba93ee28517fe072a0d3dcfd43317d2c9d61490216fc160cc0de17ca",
+            "tokenId": "69925467088892147950019773867303236572094136704750770544150012678411799350036",
+            "result": "loss",
+            "resolvedAt": "2026-10-28T03:32:48.000Z",
+            "resolvedAtSeconds": 1793158368,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x6216c81570e4944e1a752bd52423effe5f05c73a45d72f36de364d1983ec5fc4",
+            "tokenId": "88609745400718179744948021125576528833237362726091328901826586158038019202657",
+            "result": "loss",
+            "resolvedAt": "2026-10-28T01:19:48.000Z",
+            "resolvedAtSeconds": 1793150388,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x52b86bc7d68d8d0269a3400cebb434743f4d7c42a26049eb1e1a33a1ec68fb01",
+            "tokenId": "94634246516866285720745609775741408656638292511843361811969761703890041232754",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T22:01:35.000Z",
+            "resolvedAtSeconds": 1793138495,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9df74cb293333dd8b3d2b0c6a186bc3385ac41203f9cdf6d2888c1d89257c749",
+            "tokenId": "110436235741890728192405405650404192778559231291344130652831864140873154881285",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T20:39:41.000Z",
+            "resolvedAtSeconds": 1793133581,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xb3190794885f832e508d086ffa82d4b84ca1e0ada9c734550637e6fdd9bb1cff",
+            "tokenId": "92708239841263145361017304203618583258102423804507532186791623602897510452108",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T14:47:48.000Z",
+            "resolvedAtSeconds": 1793112468,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x401c1614a93ddc098c97338b5452d887f4ca1617a4445c2a1a966b6aa58e28d7",
+            "tokenId": "23988024383994965149863858271676239596656646459569397939879023427121355858150",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T03:48:51.000Z",
+            "resolvedAtSeconds": 1793072931,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xcc8fbf5f8ecc681cfdc3a414badff6f1825a8225d12c0d922ce32e9023343dff",
+            "tokenId": "9531195501104341552985982692778156021570283558943880235641163305409386821307",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T01:44:18.000Z",
+            "resolvedAtSeconds": 1792806258,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          }
+        ],
+        "wins": 4,
+        "losses": 52,
+        "resolvedMarkets": 56,
+        "winRate": 0.07142857142857142,
+        "exclusions": {
+          "early_exit_excluded": 216,
+          "missing_resolution_timestamp": 124,
+          "same_second_as_resolution_ambiguous": 3,
+          "multiple_outcomes_held_in_same_market": 3,
+          "missing_or_nonbinary_token_resolution": 3
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "missing_or_nonbinary_token_resolution"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0xbad26fe5458e6219cec3e40272760e275e835296",
+      "username": "cocococococo",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0xe058def0beb87d877a14096cff94fd024a4976d9e0afd87cccfe8f5ee9954372",
+            "tokenId": "62244095877568833242892278066780921607737354525532836359480508205923831188083",
+            "result": "loss",
+            "resolvedAt": "2026-10-30T03:08:49.000Z",
+            "resolvedAtSeconds": 1793329729,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xefb8d071c139b9279e91ef5f8fdc458eda74e842bb6cf2cc44ea2cd921493fc6",
+            "tokenId": "65812990000766154445848378671673683284596077020801957644439478833018296477414",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T20:50:04.000Z",
+            "resolvedAtSeconds": 1793479804,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x2daa4977064d862b5f441682e8ea57734263bef115d3d0e9be279b595253375b",
+            "tokenId": "7946663316591337506763328469456495971609697839427066583317429110078201721884",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T21:04:03.000Z",
+            "resolvedAtSeconds": 1793480643,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc299f9f1cd799de8865126ce5b23a233abe1253e12674ac24a952dbfa78d74d3",
+            "tokenId": "85448272141906989149205837241933025760246850656967681491131888225427822169308",
+            "result": "loss",
+            "resolvedAt": "2026-10-30T05:03:03.000Z",
+            "resolvedAtSeconds": 1793336583,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x798a8e658b9b223ca6890838f9d4a82ce003d45b071f0ed4b948bd4e47c6dbfc",
+            "tokenId": "103376648014080430275209154842202136994176470588400906278253354568110686978032",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T20:21:04.000Z",
+            "resolvedAtSeconds": 1793478064,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xfdf6de0307939559f3d4d0c5ecce880e1e52d32fb09dc51e6c65e68e08a73f12",
+            "tokenId": "106224469072968317561508710910201612157116964135146585972529491637420694068911",
+            "result": "loss",
+            "resolvedAt": "2026-11-04T02:56:48.000Z",
+            "resolvedAtSeconds": 1793761008,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x475f7bd740cdd531d81e70c6352d04ce6612d4af33143e1c680f457441186a33",
+            "tokenId": "15261239087154198118861657904816280396918676902002010392378182152825760441818",
+            "result": "loss",
+            "resolvedAt": "2026-11-04T03:07:04.000Z",
+            "resolvedAtSeconds": 1793761624,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x481429cfe9c1edf9dd22d878d1f51c4e012602574670b6e79614feb050f435b8",
+            "tokenId": "33292501242101657683501449144711122502330590152252756854328573035275179116508",
+            "result": "loss",
+            "resolvedAt": "2026-10-30T05:12:48.000Z",
+            "resolvedAtSeconds": 1793337168,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x398340841ea9eb67c0eae353ae924f6044fbe9a70793baf6fb0b8d4453dd9809",
+            "tokenId": "40038648937509822923717025614310787558646124878306546148520211484708646856646",
+            "result": "loss",
+            "resolvedAt": "2026-10-30T02:57:49.000Z",
+            "resolvedAtSeconds": 1793329069,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xcb524df63dc56418c0e401f059c4e10fee53004331908965f74f2069264feb41",
+            "tokenId": "46720157425283045086277948944225432862021399387408463333541778988074201712563",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T01:01:19.000Z",
+            "resolvedAtSeconds": 1793408479,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xdc614e16fcccc4cce28241e13e7b774d797e30bbb55b0985f63915c039fa7aa7",
+            "tokenId": "52961673568860383796111389280457814024555686645425329238438869625856072284027",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T03:01:04.000Z",
+            "resolvedAtSeconds": 1793674864,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc10ecfad4d975cce207190678f4592f69d9f6641e1bbd941f467fba87ece90ea",
+            "tokenId": "55012348255804888674190230976221967593948333146136756251045914460657281773992",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T01:52:48.000Z",
+            "resolvedAtSeconds": 1793584368,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9a9f72bb06efcec825259cef98562c067181f454e7c31ef065e04e0482d23d2d",
+            "tokenId": "97191528696189306893244991955437260327351256397992561299534031880291967124012",
+            "result": "win",
+            "resolvedAt": "2026-11-01T01:57:37.000Z",
+            "resolvedAtSeconds": 1793498257,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc98f79a6004cb650f1bf80926cfddef51a457d9d9c4980461f4dc8f43f9eb2f3",
+            "tokenId": "91970123522476018768723728369346530023660711129302746880104347807949456243417",
+            "result": "loss",
+            "resolvedAt": "2026-10-28T17:24:49.000Z",
+            "resolvedAtSeconds": 1793208289,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x6dccd54ad0aa48eb04c17f1fd0b033c07a95a87ff8c5c882f004ca45c00e7e08",
+            "tokenId": "86251960487333944829295436845339778503135448830171904215992256311240482877451",
+            "result": "loss",
+            "resolvedAt": "2026-10-23T21:37:15.000Z",
+            "resolvedAtSeconds": 1792791435,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x338782072160e4142e3762a7d6bc16c59cc794a2b20aa46d0419fb96d34cdca7",
+            "tokenId": "114176400340376423188779739029813758776881809953391351921738595247626211082093",
+            "result": "loss",
+            "resolvedAt": "2026-10-29T03:31:04.000Z",
+            "resolvedAtSeconds": 1793244664,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x5a6a50a756a4ed9a7dd8292b7e024c31265f36f9121fea8580e8059978154c83",
+            "tokenId": "63369506565188239230697311940630097772652077203759009439729976767265151485330",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T02:02:05.000Z",
+            "resolvedAtSeconds": 1792893725,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x81de92847f7efafabce6f78e96f1165983999e08e0a04dd271990c949cfe858a",
+            "tokenId": "41265434115534345236716112764772889897229326822550763458480570641276453415627",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T01:51:33.000Z",
+            "resolvedAtSeconds": 1792806693,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x2282e1294690463505324dc6d0dbd4d5f29256109fb7c080a4bffe26faa9fa35",
+            "tokenId": "41643740249775836899907772852404081791929854892437372627372490761303973089709",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T14:42:50.000Z",
+            "resolvedAtSeconds": 1792852970,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9636563d22620d1a3004cfaca638f75e8a19d9aef80eabfa9fde993345d1c0e1",
+            "tokenId": "34863269834450294241654060330284230023713631725449261277983939898728011908122",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T04:56:03.000Z",
+            "resolvedAtSeconds": 1792904163,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc626748e247068e0a44852a4316b91794456d2a47b6686d69cad435d0ae2a2a4",
+            "tokenId": "35766947959999995910587962963292529166211055696471702315302683349845451596285",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T02:01:18.000Z",
+            "resolvedAtSeconds": 1792893678,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x51f6ca5799ee3291a2d5331705ed5ff17b229053b0a2fac62388835569290172",
+            "tokenId": "30400568981639263623992378378030474567545746010419308621174814074831606130053",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T02:08:48.000Z",
+            "resolvedAtSeconds": 1792894128,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xe6cafea6f7a00a0bd8481bc4d538026ae0424e169fb74cea69a0fa8c7be8e8fa",
+            "tokenId": "12490667586350819006008801857902747812809819007964821288740646546091682270501",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T04:20:48.000Z",
+            "resolvedAtSeconds": 1792815648,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x22f0c5767833b1014db390e64efc4a3ea8acc1a0375551e3a47109a1db1b0e62",
+            "tokenId": "6300202775027883043859287148047847175159847029491983152109148686809785318254",
+            "result": "loss",
+            "resolvedAt": "2026-11-22T03:06:04.000Z",
+            "resolvedAtSeconds": 1795316764,
+            "currentShares": 2222,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9ccb926cf89649bde4a65dabee447575d1abb897bc1fcd9b8589f413239e7b65",
+            "tokenId": "2999655490162356379883688645433567606713379397690773951078669001312278342007",
+            "result": "loss",
+            "resolvedAt": "2026-11-22T02:49:04.000Z",
+            "resolvedAtSeconds": 1795315744,
+            "currentShares": 11109.9938,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xa198c0b29b2f0b5dea96a0d56b2208f75813bc8cdf44eacb1771d9fb35bcd99e",
+            "tokenId": "13175885535817307826866755817220244629674429278563566687895639727283005162963",
+            "result": "loss",
+            "resolvedAt": "2026-11-22T01:56:04.000Z",
+            "resolvedAtSeconds": 1795312564,
+            "currentShares": 1772.3964,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xac49a62d93f944277b485d1694605fe565f48a17be07d0cabd8a4d28b55a93af",
+            "tokenId": "49400816842169851745530056742212909758069227970001335396135682182405003726557",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T21:06:34.000Z",
+            "resolvedAtSeconds": 1795295194,
+            "currentShares": 985.69,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xebf4d363545edc72c2ecd9a2b2cbbc110deed8b6c9438eb185b09d26be201c09",
+            "tokenId": "111397862994304340771235108615916052505139128894015918899703628556553075214595",
+            "result": "loss",
+            "resolvedAt": "2026-11-19T03:32:04.000Z",
+            "resolvedAtSeconds": 1795059124,
+            "currentShares": 858.975,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9f83f1e6f1ead4824b23843684060c026c08773b3859e7daa482062e57313d34",
+            "tokenId": "7196889345120786700727812041564129797743465518787485741443219857644720224785",
+            "result": "loss",
+            "resolvedAt": "2026-11-18T03:23:49.000Z",
+            "resolvedAtSeconds": 1794972229,
+            "currentShares": 72.66,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xf6fcff2d85a3d46a825403cfc9a016649b5df0669efc823f05ad3c462648b208",
+            "tokenId": "73020470201495765058856393016743869149093006579763160370855001271608171088494",
+            "result": "loss",
+            "resolvedAt": "2026-11-18T02:53:50.000Z",
+            "resolvedAtSeconds": 1794970430,
+            "currentShares": 52.132,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x293f36d9dcf13d2126b1d188973ce9742ac3b569bc4d9e586f9dad46601091f1",
+            "tokenId": "53527226764560707746593510005220693651806333070953258420560858688700821577778",
+            "result": "loss",
+            "resolvedAt": "2026-11-18T02:50:49.000Z",
+            "resolvedAtSeconds": 1794970249,
+            "currentShares": 1736.5916,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x23912566c55e4cb5058e3905dfa1d0e0d19ccdfe85f70c55cea3c6cd7ed3dd78",
+            "tokenId": "79418204643282879480065012497462922018317046825069241099551840928502131052046",
+            "result": "loss",
+            "resolvedAt": "2026-11-17T05:36:49.000Z",
+            "resolvedAtSeconds": 1794893809,
+            "currentShares": 5555,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xe10e72af1e0a1fdbd4d3544a61d0fb5142ffe28529138a3dcad6a3ea0e93d056",
+            "tokenId": "111116445215105452402195447335570138990948116962434354359812521722521696149089",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T01:01:53.000Z",
+            "resolvedAtSeconds": 1794790913,
+            "currentShares": 1111,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x1b47414a2445d4cf97f7a61570cdc2f9942335d0496371bb12a0fe2108a5c2a7",
+            "tokenId": "44017871804309583437075894123907389648691900025817488899315657176683359135016",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T01:02:20.000Z",
+            "resolvedAtSeconds": 1794790940,
+            "currentShares": 2.3809,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x6619c2b5337061520e670b00bc7d630e12c95f0ca1fcc8076cfabd5d388df1a7",
+            "tokenId": "81267068737491323642098608208992120439878283442418335036683907589950661140728",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T00:15:04.000Z",
+            "resolvedAtSeconds": 1794788104,
+            "currentShares": 1111,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x8e9aeb5ea0be360906635e60a46aa5d2ed8db093e90370875cb2ac029002c4b6",
+            "tokenId": "16723173944680132217152749670357872148215567109329759693177992193225112598889",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T00:07:04.000Z",
+            "resolvedAtSeconds": 1794787624,
+            "currentShares": 2222,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xba45b9805fe8d9497c5117efe1ae4f28ecdf359788cf2c91de6dad9d00c1486f",
+            "tokenId": "66932260491687647806379696343910866346949277447911176901417164152496497104572",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T21:24:37.000Z",
+            "resolvedAtSeconds": 1794777877,
+            "currentShares": 4444,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xc197500919a1ffd5eb34a3048539be42e2bed24cf22a6027b48c8ce307d2901a",
+            "tokenId": "3773845177936136307230785746303201233170192771445345326692707063363297583234",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T21:16:19.000Z",
+            "resolvedAtSeconds": 1794777379,
+            "currentShares": 1111,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x8d432ea906196f359e5b1a3dda5a706a2db4621f672ada9a4b39c5bf9e20fd75",
+            "tokenId": "105348067430146643095123630100173653619027519828021932014331552935491338881446",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T21:15:50.000Z",
+            "resolvedAtSeconds": 1794777350,
+            "currentShares": 5555,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x70fb7404fa510ff5178452a3a631d334d59c223ed1d43784f4dad58c9d94646c",
+            "tokenId": "72156693978107641350443126291499852767816718022183679403177109508032874658102",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T21:16:04.000Z",
+            "resolvedAtSeconds": 1794777364,
+            "currentShares": 1111,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xd92ffd152a066742aa3e9cd02c588d61137c1101f22d1bce214e3fd6d4732dd3",
+            "tokenId": "89885830861736077399984479518341868643901659408789669339092565543628948107881",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T21:16:04.000Z",
+            "resolvedAtSeconds": 1794777364,
+            "currentShares": 1110.9835,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xe5911fe31ff6ada47f633e9cc21c8edfb3d1be97d580ebffe01d7e953f440a9c",
+            "tokenId": "80155488726303746262792906309731448465755569481192475721564454117557312647836",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T17:54:04.000Z",
+            "resolvedAtSeconds": 1794765244,
+            "currentShares": 1110.9884,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x30285b7437944fcdb893c99fb91d591d41ad4e6fa942a10dc3972bd60b42fdfe",
+            "tokenId": "3370415268839908701442757589529866441882941958063696369830781464162721359888",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T06:14:22.000Z",
+            "resolvedAtSeconds": 1794723262,
+            "currentShares": 555,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xbde42d97c464effaac840f9b9105ae05b6fab0a3315a6154da1abfec425621de",
+            "tokenId": "63428190781506943681276059300247575899667725420591841815042743924110585199852",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T05:52:47.000Z",
+            "resolvedAtSeconds": 1794721967,
+            "currentShares": 1111,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9f405a5c8f4140e2e23a714fe2f076e56190eec0e41d86506ae1972114dcb38a",
+            "tokenId": "58583732893068844494348625894554580399133063780297029879529329679221795890135",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T05:22:49.000Z",
+            "resolvedAtSeconds": 1794720169,
+            "currentShares": 555,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x2debab2c1ff21675f4b15cc424979ac27e4187001172ee5fc12c6330136595a1",
+            "tokenId": "63127978128727650298724119156548877364169214773626624237892288503358491377057",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T02:59:34.000Z",
+            "resolvedAtSeconds": 1794711574,
+            "currentShares": 2776.9796,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xaef06abf86f43bef4f665baaa6a0cddb82a1715f36264c63ef51d2b97dc334be",
+            "tokenId": "66192121684804492564969449731400797139648141006214266377338786773535221243202",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T23:42:49.000Z",
+            "resolvedAtSeconds": 1794699769,
+            "currentShares": 2222,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x2599d9220f04b0907fd9b1a5ba35ea08adcb5adbfc64b434f0f07d3e70836df6",
+            "tokenId": "22136597011302339141762260855441232989197064096091765150772721339893948823285",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T06:13:50.000Z",
+            "resolvedAtSeconds": 1794636830,
+            "currentShares": 5555,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x09a4e9c13f6c9dbd5c2ecf529972860c0ddf273af6305afab3e648fe787564c5",
+            "tokenId": "10177798093563842968975604490809961154127571580706056606644536140498281001734",
+            "result": "loss",
+            "resolvedAt": "2026-11-13T06:12:03.000Z",
+            "resolvedAtSeconds": 1794550323,
+            "currentShares": 2222,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x23f8d0e116256909e1cd0762a270440833fea1e45832d41a6bd4f0a71c619ce2",
+            "tokenId": "98089387779692374594860953529836879927723174861853634143496581186097467808184",
+            "result": "loss",
+            "resolvedAt": "2026-11-13T03:58:48.000Z",
+            "resolvedAtSeconds": 1794542328,
+            "currentShares": 3333,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x05f0219502994350bc24244f6532925af959fe4192a615e2fdb0f04f3de020c9",
+            "tokenId": "18001002692600213044510581138460383013696535614190201985217476099308167189309",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T06:01:49.000Z",
+            "resolvedAtSeconds": 1794376909,
+            "currentShares": 1111,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x89db57ead0e1521c22fa1749583ac0424d37ff98ac70fbaaed14b306dc962dd4",
+            "tokenId": "55565761923647878977305628187043210571207791858394497881107553456189453523571",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T03:14:48.000Z",
+            "resolvedAtSeconds": 1794366888,
+            "currentShares": 7776.9838,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xdd20756995413d2044bc8befe1314565560432a9cfcf55d1c917d07f13114d55",
+            "tokenId": "69121939454768462587112659678273482940393703017574300251748284584800369577062",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T03:00:48.000Z",
+            "resolvedAtSeconds": 1794366048,
+            "currentShares": 6666,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x3dc1050250704df69f8b8629791e073d040d6f253a324572e741feb3d27a9415",
+            "tokenId": "85760915159972546666744094452642979130398578681090160681273509277196746344408",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T02:54:28.000Z",
+            "resolvedAtSeconds": 1794365668,
+            "currentShares": 554.9657,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x372ef9fd2ef5d6e26caa63a85da27ffaf9f6e5d0f10d6e4598c772e7b570093c",
+            "tokenId": "103621116651619112830781340980111973756026371689448731650457263040342424475666",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T06:15:49.000Z",
+            "resolvedAtSeconds": 1794291349,
+            "currentShares": 1811.17,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xb23db781702d8225b014cfcafe9ccd55ede492bb7ea4507ac221d54f2375b579",
+            "tokenId": "64000589559231780705288821829062711951538882726292543540279929937997615514776",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T04:01:33.000Z",
+            "resolvedAtSeconds": 1794283293,
+            "currentShares": 4444,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5d80673ff747644636c97e2b601e6d954f26f21639c4e12db0ad74a98f53efd4",
+            "tokenId": "51581837218995831629272057044263775337145798284144731863682377925772444059729",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T21:35:49.000Z",
+            "resolvedAtSeconds": 1794173749,
+            "currentShares": 4444,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x1c8c823942607946a87a1dc9dbd4025f299b6697a79c43608ebf28a1de714401",
+            "tokenId": "84443651306170185260900167928769478301363151643271197017458957918021682260063",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T03:06:49.000Z",
+            "resolvedAtSeconds": 1794107209,
+            "currentShares": 555,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x23a03783dea7193df8afc1e8a8f15eb54193a706f0cf1a90f4ace9a4c13a75b8",
+            "tokenId": "76153514125580548796542796529378459189044281454941283459088512396855284900422",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T01:39:48.000Z",
+            "resolvedAtSeconds": 1794101988,
+            "currentShares": 1666,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xef3f4f9dff93ae550b3f77b82e5fd5a5badbaa105d0061e3eaf1de29f7744bfc",
+            "tokenId": "58164700459540565162743687624363197190297488774375714185515440988901804243257",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T20:53:48.000Z",
+            "resolvedAtSeconds": 1794084828,
+            "currentShares": 140.81,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x61fd7afa45a98ccb7e940e792cc1f3eb9c00c775e59f97113889ce06dca573e5",
+            "tokenId": "58758058365646730980491030211757443857030803202941189021551146682663927636104",
+            "result": "loss",
+            "resolvedAt": "2026-11-06T05:32:24.000Z",
+            "resolvedAtSeconds": 1793943144,
+            "currentShares": 17.5058,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5e7b80c6843281632566d2aa8c9596ecdd74306873937a9df372021406098bb8",
+            "tokenId": "46739304758229676640483453964737973193916798405592312094834094907532197756035",
+            "result": "loss",
+            "resolvedAt": "2026-11-06T02:49:49.000Z",
+            "resolvedAtSeconds": 1793933389,
+            "currentShares": 716.8615,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x515822999f7bb667b045dcc70d4627732176921150090592bca3cf5805e1d946",
+            "tokenId": "55707282603069346529522557577176470490142365187909943647442599195309475767965",
+            "result": "loss",
+            "resolvedAt": "2026-11-04T03:56:49.000Z",
+            "resolvedAtSeconds": 1793764609,
+            "currentShares": 2867.1412,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x77f96481ba0b03c8a10c6ae8a22d55f8488b84055a072529161f4465aeefc1e4",
+            "tokenId": "83782021257564377898174091761872379788617831601057041011543950033996694033931",
+            "result": "loss",
+            "resolvedAt": "2026-11-04T03:22:04.000Z",
+            "resolvedAtSeconds": 1793762524,
+            "currentShares": 3395.8982,
+            "source": "current_redeemable_position"
+          }
+        ],
+        "wins": 1,
+        "losses": 63,
+        "resolvedMarkets": 64,
+        "winRate": 0.015625,
+        "exclusions": {
+          "early_exit_excluded": 71,
+          "missing_resolution_timestamp": 215,
+          "redeemable_status_payout_mismatch": 41,
+          "multiple_outcomes_held_in_same_market": 1
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0xebb4fec90645748b8415d1d43318dfeb0e071374",
+      "username": "Kakimaki00",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0x8fa3f02f432ed798a3625b33e08d54216f88ace8e847fa0da0161a22acc80c8e",
+            "tokenId": "6100279948324620550314783851833322037677200427098577807728676883479264155758",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T21:57:34.000Z",
+            "resolvedAtSeconds": 1795298254,
+            "currentShares": 102.3118,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x7831aee9a3f97e1c6654c34b2cb4cafc99d2954491b9e3201cce737b022ff622",
+            "tokenId": "54906550449056323306928906473441607426278265377852388086849740409324370819431",
+            "result": "loss",
+            "resolvedAt": "2026-11-19T23:52:34.000Z",
+            "resolvedAtSeconds": 1795132354,
+            "currentShares": 1999.9941,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xaa7df9c340749c03954e7b9067bb1146bc0a024ae4a7d9cefe94735f4ce408c5",
+            "tokenId": "44861456724885109316816331624262822969146754602431637292702164017043365660809",
+            "result": "loss",
+            "resolvedAt": "2026-11-19T10:46:34.000Z",
+            "resolvedAtSeconds": 1795085194,
+            "currentShares": 997.4963,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x23a03783dea7193df8afc1e8a8f15eb54193a706f0cf1a90f4ace9a4c13a75b8",
+            "tokenId": "76153514125580548796542796529378459189044281454941283459088512396855284900422",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T01:39:48.000Z",
+            "resolvedAtSeconds": 1794101988,
+            "currentShares": 9999.973,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x8053575189fdeecb76b7d35b089f24ab5ea2ad23057ad8321507c5a19f9f72eb",
+            "tokenId": "75058773186033692927186127012327151640678119162577578306147714577492693386106",
+            "result": "loss",
+            "resolvedAt": "2026-11-05T01:18:27.000Z",
+            "resolvedAtSeconds": 1793841507,
+            "currentShares": 11091.2747,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x31808826e12b258a5c8909d912136275dcd414677a727664eea9350dec702c3b",
+            "tokenId": "9809511513484619559316325104094793637786232490853621283901634068806954421316",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T01:37:36.000Z",
+            "resolvedAtSeconds": 1793410656,
+            "currentShares": 5449.8793,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xa1b831a39ceaef35c6e311e85611b9da496c80d6642d271e9be44f9d82b1ef6b",
+            "tokenId": "69062882709529625116371665722579195218088693128449613121797117346817387726846",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T18:20:50.000Z",
+            "resolvedAtSeconds": 1793125250,
+            "currentShares": 211,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xdda9d2ef99f17e2c4b16dc686088f8309d624a54716113c17ea4e5cfd23fda34",
+            "tokenId": "97491579527423394169858220175879467382038374955704028626987635672772387640760",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T18:04:03.000Z",
+            "resolvedAtSeconds": 1793124243,
+            "currentShares": 1363,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xe359e17bc4741fc84c2099c64db40df11804d3c1428ec13a266d16aa7af22eb4",
+            "tokenId": "10482387610457173750367223527023234832680572566483624546430877210370293129076",
+            "result": "loss",
+            "resolvedAt": "2026-10-26T22:23:14.000Z",
+            "resolvedAtSeconds": 1793053394,
+            "currentShares": 128,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x88533cb35e3b9e14e16dfd4f3d37afb1d600a7a2a07c6b9d6a3c9d9901cc8294",
+            "tokenId": "7199079512722075794238652825256130963084141234915352110464933020220809142791",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T23:58:20.000Z",
+            "resolvedAtSeconds": 1792972700,
+            "currentShares": 8000,
+            "source": "current_redeemable_position"
+          }
+        ],
+        "wins": 0,
+        "losses": 10,
+        "resolvedMarkets": 10,
+        "winRate": 0,
+        "exclusions": {
+          "early_exit_excluded": 4,
+          "missing_resolution_timestamp": 121,
+          "redeemable_status_payout_mismatch": 10,
+          "multiple_outcomes_held_in_same_market": 1
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0x51bef5ceb733fc728d3fb55e64600d4896cc12c2",
+      "username": "sashasasha5",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0x66e9e7bb22eab392ff62e0dbe08cd47656df3825f4cb763e27fee669d0affcf4",
+            "tokenId": "72472017616472134045671702750942851351237483193194757678383309384054301262680",
+            "result": "win",
+            "resolvedAt": "2026-11-14T22:32:34.000Z",
+            "resolvedAtSeconds": 1794695554,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc425158aca77031a7b0dc110b12b2bbb8afbabbf670c80798a4415a8ff241734",
+            "tokenId": "51395185788509700431951083170237763031541439707768133349843310565367517024598",
+            "result": "win",
+            "resolvedAt": "2026-11-14T17:41:23.000Z",
+            "resolvedAtSeconds": 1794678083,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa3cfb7594ebaaa017d9d61205df8da62f63eead41fa08c180a6d69f4b7141a48",
+            "tokenId": "104201292224289952378680354426770251489392766888352937263881569544143022212566",
+            "result": "win",
+            "resolvedAt": "2026-11-13T23:01:49.000Z",
+            "resolvedAtSeconds": 1794610909,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x974b71a7e902f08cedac450fb8baa68444c341402dcda1dd86dc358bb9f9cdc4",
+            "tokenId": "68756697492300046916560486767307414082751757812029479981183057100026585401871",
+            "result": "win",
+            "resolvedAt": "2026-11-13T21:45:49.000Z",
+            "resolvedAtSeconds": 1794606349,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x8b3c3b1c77fc8f772ac87d194ccf63d9a8c21149094bcc8acad75c176bc06ee5",
+            "tokenId": "4725642861842541119518304645777631156350598698297057368729720149496865807890",
+            "result": "win",
+            "resolvedAt": "2026-11-13T12:58:49.000Z",
+            "resolvedAtSeconds": 1794574729,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x6ca9ed1cde3edcab2ed6dacfba24147864823d100ee1f898b5eeb778a228cd11",
+            "tokenId": "58361472702042400388577452260480430768925045284933604410218640943965806985498",
+            "result": "win",
+            "resolvedAt": "2026-11-13T16:21:49.000Z",
+            "resolvedAtSeconds": 1794586909,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x7898e78a4495c935b08b4fb7a5dc45af176b40bed4c8bff546a098c7cf1357db",
+            "tokenId": "74079738946080847814090980940121049155677684458554095933528657686510293482253",
+            "result": "win",
+            "resolvedAt": "2026-11-13T15:16:49.000Z",
+            "resolvedAtSeconds": 1794583009,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x329e275190683089aa4a3a6e57960cafae036d29d821d06bf382645670e27c42",
+            "tokenId": "74312299620402159342064477122466788411853838272613164755451356015512710604648",
+            "result": "win",
+            "resolvedAt": "2026-11-08T16:10:19.000Z",
+            "resolvedAtSeconds": 1794154219,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9e367914b377d5ee30e01570ae51ad50d467e7716e272e9daeca58265b9b9805",
+            "tokenId": "25438399795112112144340261920907150950431531358007417230950158909719342420943",
+            "result": "win",
+            "resolvedAt": "2026-11-07T15:01:43.000Z",
+            "resolvedAtSeconds": 1794063703,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x712da55b874e13fb7545681dd1b6806552705a51a1b0ee43eac9e9444ac62096",
+            "tokenId": "6746856907488615616483719158265152952093728844584825144494106247177832995509",
+            "result": "win",
+            "resolvedAt": "2026-11-22T19:16:04.000Z",
+            "resolvedAtSeconds": 1795374964,
+            "currentShares": 0.18,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x839454b1dbb27ad4c328a14172950e748c6de74ba41eb7b87e88c6e049bae861",
+            "tokenId": "100366579634354356608307394430737595130616050683528833072800790279710620940136",
+            "result": "loss",
+            "resolvedAt": "2026-11-22T18:17:49.000Z",
+            "resolvedAtSeconds": 1795371469,
+            "currentShares": 1603,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x29e47d5354601b507ecfed8284829657754dec217b436d51b5b0a862928841d2",
+            "tokenId": "109480503475722447792186471495615969330630581480671196298604793210686036438723",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T20:09:47.000Z",
+            "resolvedAtSeconds": 1795291787,
+            "currentShares": 1630,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xcc43a1ea6cb8beecde4bbc0cee437c3ccaf6f628d7557a156fd721a2fd169938",
+            "tokenId": "1084885932228935775580922360136804854070986038745417710325986014860587399403",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T17:52:49.000Z",
+            "resolvedAtSeconds": 1795283569,
+            "currentShares": 4399.916,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xeea40b80f6a34399a1a053a9e0148472899d3d0757c109996a59beea3c36c21b",
+            "tokenId": "14039826669916416101283914709002307866519829396859216644897304223225203142058",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T16:52:19.000Z",
+            "resolvedAtSeconds": 1795279939,
+            "currentShares": 3610.9605,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xb755c342bc3cfa885336924e1e39c6fe1f2b6eecc1ebc8c999c093d39f871619",
+            "tokenId": "60672305673098382689570327099512909990939338733207356284839668698689349646494",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T16:23:49.000Z",
+            "resolvedAtSeconds": 1795278229,
+            "currentShares": 2418.3022,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x45f0345d30987aa99419e98b11c127986a0562478cac361ac32b8edf3a3b1ea9",
+            "tokenId": "7895665967975836144905282613340394056904228210175443046409951789088054263430",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T15:09:02.000Z",
+            "resolvedAtSeconds": 1795273742,
+            "currentShares": 4086.9872,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xcb623dc3a90f0303c435073f81e42dcf3f15f3396882e8ce4ae9c76edb9b080e",
+            "tokenId": "39705001956579213589981766594491860756341498124001189354026456703487906174328",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T15:07:02.000Z",
+            "resolvedAtSeconds": 1795273622,
+            "currentShares": 2246.9659,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x31402c0548eda16fdd6e3fcca6a61a5a504f8f93faf5eb219b58d1bb879750b4",
+            "tokenId": "29520691289045267164994525879410279802273872558044030556296325536559993948180",
+            "result": "loss",
+            "resolvedAt": "2026-11-21T12:55:34.000Z",
+            "resolvedAtSeconds": 1795265734,
+            "currentShares": 599.9781,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xcce46e30577e335decba1a3ef36c73659624046b1c4208b7ec7e3ce9664a0922",
+            "tokenId": "69540871968258784907627368016364757815727679032122652554961423074116090403531",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T18:18:49.000Z",
+            "resolvedAtSeconds": 1795198729,
+            "currentShares": 3110.9792,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x67782c3d5956348ad28eb6ee31d5868213ef922da7fa11168075dd56a03cc6cd",
+            "tokenId": "33374035754625189881426600506906683204025606677071584854475574155912615585874",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T16:12:19.000Z",
+            "resolvedAtSeconds": 1795191139,
+            "currentShares": 5115,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x0ef8105ca15cbea55715f06e90b65dddda3ffd192f078226233dd78e27b29e84",
+            "tokenId": "85553796322333756967049301358200766317294677775409192040516999957969942902504",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T16:05:34.000Z",
+            "resolvedAtSeconds": 1795190734,
+            "currentShares": 3332.9879,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x09d65b636d3a81b3e1ce080d47cde14272872dc796e8fed83b7ddfa55d106909",
+            "tokenId": "74813709712867642352883836841961111400357583379359135889344966756442756399602",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T13:55:04.000Z",
+            "resolvedAtSeconds": 1795182904,
+            "currentShares": 1233.9776,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x7752a119e0ec781b13c8325b1496b534a9b470f0c19bd00725aa9986d365459a",
+            "tokenId": "70583174608211510636023738287007384783454507822483800655252571155274318676818",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T12:35:17.000Z",
+            "resolvedAtSeconds": 1795178117,
+            "currentShares": 1000,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5617bfd3c1d855ebe32be307996f17924d822362e78274585b2dc7381334cc82",
+            "tokenId": "58792084626864601489258635747553537895290989280342638478563093808255407509077",
+            "result": "loss",
+            "resolvedAt": "2026-11-18T13:18:49.000Z",
+            "resolvedAtSeconds": 1795007929,
+            "currentShares": 2012.9806,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xd532701c1107a24e713afb05fbe755f8cc61ed6561ec5a99f95f95e198ca1542",
+            "tokenId": "44597595331397063133330979780446470308240086333388278319187238651491990657488",
+            "result": "loss",
+            "resolvedAt": "2026-11-17T20:26:02.000Z",
+            "resolvedAtSeconds": 1794947162,
+            "currentShares": 4139,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xa7c1a95dd3216bb83bd68b9ce28e71ff2ad28e90b5fa6a4d9eebda3f2b161f09",
+            "tokenId": "57689796581449987798356075692827431402242402236309576222611573028910909539193",
+            "result": "loss",
+            "resolvedAt": "2026-11-17T12:29:47.000Z",
+            "resolvedAtSeconds": 1794918587,
+            "currentShares": 443.9847,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xce656866f0a4e1ca8b9cca6917883f42a1ad51407ed5fbe194535727091f2d4b",
+            "tokenId": "64520522458754216030619999087656577377837708549153955007584101177816860314945",
+            "result": "loss",
+            "resolvedAt": "2026-11-17T11:24:47.000Z",
+            "resolvedAtSeconds": 1794914687,
+            "currentShares": 4468.9593,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x18d4393eabe4af08289c6e1a22febcda48efbef694197155f5300fc95b19c7ff",
+            "tokenId": "65553081088740778054850163519983806232823148502329061047249403253818031604909",
+            "result": "loss",
+            "resolvedAt": "2026-11-17T00:01:49.000Z",
+            "resolvedAtSeconds": 1794873709,
+            "currentShares": 2829.9952,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x1f212c5426d4910e51f46ae252be18bf197e378fcc3fdfca40db620b8bd2cd62",
+            "tokenId": "34406464525548150173502557625000673441499889061218588644739401737304713036445",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T22:48:47.000Z",
+            "resolvedAtSeconds": 1794869327,
+            "currentShares": 4871.5104,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x6ebdd9744434422e3618ddce8f98c2239866faa6b1e934b18a7ffb0e3c12ff7f",
+            "tokenId": "109752952146089840305373635724141611264936137397052465523019599924454894058364",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T21:34:49.000Z",
+            "resolvedAtSeconds": 1794864889,
+            "currentShares": 3783.6614,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x06ff4c983101b8927225f3589d4a6b7ca4b33dcac14971fa5b6bcea7697f8173",
+            "tokenId": "22304366845571634733951714554242746356426193005050482083140995798449996438020",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T20:23:17.000Z",
+            "resolvedAtSeconds": 1794860597,
+            "currentShares": 3816.9851,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xe63f9a5c90feed41463e2fec0c8721130e57b1decb8a6f3b5738b6d1bd33c827",
+            "tokenId": "105881780693928707708836622006889677678072540814104399541695960270014411693474",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T18:22:43.000Z",
+            "resolvedAtSeconds": 1794853363,
+            "currentShares": 0.1638,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9392f546f757c7695577439c47036a098b37841757b5d47255ffa93d55dd315f",
+            "tokenId": "82561859574176978749016191134971036969077132870614504961782883465180627751222",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T22:50:35.000Z",
+            "resolvedAtSeconds": 1794783035,
+            "currentShares": 2565.9702,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xadbd57cbe4690c78f2a3f80c759824db2f579e3ade32647972f050b8131cee44",
+            "tokenId": "83398381930435216096264911743610734851506135747658733277673600031345667860148",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T21:51:04.000Z",
+            "resolvedAtSeconds": 1794779464,
+            "currentShares": 1487,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xb9a001e3e727e24c6c9986d32976a18d91ba7a25797032b47a1a19b3a1c3e709",
+            "tokenId": "76207864458608061585967467955451776723099865922799742082504415884662220672592",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T14:40:02.000Z",
+            "resolvedAtSeconds": 1794753602,
+            "currentShares": 1483,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5638c75a7d4b10a4f83fac812d4e853d1d8eb27f6d189de4dc66161a50846ab9",
+            "tokenId": "56495072794130935127566199710932144789091292368445950685215768858961346405748",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T13:30:04.000Z",
+            "resolvedAtSeconds": 1794749404,
+            "currentShares": 0.3404,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x619a3eb75985d070ccf09580825694081a47f1154c8b25f3fc566c8539b84c75",
+            "tokenId": "10939285912177123191387494846236047166068091096752773365644122668747479246932",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T01:20:47.000Z",
+            "resolvedAtSeconds": 1794705647,
+            "currentShares": 4716.9796,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x055114d91f5486ac8821a1038534d744cd01cada6ad14d40280ede7bc33156ac",
+            "tokenId": "1780066333280666850545359115254450379415688023830304270902140340945834096486",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T20:20:26.000Z",
+            "resolvedAtSeconds": 1794687626,
+            "currentShares": 4317.9925,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x298d5ed23e2f4fc94ed27b6d37a20432918ddfb76a6e1514dab662001207df88",
+            "tokenId": "51405167664769722911568452660479116302540258488726012085280325698595799620236",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T18:57:49.000Z",
+            "resolvedAtSeconds": 1794682669,
+            "currentShares": 4768.9836,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x84369c68bd88083307812ad47b15a64b8c731ffca78ae23663c0236a52fec7a9",
+            "tokenId": "86297758518116506618102571624037769707910480013172473135351510963157158223566",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T16:19:16.000Z",
+            "resolvedAtSeconds": 1794673156,
+            "currentShares": 3360.9414,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x2c5fa4d7182484c62160bcef46918caef9b16f87a4db671f11644ee70744597d",
+            "tokenId": "84294667137334994780551185827674997323112350786588761573417991827412743653690",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T14:52:47.000Z",
+            "resolvedAtSeconds": 1794667967,
+            "currentShares": 777,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x2f729925761a2a5a94fc1c5457e2a74ccc78a1e995c9dc8403565e36e53d6592",
+            "tokenId": "31309834563591316381760750384431512822796100262304982048953744392940399336021",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T12:17:49.000Z",
+            "resolvedAtSeconds": 1794658669,
+            "currentShares": 2442.9936,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x226e749ad1dfe7c2a968cb4682eec704abad67cf4417dcebae1074c5da7e0fce",
+            "tokenId": "80220389835166334585844496381543254166399457226601105234107393167884000849833",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T11:07:19.000Z",
+            "resolvedAtSeconds": 1794654439,
+            "currentShares": 665.9747,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x79274bb1a89904ece4a96ebfd8354012943b8eeaa5e9d0d2ea46367241525074",
+            "tokenId": "4598775884180580500398673492434750867081313088900221584290396301544107207451",
+            "result": "loss",
+            "resolvedAt": "2026-11-13T20:22:21.000Z",
+            "resolvedAtSeconds": 1794601341,
+            "currentShares": 6528.9354,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9a246aadca32014516f985891dfcb7f70108cae3f7887eb3716688af4b43efa6",
+            "tokenId": "2522860996838855530127960508839111899387166974709067166831085009564049864405",
+            "result": "loss",
+            "resolvedAt": "2026-11-13T14:06:04.000Z",
+            "resolvedAtSeconds": 1794578764,
+            "currentShares": 3677.9749,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xc41e65d833183abad0eb581c233efac535059dd58ecdf2516401eb8a47568511",
+            "tokenId": "79349289125290937634078295248366072667456301139481409591265777084881864034462",
+            "result": "loss",
+            "resolvedAt": "2026-11-13T11:52:49.000Z",
+            "resolvedAtSeconds": 1794570769,
+            "currentShares": 1111,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x16222285cdbbff3e62ff2d0e3dd1a346846db2326ec119332beefce69bdef372",
+            "tokenId": "25617119206387970319856056592890603022654426437704136303418591435917007455144",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T23:39:27.000Z",
+            "resolvedAtSeconds": 1794526767,
+            "currentShares": 1254.7416,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x0a0a6e74f0dfc8483f11347a01b6fd362d2236997e7c1001ad680bc158d12968",
+            "tokenId": "65802162834269977443806823417297845893618106821492164376643672173930166649345",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T23:38:49.000Z",
+            "resolvedAtSeconds": 1794526729,
+            "currentShares": 494.5784,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x892f4589612cc81ce8f91af0db4e65edb582eefaf3eddee90d4e66c54b006162",
+            "tokenId": "62461238272213240019868761482415738527307697856454103297597945642637146029732",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T16:43:19.000Z",
+            "resolvedAtSeconds": 1794501799,
+            "currentShares": 2710.9883,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xdbee79411287ee3462e2f4d6b2fe564647892ba86ddba56d9ef9668ab0de62cf",
+            "tokenId": "4187144353828438953607704396199018732596830432799957701327687024815327750727",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T15:36:49.000Z",
+            "resolvedAtSeconds": 1794497809,
+            "currentShares": 2276.3887,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x02a611060341fcc5b09ed4b5040a0f016f7cbc2c5dd3fb81f3b0fef7da9200e7",
+            "tokenId": "8143635055497515109149632633457125845921931199600840892011189621041346542867",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T14:24:34.000Z",
+            "resolvedAtSeconds": 1794493474,
+            "currentShares": 3376,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xb6a756799aaf224f2fbbf16e605c2f3d404bfc864f014979806c742ea7988171",
+            "tokenId": "40546567546468049251746851289929532531218156803024037267775091595320292730972",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T22:50:49.000Z",
+            "resolvedAtSeconds": 1794437449,
+            "currentShares": 0.3494,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x0f16aedd2c194575cc790c651b3048929593d247c0ea01e574f94c5aed2595c8",
+            "tokenId": "100317171765181825456632035592419347397820055036396900251578541694026288131743",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T20:54:19.000Z",
+            "resolvedAtSeconds": 1794430459,
+            "currentShares": 1738.0158,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x2c576dd1a6385cc66764fc5016b3b52c3271ca155edb9cdaab4d79711c80538b",
+            "tokenId": "92290796369328241830176074724568830826804271320458597363597624506341347055492",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T18:58:48.000Z",
+            "resolvedAtSeconds": 1794423528,
+            "currentShares": 1686.986,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xc441dcd969f7ac915533e23df3970550c385a0dcecdefa2760f404458aadfe9b",
+            "tokenId": "35602314403359264003463815915638381536913715629483753251450050168194571498956",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T16:29:03.000Z",
+            "resolvedAtSeconds": 1794414543,
+            "currentShares": 0.1325,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9334b8519ac2ad5b6b9010ebf3b4b8d3bcc24863934d47c887b915ff65a92b31",
+            "tokenId": "19453403491946472471724924939043671376323161713104201065380065376404862591145",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T15:28:48.000Z",
+            "resolvedAtSeconds": 1794410928,
+            "currentShares": 1998.99,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5eea1d13e107834c9609ce662d9ad095f1468d27abcfcc366c3d0ff607bd7a71",
+            "tokenId": "3265384768879291177491512913956461768346408106083304162929559492139537158646",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T13:27:48.000Z",
+            "resolvedAtSeconds": 1794403668,
+            "currentShares": 0.1698,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x67da8081805093116f35074b78096810fec0231275a437552730cde6e0b1ebd1",
+            "tokenId": "109837738492895387356015253916751348332539242445629983384626438965746057931133",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T11:43:48.000Z",
+            "resolvedAtSeconds": 1794397428,
+            "currentShares": 1739.9102,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x47457281182ab347aaa65a00b385c4952a43bdabe7fae70afda5002d9d70338e",
+            "tokenId": "5528826174159772122944982514654158701800689082822977226881831285460758964911",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T02:39:48.000Z",
+            "resolvedAtSeconds": 1794364788,
+            "currentShares": 0.115,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x8bde00bd2de7d79ab8d3cdd60f88fdbe849ed31b16473b359976daa20531771d",
+            "tokenId": "28216110521727595289394606017670942256933847449890672818005449627015933401889",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T23:55:04.000Z",
+            "resolvedAtSeconds": 1794354904,
+            "currentShares": 1744.9859,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xf015194a78471096cc8f9b21353685b4f99bea0bcd502e1dccd807f23f0b0202",
+            "tokenId": "7528422976306985290883913287126443197003944751879494025797806277433562013016",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T22:34:33.000Z",
+            "resolvedAtSeconds": 1794350073,
+            "currentShares": 2847.3678,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xe0fae4f9606f519fd4e498dab2cb1bf719ae808a182cea1221e2c71608f5a336",
+            "tokenId": "46145510640667911672989429763035708909657449553519783528028808423659674177976",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T21:28:18.000Z",
+            "resolvedAtSeconds": 1794346098,
+            "currentShares": 0.6442,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x1fd7dfdbf480f56e0fb03d0aea3b486b211ce61d49cbce35bd72d162cccb4dc1",
+            "tokenId": "93516767417627761814800922336874311216860131839980747096370662070875243710728",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T18:51:18.000Z",
+            "resolvedAtSeconds": 1794336678,
+            "currentShares": 1892,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xd63a9778f60678488786c0dc6470c7412177b4e64fae044606d12b4d59498b5d",
+            "tokenId": "93579381598896963760179605099786019694741312167752307649037457820709352437346",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T17:12:03.000Z",
+            "resolvedAtSeconds": 1794330723,
+            "currentShares": 3233,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xcf19b2db4726c19652064b75004ec6de34008c094f5e6ec275b39ba9af3d3114",
+            "tokenId": "37891586540237078162332761759241715158913624263807315523578785943358758642763",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T16:02:33.000Z",
+            "resolvedAtSeconds": 1794326553,
+            "currentShares": 0.33,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xf3aa8d4df4ed66c307d447077c2a89ef1d8f616ee2fbe7ab4504bcb9a614307d",
+            "tokenId": "58442701911889025028647370842968986704458649908313830558561742004531227036811",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T18:48:48.000Z",
+            "resolvedAtSeconds": 1794250128,
+            "currentShares": 2932.8094,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x6f8a5efb0d76fc37e2906835d5f3b49b31aa32582acfc5ac13f01cd15ca0f8d9",
+            "tokenId": "110784459627482621879847910697050219082580446857129719629947595763705929812801",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T18:40:27.000Z",
+            "resolvedAtSeconds": 1794249627,
+            "currentShares": 3676.9945,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x20b53ceb990c03337dae58060a27d5ee5bf3e53aad359acb84f8dcbe005f20b5",
+            "tokenId": "85377470744001006090848384265221187640019053017653077778569674439952323133260",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T17:54:48.000Z",
+            "resolvedAtSeconds": 1794246888,
+            "currentShares": 2732.9702,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x5655f115708d7d5c7d318b0198cddbbe7c2d78631f93ca66a8f373000e6bbd33",
+            "tokenId": "15299664295891170391338327597725951252409032637101780281124119313165275453096",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T15:07:48.000Z",
+            "resolvedAtSeconds": 1794236868,
+            "currentShares": 0.113,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x55c7dd8ee8fa9ee518fb6bd482c336e38ac70edae6b39bf76a58bc0d65519321",
+            "tokenId": "13560440986749785943680250314766473578989667876489565447756944700104750230992",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T16:06:19.000Z",
+            "resolvedAtSeconds": 1794240379,
+            "currentShares": 2166,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x1a3d2e32671eac5db16823532dcfdd156c5b6739025a97c5efa36f703149bd6d",
+            "tokenId": "44375278112618403198601997034331724539521643930432525689369308478407267587589",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T12:12:18.000Z",
+            "resolvedAtSeconds": 1794226338,
+            "currentShares": 2394.71,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xd8861e708017e9106e04f06635d525626b8d72342228d9b951b5d380fddbaeb5",
+            "tokenId": "109821002607486377683019652801135872421795543151963500584396789789732279765652",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T12:08:18.000Z",
+            "resolvedAtSeconds": 1794226098,
+            "currentShares": 916.1722,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x3c760509257e35a87a5657f7b470061e902523c1b70ac1013d03e4e7714b8947",
+            "tokenId": "85308203996415682487465426734531619767456159979161862036342247748446796575119",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T11:54:18.000Z",
+            "resolvedAtSeconds": 1794225258,
+            "currentShares": 1373,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x610f6e13fadbfd01df7b9820a3a8b43d47f3a8b0577fbe630e1b44fa466701a2",
+            "tokenId": "88837815332858101449769741895202520265344282894558503538486332401131121333003",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T22:17:19.000Z",
+            "resolvedAtSeconds": 1794176239,
+            "currentShares": 1777,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9462c05edf97a5df7cd4790899f5a84a0d33a1acf8bdb4ab08d646e01b091ce6",
+            "tokenId": "63288711116734840311451004156701705083605474921508180482133544624067565981496",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T21:45:19.000Z",
+            "resolvedAtSeconds": 1794174319,
+            "currentShares": 0.2652,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x0228c541939a6b9f621c1b76dc371210150e2bef701606a9f551ef82d6538217",
+            "tokenId": "100887012701238451316568492387834854119610950046768897883712813916949963494196",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T20:28:48.000Z",
+            "resolvedAtSeconds": 1794169728,
+            "currentShares": 0.44,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xfb759865c80113b34a5856a8bd459f2317e321cd5994d9ef705351034dac1bb3",
+            "tokenId": "88190902398898610193508420429971113864934897571074270355107922265472106679389",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T19:22:18.000Z",
+            "resolvedAtSeconds": 1794165738,
+            "currentShares": 2755.9765,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xfc06e46318689f6c99bc1fdb5b0b2632ff982d16f97e570a43acd4e4528a6c6c",
+            "tokenId": "93692385552295875616021773394964487236874464567020729418696353838790595849350",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T18:38:18.000Z",
+            "resolvedAtSeconds": 1794163098,
+            "currentShares": 1288.9805,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x1fa0c467e4d981424e1a50b5fcf8e6a935d39dd265d103a9bfee87d3c19f8977",
+            "tokenId": "69289298376935323040521988263482995113486939413107109381621481009594372611522",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T21:27:49.000Z",
+            "resolvedAtSeconds": 1794086869,
+            "currentShares": 599.9629,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xe8bfc62c06535929082059d89bd4b36b9d007d6424f38cb72c9d88289701bd8c",
+            "tokenId": "103520992657731281597952971149268405134670481693739653147653875804202791516097",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T19:47:19.000Z",
+            "resolvedAtSeconds": 1794080839,
+            "currentShares": 0.35,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x52770a9a596ed0eec7c50fb0159b533751fab3c7f3b1464a4b49f885f01738a0",
+            "tokenId": "49004985663646544100398283420288907405522795950732679232442208629921175459572",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T18:48:48.000Z",
+            "resolvedAtSeconds": 1794077328,
+            "currentShares": 749.9988,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x002a8e44a3fcc751dc24a3f6de6ac32fe83d3dbdc135b69c132d21629af7509e",
+            "tokenId": "24390336844951694538568789456273627308244281453105989061441544908306467313463",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T17:05:19.000Z",
+            "resolvedAtSeconds": 1794071119,
+            "currentShares": 1123.992,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x658dd499a1878e1ee7188c14d7d2ed4b4425ef3d5f64ac11a77be047c739547c",
+            "tokenId": "64000518916114159048827098628432621859972550866070634806249823599045551529832",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T16:04:48.000Z",
+            "resolvedAtSeconds": 1794067488,
+            "currentShares": 1868.9933,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x4c897dcc16aec3de6f1ea935d161c364129a018cdba832f9d12d9ed055ac5933",
+            "tokenId": "108536184690883204174792104297697444735041540505422078193602087398850155746993",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T13:57:48.000Z",
+            "resolvedAtSeconds": 1794059868,
+            "currentShares": 1552.9808,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x54d5cf93869cb8c9d437f4d5fb1b2c180652f88f886a55d422d6cc331810c651",
+            "tokenId": "94043347660054695037929073461738546717714237996640644440143205043918743933172",
+            "result": "loss",
+            "resolvedAt": "2026-11-07T12:48:48.000Z",
+            "resolvedAtSeconds": 1794055728,
+            "currentShares": 498.468,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x287f57430a0a1d595660415845533d3a1ab302e45684545ec32aedcb091943ae",
+            "tokenId": "8235373842421794896051847654086398986374388703727867064584296549813140036149",
+            "result": "loss",
+            "resolvedAt": "2026-11-05T22:54:48.000Z",
+            "resolvedAtSeconds": 1793919288,
+            "currentShares": 3010.5196,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x595f48e07af775355ab21905cd295457e7a50a683ba1006a8886decfa6a1fd8a",
+            "tokenId": "18640409063479444013259975675940452212577497182244264381777433349072829453085",
+            "result": "loss",
+            "resolvedAt": "2026-11-05T21:54:42.000Z",
+            "resolvedAtSeconds": 1793915682,
+            "currentShares": 0.4238,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xdd7ae725c2ccc216a002dd9a60dbe8811d5d73e75ce7634b1cef46d2816c9e85",
+            "tokenId": "24083957726189552499310240161635933184637577795032312717721780094774065839602",
+            "result": "loss",
+            "resolvedAt": "2026-11-05T20:45:18.000Z",
+            "resolvedAtSeconds": 1793911518,
+            "currentShares": 2036.9944,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xf38ba4aed66bd841b97f51254d82e66781350313052e04354c4ea72308063a1a",
+            "tokenId": "12462080747736105199792557235091651503465867684549536565839348804215920818202",
+            "result": "loss",
+            "resolvedAt": "2026-11-05T17:27:49.000Z",
+            "resolvedAtSeconds": 1793899669,
+            "currentShares": 3734.9746,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xe19206a0860cbe9be0402207ffaf6dd34cf6e9569d62b6b04f5f3e84d0460d59",
+            "tokenId": "114154782081037380126264805191246857496582855660038741723749592587314625459618",
+            "result": "loss",
+            "resolvedAt": "2026-11-05T15:55:18.000Z",
+            "resolvedAtSeconds": 1793894118,
+            "currentShares": 1249.9975,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xee5de21e5c508053f2ae73855ca7518cfe6de16dded249ab640cc31e92c3c812",
+            "tokenId": "28107127427593652001211329626092493383374698558713827334581579991530577105978",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T23:32:48.000Z",
+            "resolvedAtSeconds": 1793748768,
+            "currentShares": 3000.3673,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xa4bf129435c79c2162fbb66c0598740456af37ab89d67460c34b977ad40c9d0c",
+            "tokenId": "96172222135390731633896327694033632334324917721159323127946244440124392753954",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T14:18:18.000Z",
+            "resolvedAtSeconds": 1793715498,
+            "currentShares": 749.9907,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x9945af2e3be6a2cbe7f670398d1a40e73ba89522f177e40452b27c7b79efe252",
+            "tokenId": "57564379740248373450201394669680290478720244507877273965058379216144466441509",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T13:14:03.000Z",
+            "resolvedAtSeconds": 1793711643,
+            "currentShares": 1110.99,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x24ccd92fcf73aa5856fbc8cfa1a36b23177c2da939c0f6230c79522074ac7227",
+            "tokenId": "45423533645268111735679935132659522638450034603324983080952263337044152469131",
+            "result": "loss",
+            "resolvedAt": "2026-11-03T11:57:48.000Z",
+            "resolvedAtSeconds": 1793707068,
+            "currentShares": 1999,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xb99d6d79f20b13dd8199fedb30769236050eaf433804422fe77b87692d17e415",
+            "tokenId": "42792145956109240520576281987564552987460121634652858233542116016580755571616",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T17:52:18.000Z",
+            "resolvedAtSeconds": 1793641938,
+            "currentShares": 1200,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x3d82e066c43052b86d28466dbaeb7653d4213cb954ffe9dcbb5c8e153a372810",
+            "tokenId": "32012084543031775001490098662420605850184244182393801983972993575759215194000",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T15:59:48.000Z",
+            "resolvedAtSeconds": 1793635188,
+            "currentShares": 2998.9648,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x372dc62c2c01ac716765af3cfc9307a209e35de9175d0bec62609f204449b0dc",
+            "tokenId": "26213893361856933438807998014722825570854909929695931897284701280963647561017",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T15:19:48.000Z",
+            "resolvedAtSeconds": 1793632788,
+            "currentShares": 1776.9823,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xdd2503707544c081a00ad428d0f98716907783ee146570b17298800880469c94",
+            "tokenId": "11876001281143531410380190178494558769686373245649282812777228091448366637738",
+            "result": "loss",
+            "resolvedAt": "2026-11-02T11:59:48.000Z",
+            "resolvedAtSeconds": 1793620788,
+            "currentShares": 1540.0022,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xc3986fc22e64724dfaeb7471eb2443050279f265ac163fbd57671f25647d8cf2",
+            "tokenId": "76777918580447886822297877605072805558343639365202509918214374411483971933649",
+            "result": "loss",
+            "resolvedAt": "2026-11-01T16:01:19.000Z",
+            "resolvedAtSeconds": 1793548879,
+            "currentShares": 3332.9833,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xce5b9cd0e6076df1b8f2eac2e9b903240f07d5c46baa50591f86d1dbb21ce8d7",
+            "tokenId": "16877917537506188354263087518924265867782089030078354632593793422342445698751",
+            "result": "loss",
+            "resolvedAt": "2026-11-01T14:22:03.000Z",
+            "resolvedAtSeconds": 1793542923,
+            "currentShares": 4444,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xa2a40d046f82d47cb4d43eefd656612f7c740511d2939fc81b057f191d87b1ad",
+            "tokenId": "12912916265684448261199685567064371025687484368374203474473553981710870795754",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T19:11:04.000Z",
+            "resolvedAtSeconds": 1793473864,
+            "currentShares": 4778.03,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x89781eae5fbf7bea8cdc305f6a92a7449b2c74bffe1fe34cf4c29f1a62f600d2",
+            "tokenId": "76835857067089423367043040371190314191588364331239019721751651650491216592039",
+            "result": "loss",
+            "resolvedAt": "2026-10-31T14:31:03.000Z",
+            "resolvedAtSeconds": 1793457063,
+            "currentShares": 3332.98,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xedd069a2a7ce2272b3d40060376bd9d578239936a415d5f4bf8ec00c578cc4a2",
+            "tokenId": "46449077603455172009322851483221196928683666122171039576804588340613811049242",
+            "result": "loss",
+            "resolvedAt": "2026-10-29T20:23:48.000Z",
+            "resolvedAtSeconds": 1793305428,
+            "currentShares": 11,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xad60de40d56ed218a40d3adad8ba6d3620c05152a95e6740a9c555a34cd04ff4",
+            "tokenId": "47940064526880665785190221972957472013245211196929226069669395650150101881503",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T20:19:05.000Z",
+            "resolvedAtSeconds": 1792959545,
+            "currentShares": 1000,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xcc4562909e9cbd036457c52971740eb5d06b1bd657cce682f8b04c03ef156e88",
+            "tokenId": "15099302365477140783765956803624313957396686515699182879878864152760418287827",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T15:31:03.000Z",
+            "resolvedAtSeconds": 1792942263,
+            "currentShares": 1026.6,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xa3db5facce45bf5a424868f009e49fa56d77a1e6eae95d594cb0cf22c8396242",
+            "tokenId": "86898093775764145496746515904548373226075439957726687205266051847818270318122",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T20:27:20.000Z",
+            "resolvedAtSeconds": 1792873640,
+            "currentShares": 2093.7985,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xde4b926a7ae5c8cf530b0664efea2a7cb600719de3b3ff65131f6ea1f0ad352b",
+            "tokenId": "72232487043052219453042375644256175807622826446640120293016816520765211477202",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T17:59:05.000Z",
+            "resolvedAtSeconds": 1792864745,
+            "currentShares": 4235.4034,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x0214e2950a045e1accdeea7e7774f2c2b1115db7e7c67698fb4f39ec26c8897b",
+            "tokenId": "41600459026165551820567781724320112298622383357347686468021977391991791680613",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T16:19:20.000Z",
+            "resolvedAtSeconds": 1792858760,
+            "currentShares": 2222,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0xaa105cdfb73e30a982a96d4121f848588aaee61b2426f4168d0a9aef107e5042",
+            "tokenId": "98665888714609660528225813752962851718642660303334448026105590019804251002730",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T10:53:15.000Z",
+            "resolvedAtSeconds": 1792839195,
+            "currentShares": 444,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x3ca836148df72302679c92f3920c6591a6544cce8112ec0079a55c69e1ad30a5",
+            "tokenId": "84001604201051199392531940324597011967684995465171636455037440061218585076622",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T09:34:33.000Z",
+            "resolvedAtSeconds": 1792834473,
+            "currentShares": 1979.3827,
+            "source": "current_redeemable_position"
+          }
+        ],
+        "wins": 10,
+        "losses": 100,
+        "resolvedMarkets": 110,
+        "winRate": 0.09090909090909091,
+        "exclusions": {
+          "early_exit_excluded": 318,
+          "same_second_as_resolution_ambiguous": 6,
+          "redeemable_status_payout_mismatch": 100,
+          "missing_resolution_timestamp": 48,
+          "multiple_outcomes_held_in_same_market": 16
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch",
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792785015
+      },
+      "coverage": "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+      "recentBuys": [],
+      "currentPositions": [],
+      "comboRows": []
+    },
+    {
+      "wallet": "0xfec3069089eaf03c68f473436d108750c377c4dc",
+      "username": "PTke",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "settlement_integrity_not_verified"
+      },
+      "summary": {
+        "results": [
+          {
+            "conditionId": "0x33acfb1501a73151a67e352906f3758ba5dec148cf1fe1ce46bb451670059531",
+            "tokenId": "1269702954561618697946026175311284737794983785845715037834569627197756818036",
+            "result": "loss",
+            "resolvedAt": "2026-11-19T18:09:32.000Z",
+            "resolvedAtSeconds": 1795111772,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xd801d1ee753fe6b2e19e38abece4c889d278567b33cb0f80d342cf233dee30f3",
+            "tokenId": "32118265577459557447520620152387574067250533488645780881092006758299008428986",
+            "result": "loss",
+            "resolvedAt": "2026-11-19T21:02:02.000Z",
+            "resolvedAtSeconds": 1795122122,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x9ce155579da2337d8868e291cfda1f8e95c30935bea8f47d770b4ca3b7c0882d",
+            "tokenId": "81724993262697437617047873573274927725669923010856399981800540130352339974605",
+            "result": "loss",
+            "resolvedAt": "2026-11-19T22:01:04.000Z",
+            "resolvedAtSeconds": 1795125664,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa2988ecbff0e8ec8e24b3161175c236d48be8ef6026268a47473d7eca2e876ba",
+            "tokenId": "84876460615658845884210985656886887433497718805201914574827627822589495103968",
+            "result": "loss",
+            "resolvedAt": "2026-11-19T16:54:10.000Z",
+            "resolvedAtSeconds": 1795107250,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x5b6bc8911ab72d79fb7496da8b4fac98f6484a2bc48a0b98dd9a02c8857a0dc2",
+            "tokenId": "88912805197400377213089044588141540370913326905044029353215811776509261580167",
+            "result": "loss",
+            "resolvedAt": "2026-11-18T15:30:47.000Z",
+            "resolvedAtSeconds": 1795015847,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc4d34b82b1296ce05466c765fa787ee59eb0eee4bc7eeef42333e5da000d0742",
+            "tokenId": "99689911330570604268629878857973940659341549801009486289627948289946409746844",
+            "result": "loss",
+            "resolvedAt": "2026-11-18T18:03:47.000Z",
+            "resolvedAtSeconds": 1795025027,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x2efb54d6ad7a3c7c6d45d75cf96a9db4dcae4cd0bed92dd1e44cc66a05791f1f",
+            "tokenId": "53886321814279599718337340811375627068052302522582353311467048953420585916445",
+            "result": "loss",
+            "resolvedAt": "2026-11-17T13:11:49.000Z",
+            "resolvedAtSeconds": 1794921109,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x1f212c5426d4910e51f46ae252be18bf197e378fcc3fdfca40db620b8bd2cd62",
+            "tokenId": "34406464525548150173502557625000673441499889061218588644739401737304713036445",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T22:48:47.000Z",
+            "resolvedAtSeconds": 1794869327,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xaaf680c4eab45c2287f24a5dbdd511f3dd009dfe22ad42ed3354ae80c45649e1",
+            "tokenId": "20744941916583685458797496775266973558385028576811157064433638190522482832058",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T20:23:49.000Z",
+            "resolvedAtSeconds": 1794860629,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xf9a1dd8bd4d1c43a2c7686e853eb275fab1b1ed82423954afc5325d4a1c10d33",
+            "tokenId": "3082282744036262349838461468103382299488726203323200332101164157451808377567",
+            "result": "loss",
+            "resolvedAt": "2026-11-15T13:35:02.000Z",
+            "resolvedAtSeconds": 1794749702,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa935724ee0f11814f8d32b2a6d44cb04a083e38e6f3c87665ea25e17fdae0a92",
+            "tokenId": "35885220286619992467996638170366756631863469406490789477612452333749547575452",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T20:23:17.000Z",
+            "resolvedAtSeconds": 1794860597,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x5269d18cff176358dfc8e14d34080a86368c3b0702a9323e8b11001d8e15783f",
+            "tokenId": "43004375709520724670159040522949812223476512693248952781976966750899065075593",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T17:16:34.000Z",
+            "resolvedAtSeconds": 1794849394,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc3d6ff3008e1f602df0fa2ef33aa72d044cea53b01cf33cf5ce7774458dfe79c",
+            "tokenId": "63678490918587387646591636884320663894711574145506862582967324180822869996076",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T17:16:34.000Z",
+            "resolvedAtSeconds": 1794849394,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa01a6a0e65f95b897ed5e4c3e069d6039301cf436aa50aa6232e89bd7515bf0f",
+            "tokenId": "77106174112969606923094239770235758168832661546084291565621501603523147496909",
+            "result": "loss",
+            "resolvedAt": "2026-11-16T12:45:02.000Z",
+            "resolvedAtSeconds": 1794833102,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x721b4f5aeacd64d011b1d52234b52111b10466e60c81f51fcfb50ce686152010",
+            "tokenId": "32017896468660101089348809996836868536053704676247704599557402601839845523297",
+            "result": "loss",
+            "resolvedAt": "2026-11-14T13:41:49.000Z",
+            "resolvedAtSeconds": 1794663709,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x1ad2b9ec36ee688ca112499eca0b180b665eee00b6ca4d9881dc2ec665429a88",
+            "tokenId": "53899265614912298022513469980795759316962473777907969564509035775345213953056",
+            "result": "loss",
+            "resolvedAt": "2026-11-13T14:25:49.000Z",
+            "resolvedAtSeconds": 1794579949,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xab6e8f5ee717b36c301f06c3a86820dc160120cfa7619671f6b51731d7e4e0a2",
+            "tokenId": "28701319030228730826294703288302152549176108113110072607284447456769769189287",
+            "result": "win",
+            "resolvedAt": "2026-11-13T14:25:21.000Z",
+            "resolvedAtSeconds": 1794579921,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x6d8cda75dd0af96eaebb074ccb87b0c55ab50a03fefa648b12aeda3bd6df856a",
+            "tokenId": "32517547708366488184514795656445471187678190327463878901989073321385546362263",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T19:04:49.000Z",
+            "resolvedAtSeconds": 1794510289,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x892f4589612cc81ce8f91af0db4e65edb582eefaf3eddee90d4e66c54b006162",
+            "tokenId": "62461238272213240019868761482415738527307697856454103297597945642637146029732",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T16:43:19.000Z",
+            "resolvedAtSeconds": 1794501799,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc0948d7bf027e5b69370855e320172275df3c12dbd6d03d20ec54a92b258fa9f",
+            "tokenId": "65172239481553580495790467959267581039574854552164025586344724982190708147172",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T18:07:49.000Z",
+            "resolvedAtSeconds": 1794506869,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x448aea42cafe4840ce24f0212c6f26c1d6c1a5aba7232d2dfba6d314e3b6d629",
+            "tokenId": "82751257469247935984025799345077850197417918040557408211172281137800650876812",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T23:39:27.000Z",
+            "resolvedAtSeconds": 1794526767,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x0452f1a59482bda1777197f8c33558dede4d777349b816f696fec5d482ac87ca",
+            "tokenId": "87692992186185628126052479999940935781934103660227420926019932089229825734345",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T19:04:34.000Z",
+            "resolvedAtSeconds": 1794510274,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x7e6a3d3cc0acd66012b35154819bbacb5550602dd5758e77b9685fd94cb419ca",
+            "tokenId": "32756838166308329808775782756344414165680307033635135693191246336105382616606",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T12:33:04.000Z",
+            "resolvedAtSeconds": 1794486784,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x72d01e3f72c16f056025acee1d6a0ae2062cc350db8e36880b108bd73f563fc7",
+            "tokenId": "46148092544402400312498877094204923950145496952611428713805367241532832368714",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T12:33:04.000Z",
+            "resolvedAtSeconds": 1794486784,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x485b8dde991b75b63e377486a54ba4f8dea6b4ac23596a108f477366a00d7baa",
+            "tokenId": "27994584039136755200246435901104608468868433356927501833503248124821191903786",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T11:39:18.000Z",
+            "resolvedAtSeconds": 1794483558,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xa542ff0f550d2d858b8237b77293239e240976de0dfaf5e07b5aa04ae3beb110",
+            "tokenId": "33274522830573050172027885333657887432775072867441631777665597307724968445434",
+            "result": "loss",
+            "resolvedAt": "2026-11-12T10:48:19.000Z",
+            "resolvedAtSeconds": 1794480499,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x08308a4579ee385ddf67d664096411ce39c2ce620846de9fd60078eaf4da73fc",
+            "tokenId": "113475742615617894659976870368769740872864443405644344266832452056413148872876",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T12:41:03.000Z",
+            "resolvedAtSeconds": 1794314463,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xc0f62bce97830b3a8b897c5a93e5c3f45005b11043847a447da559bd395eb0f4",
+            "tokenId": "24291425699387861123474536592727817953516393362366461870547267972599151852960",
+            "result": "loss",
+            "resolvedAt": "2026-11-10T14:16:04.000Z",
+            "resolvedAtSeconds": 1794320164,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xd9a39c750f927be4528547ac505277963153fd3c79aa3bac0e75161f559ba66b",
+            "tokenId": "33882430567147668367851139447648515104380746724120947496343707859349333685720",
+            "result": "loss",
+            "resolvedAt": "2026-11-11T09:32:48.000Z",
+            "resolvedAtSeconds": 1794389568,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xeb46f442be838970334cec2e1cfc3409a838ce9b69151c7c045b9e141e0f9237",
+            "tokenId": "103342698857059956586542753010758723563845787207519013284825321838586090078283",
+            "result": "loss",
+            "resolvedAt": "2026-11-09T02:08:48.000Z",
+            "resolvedAtSeconds": 1794190128,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x5bbf98e3ab8b34bfa06cc3760eb8166a71227a9bcf58adccac7d4ddbca124010",
+            "tokenId": "88306259495854407759368718731231988642572478254861735845982089747826706703507",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T10:26:19.000Z",
+            "resolvedAtSeconds": 1794133579,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x23a03783dea7193df8afc1e8a8f15eb54193a706f0cf1a90f4ace9a4c13a75b8",
+            "tokenId": "76153514125580548796542796529378459189044281454941283459088512396855284900422",
+            "result": "loss",
+            "resolvedAt": "2026-11-08T01:39:48.000Z",
+            "resolvedAtSeconds": 1794101988,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x1467169f8779f28db6181e56f909c5f5e982bda9df99c8432a8e2400393e9300",
+            "tokenId": "15087073709995775270106603134908895648234842438051400546189704315456068634312",
+            "result": "loss",
+            "resolvedAt": "2026-11-05T01:18:27.000Z",
+            "resolvedAtSeconds": 1793841507,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x2e449a9485ee9aca4787c01707b8c2d5355dfb75a80248d025004b6305ff60fb",
+            "tokenId": "70793596443653102057313114475668512475701780380719042483255203246531072717263",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T16:23:50.000Z",
+            "resolvedAtSeconds": 1793118230,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x625a989ce4602b4f93b656d118f5a5a806d8052fef07709a97befc35b8bc8125",
+            "tokenId": "80669706653899508046164461542300278016563929741102490621740278827790212047795",
+            "result": "loss",
+            "resolvedAt": "2026-10-26T18:36:48.000Z",
+            "resolvedAtSeconds": 1793039808,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xfb77b6bf875f852341019ef6f1871044a09cb41809c1187f252eaa7566e395b3",
+            "tokenId": "85152890751882437096621513025456375779341499166351416155584876299048047879779",
+            "result": "loss",
+            "resolvedAt": "2026-10-27T16:23:50.000Z",
+            "resolvedAtSeconds": 1793118230,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xcc4562909e9cbd036457c52971740eb5d06b1bd657cce682f8b04c03ef156e88",
+            "tokenId": "15099302365477140783765956803624313957396686515699182879878864152760418287827",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T15:31:03.000Z",
+            "resolvedAtSeconds": 1792942263,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x0c9aab6d98b2f75cab1b5e996b78ef87e124b0657fc63731fbe1494130d3b8ff",
+            "tokenId": "98501524778956026916795658938100244753726105010894653776136622586278525101850",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T14:35:50.000Z",
+            "resolvedAtSeconds": 1792938950,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xad2b65e87cf7d112c002812e266309dca563ae245147784f353906d09da7fc82",
+            "tokenId": "41442811723810386501930528018849327654230894621611452313882432123263216564392",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T20:18:50.000Z",
+            "resolvedAtSeconds": 1792873130,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x50b119d2c522ef48e166e95da116778efbb8d6a0088c601f81c8fc95698ff047",
+            "tokenId": "46282497409196718105484806931644267824695714151948993963908144070510677890060",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T17:08:24.000Z",
+            "resolvedAtSeconds": 1792861704,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x2e033cdef8bd82c1f08adf53e2ac973e243bb2494e664211ad23b06224f0f3d1",
+            "tokenId": "62336825501124112706803760953309360532845894992771504718095924853690423140732",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T02:40:50.000Z",
+            "resolvedAtSeconds": 1792896050,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x7a5151b4ed554b81dd41835615e8e5af39a15a4ee0853a6b74694a8efaf18812",
+            "tokenId": "66988429462868005147071482793872177103611526901080129149098158879887487164004",
+            "result": "loss",
+            "resolvedAt": "2026-10-25T02:21:05.000Z",
+            "resolvedAtSeconds": 1792894865,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xfb0204cb90bf6fd9485b35297152dedfc1cdacf8a46e0179d3025daa64a8f2f5",
+            "tokenId": "86823797546180309735178366049362938412020012639711025120719482013438418550490",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T16:49:05.000Z",
+            "resolvedAtSeconds": 1792860545,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0xaa6732db2c6018d062c6ee0999a1aaf035373ddb6ea2a8fbddd9b545ff4a1e33",
+            "tokenId": "28155147970851400481324686873268047773975745422759517336220454888429840209870",
+            "result": "loss",
+            "resolvedAt": "2026-10-24T10:51:33.000Z",
+            "resolvedAtSeconds": 1792839093,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x81c9225fae2ce71e7c712523f458862f2d16cd4f3881f5ca31c351ec15a2fab0",
+            "tokenId": "80681350167081345387188830570748285552312548625594614764149183642820220575429",
+            "result": "loss",
+            "resolvedAt": "2026-10-23T20:37:17.000Z",
+            "resolvedAtSeconds": 1792787837,
+            "currentShares": 0,
+            "source": "closed_after_resolution"
+          },
+          {
+            "conditionId": "0x3314a60483fec3c77255987a8d1cd333c814c4fc22efc978051ba6657e3f5d24",
+            "tokenId": "77339697023756018790744808169484980890876782380695261506306107920346523602761",
+            "result": "loss",
+            "resolvedAt": "2026-11-22T18:17:02.000Z",
+            "resolvedAtSeconds": 1795371422,
+            "currentShares": 1727.1044,
+            "source": "current_redeemable_position"
+          },
+          {
+            "conditionId": "0x7b6e97d99ddc49e365a2c1a66658175224d5e2270d4d13b7a10ae33d8c896fd9",
+            "tokenId": "87868937890330472625410662412550510209364547383630609806489321984806392384596",
+            "result": "loss",
+            "resolvedAt": "2026-11-20T20:47:25.000Z",
+            "resolvedAtSeconds": 1795207645,
+            "currentShares": 2124.18,
+            "source": "current_redeemable_position"
+          }
+        ],
+        "wins": 1,
+        "losses": 46,
+        "resolvedMarkets": 47,
+        "winRate": 0.02127659574468085,
+        "exclusions": {
+          "early_exit_excluded": 27,
+          "redeemable_status_payout_mismatch": 2
+        },
+        "integrityPassed": false,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
         "complete": true,
         "windowStartSeconds": 1792785015
       },
