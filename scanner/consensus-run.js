@@ -80,7 +80,8 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   const conditionIds = [...new Set(batch.results.flatMap(row => row.currentPositions ?? []).map(row => row.conditionId).filter(Boolean))];
   process.stdout.write(`Fetched ${conditionIds.length} distinct active market conditions from ${wallets.length} wallets. Enriching markets in batches.\n`);
   const marketFetch = createPacedFetch({ intervalMs: 100 });
-  const marketFacts = await fetchGammaMarkets(conditionIds, { fetchImpl: marketFetch, batchSize: 100 });
+  const tokenIds = [...new Set(batch.results.flatMap(row => row.currentPositions ?? []).map(row => row.tokenId).filter(Boolean))];
+  const marketFacts = await fetchGammaMarkets(conditionIds, { tokenIds, fetchImpl: marketFetch, batchSize: 100 });
   const result = buildConsensusSignals({
     complete: true,
     results: batch.results.map(row => ({ ...row, qualification: { qualified: true } })),

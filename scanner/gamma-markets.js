@@ -12,6 +12,7 @@ function retryDelay(response, attempt) {
 }
 
 export async function fetchGammaMarkets(conditionIds, {
+  tokenIds = [],
   fetchImpl = globalThis.fetch,
   baseUrl = DEFAULT_BASE_URL,
   batchSize = 100,
@@ -26,10 +27,11 @@ export async function fetchGammaMarkets(conditionIds, {
   const ids = [...new Set(conditionIds.map((id) => String(id).toLowerCase()))];
   const markets = new Map();
 
-  for (let i = 0; i < ids.length; i += batchSize) {
-    const batch = ids.slice(i, i + batchSize);
-    const url = new URL("/markets", baseUrl);
-    for (const conditionId of batch) url.searchParams.append("condition_ids", conditionId);
+  async function fetchBatches(values, parameter) {
+    for (let i = 0; i < values.length; i += batchSize) {
+      const batch = values.slice(i, i + batchSize);
+      const url = new URL("/markets", baseUrl);
+      for (const value of batch) url.searchParams.append(parameter, value);
     url.searchParams.set("limit", String(batch.length));
     url.searchParams.set("include_tag", "true");
     let response;
@@ -51,10 +53,10 @@ export async function fetchGammaMarkets(conditionIds, {
     if (!response.ok) throw new Error(`Gamma API returned HTTP ${response.status}`);
     const body = await response.json();
     if (!Array.isArray(body)) throw new Error("Gamma markets response was not an array");
-    for (const market of body) {
-      const conditionId = market?.conditionId ?? market?.condition_id;
-      if (typeof conditionId !== "string") throw new Error("Gamma market is missing conditionId");
-      markets.set(conditionId.toLowerCase(), {
+      for (const market of body) {
+        const conditionId = market?.conditionId ?? market?.condition_id;
+        if (typeof conditionId !== "string") throw new Error("Gamma market is missing conditionId");
+        markets.set(conditionId.toLowerCase(), {
         conditionId: conditionId.toLowerCase(),
         title: market.question ?? market.title ?? "",
         slug: market.slug ?? "",
@@ -68,8 +70,21 @@ export async function fetchGammaMarkets(conditionIds, {
         tags: Array.isArray(market.tags) ? market.tags : [],
         clobTokenIds: market.clobTokenIds ?? market.clob_token_ids ?? [],
         outcomes: market.outcomes ?? [],
-      });
+        });
+      }
     }
+  }
+
+  await fetchBatches(ids, "condition_ids");
+  // Some Data API position snapshots expose token identifiers that Gamma can
+  // resolve more reliably than condition IDs. Retry by CLOB token ID rather
+  // than silently publishing a successful scan with zero market metadata.
+  if (markets.size === 0 && tokenIds.length > 0) {
+    const tokens = [...new Set(tokenIds.map((id) => String(id)).filter(Boolean))];
+    await fetchBatches(tokens, "clob_token_ids");
+  }
+  if (ids.length > 0 && markets.size === 0) {
+    throw new Error(`Gamma returned zero market metadata for ${ids.length} conditions (including token-ID fallback). Refusing to publish empty consensus.`);
   }
   return markets;
 }

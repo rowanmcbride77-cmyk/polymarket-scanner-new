@@ -40,3 +40,28 @@ test("malformed Gamma rows fail closed", async () => {
     fetchImpl: async () => new Response(JSON.stringify([{question:"missing condition"}]),{status:200}),
   }), /missing conditionId/);
 });
+
+
+test("falls back to CLOB token IDs when condition ID lookup returns no markets", async () => {
+  const calls = [];
+  const result = await fetchGammaMarkets(["0xcondition"], {
+    tokenIds: ["123456789"],
+    fetchImpl: async (url) => {
+      const parsed = new URL(url);
+      calls.push({ conditions: parsed.searchParams.getAll("condition_ids"), tokens: parsed.searchParams.getAll("clob_token_ids") });
+      const rows = calls.at(-1).tokens.length
+        ? [{ conditionId: "0xcondition", question: "NBA market", active: true, closed: false }]
+        : [];
+      return new Response(JSON.stringify(rows), { status: 200 });
+    },
+  });
+  assert.equal(result.size, 1);
+  assert.equal(calls.length, 2);
+  assert.deepEqual(calls[1].tokens, ["123456789"]);
+});
+
+test("fails instead of reporting successful zero-metadata consensus", async () => {
+  await assert.rejects(fetchGammaMarkets(["0xcondition"], {
+    fetchImpl: async () => new Response("[]", { status: 200 }),
+  }), /zero market metadata/);
+});
