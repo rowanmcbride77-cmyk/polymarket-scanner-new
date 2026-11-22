@@ -111,11 +111,11 @@ export async function auditCandidatesBatch(candidates, {
   const missingConditionIds = [...conditionIds].filter((id) => !sharedResolutions.has(id));
   try {
     const [newTokenFacts, newResolutions] = await Promise.all([
-      fetchTokenFacts(client, missingTokenIds,
+      fetchTokenFacts(client, missingTokenIds, {
         concurrency: 8,
         onProgress: (progress) => onProgress?.({ ...progress, failed: [...failures.values()].reduce((sum, count) => sum + count, 0) }),
       }),
-      fetchMarketResolutions(client, missingConditionIds,
+      fetchMarketResolutions(client, missingConditionIds, {
         concurrency: 8,
         onProgress: (progress) => onProgress?.({ ...progress, failed: [...failures.values()].reduce((sum, count) => sum + count, 0) }),
       }),
