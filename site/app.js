@@ -28,8 +28,12 @@ async function loadConsensus(){
    json("./data/consensus-status.json").catch(()=>null)
   ]);
   const signals=Array.isArray(consensus.signals)?consensus.signals:[];
-  const validated=status?.state==="success"&&status.validation?.passed===true&&
-   status.generatedAt===consensus.generatedAt&&consensus.validation?.passed===true&&consensus.validation?.complete===true;
+  // Consensus is an independent product from settlement qualification. Its own
+  // complete scan attestation is authoritative; a stale/missing qualification
+  // status file must never hide a successfully published consensus snapshot.
+  const validated=consensus.schemaVersion===1&&consensus.validation?.passed===true&&
+   consensus.validation?.complete===true&&Number.isInteger(consensus.walletsChecked)&&
+   consensus.walletsChecked===20000&&consensus.scanDiagnostics?.failedWallets===0;
   if(target){
    target.replaceChildren();
    if(!validated){
