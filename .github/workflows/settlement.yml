@@ -55,6 +55,7 @@ jobs:
           SCANNER_API_INTERVAL_MS: 75
           SCANNER_DIAGNOSTIC_LIMIT: 0
           SCANNER_AUDIT_CHUNK_SIZE: 50
+          SCANNER_PERSIST_CHECKPOINTS: 1
           NODE_OPTIONS: --max-old-space-size=6144 --expose-gc
       - name: Validate settlement-qualified dashboard data
         run: |
