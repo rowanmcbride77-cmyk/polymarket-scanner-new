@@ -1,4 +1,5 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile, unlink } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createDataApiClient } from "./data-api.js";
@@ -47,6 +48,7 @@ export async function runQualification({
     throw new Error("Candidate discovery input failed validation");
   }
 
+  let effectiveNowSeconds = nowSeconds;
   const auditLimit = Number(process.env.SCANNER_AUDIT_LIMIT ?? 1000);
   if (!Number.isInteger(auditLimit) || auditLimit < 1) throw new Error("SCANNER_AUDIT_LIMIT must be a positive integer");
   const auditCandidates = discovery.candidates.slice(0, auditLimit);
@@ -64,15 +66,40 @@ export async function runQualification({
   }
   const tokenFactsCache = new Map();
   const resolutionsCache = new Map();
+  const checkpointPath = "data/qualification-progress.json";
+  const persistCheckpoints = process.env.SCANNER_PERSIST_CHECKPOINTS === "1" && diagnosticLimit === 0;
+  let checkpoint = null;
+  if (persistCheckpoints) {
+    try {
+      const saved = JSON.parse(await readFile(resolve(checkpointPath), "utf8"));
+      if (saved.schemaVersion === 1 &&
+          saved.discoveryGeneratedAt === discovery.generatedAt &&
+          saved.candidateCount === candidates.length &&
+          saved.auditLimit === auditLimit &&
+          Array.isArray(saved.results) && saved.results.length === saved.nextOffset &&
+          saved.results.length <= candidates.length &&
+          Number.isInteger(saved.nowSeconds)) {
+        checkpoint = saved;
+        effectiveNowSeconds = saved.nowSeconds;
+        process.stdout.write(`Resuming settlement qualification at wallet ${saved.nextOffset}/${candidates.length}.\\n`);
+      }
+    } catch {}
+  }
   const combined = {
-    results: [], complete: true, allAuditsComplete: true, completed: 0, failed: 0,
-    errorCounts: {}, errorSamples: [], sharedTokenFacts: 0, sharedResolutionFacts: 0,
+    results: checkpoint?.results ?? [],
+    complete: true,
+    allAuditsComplete: checkpoint?.allAuditsComplete ?? true,
+    completed: checkpoint?.results.length ?? 0,
+    failed: checkpoint?.failed ?? 0,
+    errorCounts: checkpoint?.errorCounts ?? {},
+    errorSamples: checkpoint?.errorSamples ?? [],
+    sharedTokenFacts: 0, sharedResolutionFacts: 0,
     uniqueTokens: 0, uniqueMarkets: 0,
   };
-  for (let offset = 0; offset < candidates.length; offset += chunkSize) {
+  for (let offset = combined.completed; offset < candidates.length; offset += chunkSize) {
     const chunk = candidates.slice(offset, offset + chunkSize);
     const part = await auditCandidatesBatch(chunk, {
-      client, concurrency, nowSeconds, lookbackDays: 30,
+      client, concurrency, nowSeconds: effectiveNowSeconds, lookbackDays: 30,
       minimumResolvedMarkets: 10, minimumWinRate: 0.9,
       sharedTokenFacts: tokenFactsCache,
       sharedResolutions: resolutionsCache,
@@ -99,10 +126,29 @@ export async function runQualification({
     combined.uniqueTokens += part.uniqueTokens;
     combined.uniqueMarkets += part.uniqueMarkets;
     if (global.gc) global.gc();
+    if (persistCheckpoints) {
+      const saved = {
+        schemaVersion: 1,
+        discoveryGeneratedAt: discovery.generatedAt,
+        candidateCount: candidates.length,
+        auditLimit,
+        nowSeconds: effectiveNowSeconds,
+        nextOffset: combined.results.length,
+        results: combined.results,
+        failed: combined.failed,
+        errorCounts: combined.errorCounts,
+        errorSamples: combined.errorSamples,
+        allAuditsComplete: combined.allAuditsComplete,
+      };
+      await writeJsonAtomic(checkpointPath, saved);
+      execFileSync("git", ["add", checkpointPath], { stdio: "inherit" });
+      execFileSync("git", ["commit", "-m", `Checkpoint settlement qualification ${saved.nextOffset}/${saved.candidateCount}`], { stdio: "inherit" });
+      execFileSync("git", ["push"], { stdio: "inherit" });
+    }
   }
   const batch = combined;
 
-  const generatedAt = new Date(nowSeconds * 1000).toISOString();
+  const generatedAt = new Date(effectiveNowSeconds * 1000).toISOString();
   if (diagnosticLimit > 0) {
     const diagnostic = {
       schemaVersion: 1,
@@ -208,6 +254,9 @@ export async function runQualification({
     monthly: boards.monthly,
   };
   const target = await writeJsonAtomic(outputPath, payload);
+  if (persistCheckpoints) {
+    try { await unlink(resolve(checkpointPath)); } catch {}
+  }
   await writeJsonAtomic("site/data/qualified-week.json", {
     schemaVersion: 1, generatedAt, period: "week",
     qualification: payload.qualification,
