@@ -42,6 +42,7 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
   maxResolutionHours = 24,
   minWallets = 8,
   minUsdPerWallet = 10,
+  requireRecentBuy = true,
 } = {}) {
   if (auditBatch?.complete !== true || !Array.isArray(auditBatch.results)) {
     throw new Error("Consensus requires a complete wallet audit batch");
@@ -65,7 +66,14 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
   for (const audit of auditBatch.results) {
     const wallet = audit.wallet.toLowerCase();
     if (!qualified.has(wallet)) continue;
-    const recentBuys = audit.recentBuys ?? [];
+    const recentBuys = requireRecentBuy ? (audit.recentBuys ?? []) : (audit.currentPositions ?? []).map((position) => ({
+      conditionId: position.conditionId, tokenId: position.tokenId,
+      timestamp: Number.isInteger(position.lastEventAt) ? position.lastEventAt : nowSeconds,
+      size: position.currentSize,
+      usdSize: Number.isFinite(position.initialValue) && position.initialValue > 0
+        ? position.initialValue
+        : Number.isFinite(position.currentValue) ? position.currentValue : 0,
+    }));
     const heldByCondition = new Map();
     for (const position of audit.currentPositions ?? []) {
       if (!position?.conditionId || !position?.tokenId ||
@@ -207,7 +215,7 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
     qualifiedWalletsConsidered: qualified.size,
     marketsWithRecentQualifiedBuys: byCondition.size,
     exclusions,
-    thresholds: { windowMinutes, maxResolutionHours, minWallets, minUsdPerWallet, requireCurrentHoldings: true, sameSideOnly: true, excludeDuplicateRepresentations: true },
+    thresholds: { windowMinutes, maxResolutionHours, minWallets, minUsdPerWallet, requireCurrentHoldings: true, requireRecentBuy, sameSideOnly: true, excludeDuplicateRepresentations: true },
     complete: true,
   };
 }
