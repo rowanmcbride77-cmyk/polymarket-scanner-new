@@ -157,7 +157,9 @@ export async function fetchCurrentPositionSnapshot(client, wallet, {
   return {
     wallet: wallet.toLowerCase(),
     records: result.rows
-      .filter((row) => row.current_size > 0)
+      .filter((row) => row.current_size > 0 &&
+        (!row.status || ["OPEN", "ACTIVE"].includes(String(row.status).toUpperCase())) &&
+        row.closed !== true && row.redeemable !== true && row.mergeable !== true)
       .map((position) => ({
         conditionId: position.condition_id.toLowerCase(),
         tokenId: String(position.token_id),
