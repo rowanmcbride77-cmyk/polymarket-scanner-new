@@ -7,7 +7,10 @@ on:
     paths:
       - "scanner/**"
       - "!scanner/qualify.js"
-      - ".github/workflows/qualified.yml"
+      - "!scanner/wallet-positions.js"
+      - "!scanner/batch-audit.js"
+      - "!scanner/audit-wallet.js"
+      - "!.github/workflows/qualified.yml"
   schedule:
     - cron: "47 */6 * * *"
 
