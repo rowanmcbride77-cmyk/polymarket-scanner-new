@@ -7,7 +7,7 @@ test("fetches Gamma markets in batches and indexes by condition ID", async () =>
   const calls = [];
   const result = await fetchGammaMarkets(ids, {
     fetchImpl: async (url) => {
-      calls.push(new URL(url).searchParams.get("condition_ids").split(","));
+      calls.push(new URL(url).searchParams.getAll("condition_ids"));
       return new Response(JSON.stringify(calls.at(-1).map(conditionId => ({
         conditionId, question:"Question", active:true, closed:false,
         endDate:"2026-11-19T12:00:00Z", category:"Sports",
