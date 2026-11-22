@@ -20,13 +20,39 @@ function render(period){
  }
  table.append(body);target.append(table);
 }
-async function start(){
+async function loadConsensus(){
+ const target=$("#consensus");
  try{
-  const [status,week,month,consensus]=await Promise.all([
+  const [consensus,status]=await Promise.all([
+   json("./data/consensus.json"),
+   json("./data/consensus-status.json").catch(()=>null)
+  ]);
+  const signals=Array.isArray(consensus.signals)?consensus.signals:[];
+  if(target){
+   target.replaceChildren();
+   target.className=signals.length?"signal-list":"signal-list empty";
+   target.append(node("strong",signals.length+" active same-side consensus markets"));
+   if(!signals.length) target.append(node("p",
+    status?.state==="success"
+     ? "The latest completed scan found no markets meeting the consensus thresholds."
+     : "Consensus scan data is not yet validated."));
+   for(const signal of signals.slice(0,12)){
+    const item=node("p","");
+    item.textContent=(signal.marketTitle||"Market")+" — "+(signal.outcome||"")+" · "+signal.qualifiedWalletCount+" traders · "+money(signal.totalUsd);
+    target.append(item);
+   }
+  }
+ }catch(error){
+  if(target){target.className="signal-list empty";target.textContent="Consensus data is temporarily unavailable.";}
+ }
+}
+async function start(){
+ loadConsensus();
+ try{
+  const [status,week,month]=await Promise.all([
    json("./data/qualification-status.json"),
    json("./data/qualified-week.json"),
-   json("./data/qualified-month.json"),
-   json("./data/consensus.json").catch(()=>({schemaVersion:1,signals:[]}))
+   json("./data/qualified-month.json")
   ]);
   const validBoard=board=>board.schemaVersion===1&&board.validation?.passed===true&&board.validation?.complete===true&&Array.isArray(board.traders)&&
    board.traders.every((t,i)=>t.rank===i+1&&Number.isFinite(t.winRate)&&t.winRate>=0.9&&Number.isInteger(t.resolvedMarkets)&&t.resolvedMarkets>=10&&
@@ -44,18 +70,6 @@ async function start(){
   set("#last-scan",new Date(status.completedAt||status.generatedAt).toLocaleString());
   const period=$("#leader-period");render(period?.value==="month"?"month":"week");
   if(period)period.addEventListener("change",()=>render(period.value==="month"?"month":"week"));
-  const signals=Array.isArray(consensus.signals)?consensus.signals:[];
-  const consensusNode=$("#consensus");
-  if(consensusNode){
-   consensusNode.replaceChildren();
-   consensusNode.append(node("strong",signals.length+" active same-side consensus markets"));
-   if(!signals.length) consensusNode.append(node("p","No markets currently meet the consensus thresholds."));
-   for(const signal of signals.slice(0,12)){
-    const item=node("p","");
-    item.textContent=(signal.marketTitle||"Market")+" — "+(signal.outcome||"")+" · "+signal.qualifiedWalletCount+" traders · "+money(signal.totalUsd);
-    consensusNode.append(item);
-   }
-  }
   set("#combos","Combo scanning runs separately from settlement qualification.");
   set("#combo-status","Settlement-qualified leaderboard refresh");
  }catch(error){
