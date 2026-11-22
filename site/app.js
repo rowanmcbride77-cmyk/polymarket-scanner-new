@@ -28,14 +28,20 @@ async function loadConsensus(){
    json("./data/consensus-status.json").catch(()=>null)
   ]);
   const signals=Array.isArray(consensus.signals)?consensus.signals:[];
+  const validated=status?.state==="success"&&status.validation?.passed===true&&
+   status.generatedAt===consensus.generatedAt&&consensus.validation?.passed===true&&consensus.validation?.complete===true;
   if(target){
    target.replaceChildren();
+   if(!validated){
+    target.className="signal-list empty";
+    target.textContent=status?.state==="scanning"
+     ? "The 20,000-wallet consensus scan is running. Previous results are hidden until the new scan is validated."
+     : "Waiting for a fresh, validated 20,000-wallet consensus scan. Previous results are hidden.";
+    return;
+   }
    target.className=signals.length?"signal-list":"signal-list empty";
    target.append(node("strong",signals.length+" active same-side consensus markets"));
-   if(!signals.length) target.append(node("p",
-    status?.state==="success"
-     ? "The latest completed scan found no markets meeting the consensus thresholds."
-     : "Consensus scan data is not yet validated."));
+   if(!signals.length) target.append(node("p","The latest completed scan found no markets meeting the consensus thresholds."));
    for(const signal of signals.slice(0,12)){
     const item=node("p","");
     item.textContent=(signal.marketTitle||"Market")+" — "+(signal.outcome||"")+" · "+signal.qualifiedWalletCount+" traders · "+money(signal.totalUsd);
