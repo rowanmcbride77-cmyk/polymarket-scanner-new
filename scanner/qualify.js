@@ -80,7 +80,7 @@ export async function runQualification({
   }
 
   let effectiveNowSeconds = nowSeconds;
-  const auditLimit = Number(process.env.SCANNER_AUDIT_LIMIT ?? 1000);
+  const auditLimit = Number(process.env.SCANNER_AUDIT_LIMIT ?? discovery.candidates.length);
   if (!Number.isInteger(auditLimit) || auditLimit < 1) throw new Error("SCANNER_AUDIT_LIMIT must be a positive integer");
   const auditCandidates = discovery.candidates.slice(0, auditLimit);
   const diagnosticLimit = Number(process.env.SCANNER_DIAGNOSTIC_LIMIT ?? 0);
@@ -103,30 +103,52 @@ export async function runQualification({
   if (persistCheckpoints) {
     try {
       const saved = JSON.parse(await readFile(resolve(checkpointPath), "utf8"));
+      const savedPrefixMatches = Array.isArray(saved.results) &&
+        saved.results.every((row, index) =>
+          row?.wallet?.toLowerCase() === candidates[index]?.wallet?.toLowerCase());
       if (saved.schemaVersion === 1 &&
           saved.discoveryGeneratedAt === discovery.generatedAt &&
-          saved.candidateCount === candidates.length &&
-          saved.auditLimit === auditLimit &&
+          saved.candidateCount <= candidates.length &&
+          saved.auditLimit <= auditLimit &&
           Array.isArray(saved.results) && saved.results.length === saved.nextOffset &&
           saved.results.length <= candidates.length &&
+          savedPrefixMatches &&
           Number.isInteger(saved.nowSeconds)) {
         checkpoint = saved;
         effectiveNowSeconds = saved.nowSeconds;
-        process.stdout.write(`Resuming settlement qualification at wallet ${saved.nextOffset}/${candidates.length}.\\n`);
+        process.stdout.write(`Resuming settlement qualification at wallet ${saved.nextOffset}/${candidates.length}; reusing ${saved.results.length} saved results.\\n`);
       }
     } catch {}
   }
+  const firstIncomplete = checkpoint
+    ? checkpoint.results.findIndex(row => row?.complete !== true)
+    : -1;
+  const resumeOffset = checkpoint
+    ? (firstIncomplete >= 0 ? firstIncomplete : checkpoint.results.length)
+    : 0;
+  const reusableResults = checkpoint?.results.slice(0, resumeOffset) ?? [];
   const combined = {
-    results: checkpoint?.results ?? [],
+    results: reusableResults,
     complete: true,
-    allAuditsComplete: checkpoint?.allAuditsComplete ?? true,
-    completed: checkpoint?.results.length ?? 0,
-    failed: checkpoint?.failed ?? 0,
-    errorCounts: checkpoint?.errorCounts ?? {},
-    errorSamples: checkpoint?.errorSamples ?? [],
+    allAuditsComplete: true,
+    completed: reusableResults.length,
+    failed: 0,
+    errorCounts: {},
+    errorSamples: [],
     sharedTokenFacts: 0, sharedResolutionFacts: 0,
     uniqueTokens: 0, uniqueMarkets: 0,
   };
+  if (checkpoint && resumeOffset < checkpoint.results.length) {
+    process.stdout.write(`Retrying from first incomplete wallet ${resumeOffset + 1}; discarding ${checkpoint.results.length - resumeOffset} later checkpoint rows so results stay contiguous.\\n`);
+  }
+  await writeJsonAtomic("site/data/qualification-status.json", {
+    schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
+    completedAt: null, validation: { passed: false, complete: false },
+    state: "in_progress", discoveredWallets: discovery.candidates.length,
+    auditedWallets: combined.completed, fullyAuditedWallets: combined.completed,
+    failedWalletAudits: 0, qualifiedWallets: 0,
+    message: `Auditing all ${candidates.length} discovered wallets in resumable batches.`,
+  });
   for (let offset = combined.completed; offset < candidates.length; offset += chunkSize) {
     const chunk = candidates.slice(offset, offset + chunkSize);
     const part = await auditCandidatesBatch(chunk, {
@@ -207,7 +229,7 @@ export async function runQualification({
     process.stdout.write(`Diagnostic sample finished: ${batch.completed}/${candidates.length}; failures ${batch.failed}. Output: ${path}\n`);
     return diagnostic;
   }
-  if (!batch.complete) {
+  if (!batch.complete || !batch.allAuditsComplete) {
     const incomplete = {
       schemaVersion: 1,
       generatedAt,
@@ -223,7 +245,16 @@ export async function runQualification({
       results: batch.results,
     };
     const path = await writeJsonAtomic("data/qualification-incomplete.json", incomplete);
-    throw new Error(`Wallet audit incomplete (${batch.failed} failed). No Top 100 was generated. Diagnostic: ${path}`);
+    await writeJsonAtomic("site/data/qualification-status.json", {
+      schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
+      validation: { passed: false, complete: false, allAuditsComplete: false },
+      state: "incomplete", discoveredWallets: discovery.candidates.length,
+      auditedWallets: batch.completed, fullyAuditedWallets: batch.completed - batch.failed,
+      failedWalletAudits: batch.failed, qualifiedWallets: 0,
+      errorCounts: batch.errorCounts,
+      message: `Audit progress saved. ${batch.completed}/${candidates.length} wallets attempted; ${batch.failed} need retry. No leaderboard published.`,
+    });
+    throw new Error(`Wallet audit incomplete (${batch.failed} failed). No Top 100 was published. Checkpoint saved; next scheduled run will retry incomplete wallets. Diagnostic: ${path}`);
   }
 
   const qualificationDiscovery = { ...discovery, candidates };
