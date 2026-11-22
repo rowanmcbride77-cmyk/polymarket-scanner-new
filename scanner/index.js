@@ -78,7 +78,7 @@ export async function runDiscovery({ outputPath = "data/discovery.json" } = {}) 
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   runDiscovery().then(({ path, payload }) => {
-    process.stdout.write(`Candidate discovery complete: ${payload.candidates.length} unique wallets across ${payload.partitions.length} bounded leaderboard partitions; source exhausted: ${payload.validation.sourceExhausted}.\n`);
+    process.stdout.write(`Candidate discovery complete: ${payload.validation.candidateCount}/${payload.validation.maxCandidates} unique wallets across ${payload.partitions.length} bounded leaderboard partitions; source exhausted: ${payload.validation.sourceExhausted}.\n`);
     process.stdout.write(`Output: ${path}\n`);
     process.stdout.write("Discovery only: this is not a qualified Top 100 and is not published to the dashboard.\n");
   }).catch((error) => {

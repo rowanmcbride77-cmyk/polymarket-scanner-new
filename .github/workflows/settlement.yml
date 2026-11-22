@@ -15,7 +15,7 @@ on:
       - "scanner/qualify.js"
       - ".github/workflows/settlement.yml"
   workflow_run:
-    workflows: ["Discover Polymarket Wallets & Consensus"]
+    workflows: ["Discover Polymarket Wallets"]
     types: [completed]
     branches: [main]
 
