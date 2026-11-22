@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-22T06:08:44.000Z",
+  "generatedAt": "2026-11-22T07:28:14.000Z",
   "validation": {
     "passed": true,
     "complete": true,
@@ -9,8 +9,8 @@
   "walletUniverse": "full-discovery-pool",
   "walletsChecked": 20000,
   "qualifiedWalletsConsidered": 20000,
-  "marketsWithRecentQualifiedBuys": 1511,
-  "signalCount": 0,
+  "marketsWithRecentQualifiedBuys": 1565,
+  "signalCount": 1,
   "thresholds": {
     "windowMinutes": 60,
     "maxResolutionHours": 24,
@@ -23,13 +23,12 @@
     "basis": "Current open positions from the full discovered wallet pool; settlement qualification is a separate pipeline."
   },
   "exclusions": {
-    "wallet_below_minimum_usd": 3444,
-    "mixed_outcomes_in_market": 485,
-    "outside_24h_resolution_window": 597,
+    "wallet_below_minimum_usd": 3141,
+    "mixed_outcomes_in_market": 423,
     "insufficient_qualified_wallets": 256,
-    "missing_market_end_date": 4,
-    "missing_market_metadata": 23,
-    "excluded_or_unclassified_category": 146
+    "outside_24h_resolution_window": 704,
+    "excluded_or_unclassified_category": 164,
+    "missing_market_metadata": 17
   },
   "scanDiagnostics": {
     "discoveredWallets": 20000,
@@ -37,11 +36,126 @@
     "positionPagesPerWallet": 1,
     "positionPageSize": 500,
     "positionSnapshotMayBeTruncated": true,
-    "uniqueConditions": 33783,
-    "marketMetadataReturned": 33357,
+    "uniqueConditions": 33589,
+    "marketMetadataReturned": 33257,
     "failedWallets": 0
   },
-  "signals": [],
+  "signals": [
+    {
+      "conditionId": "0x839454b1dbb27ad4c328a14172950e748c6de74ba41eb7b87e88c6e049bae861",
+      "tokenId": "91100783259005244371235924226192368690406751930992092916815572248721208472124",
+      "outcome": "PARIVISION",
+      "marketTitle": "Dota 2: PARIVISION vs Team Liquid (BO3) - BLAST Slam Group C",
+      "marketSlug": "dota2-pari-liquid-2026-11-22",
+      "eventId": "1433227",
+      "eventSlug": "dota2-pari-liquid-2026-11-22",
+      "category": "esports",
+      "endDate": "2026-11-22T20:00:00.000Z",
+      "minutesToResolution": 752,
+      "qualifiedWalletCount": 14,
+      "totalUsd": 2606.6129,
+      "wallets": [
+        {
+          "wallet": "0x92839e2d4f467ae41dc141913585afad1d474277",
+          "username": "wangyou1288",
+          "usdSize": 1574.6614,
+          "buyCount": 1,
+          "lastBuyAt": 1795330867
+        },
+        {
+          "wallet": "0xcf0c70317fd5e4e4429758b3d80a7b7f3762f2bb",
+          "username": "0x478fhs7832bfs8f7dfdsfesh",
+          "usdSize": 620.929,
+          "buyCount": 1,
+          "lastBuyAt": 1795330853
+        },
+        {
+          "wallet": "0x4f23b6e57662f1ffc11641df7f6367868e93aec2",
+          "username": "copybot5416",
+          "usdSize": 77.76,
+          "buyCount": 1,
+          "lastBuyAt": 1795330853
+        },
+        {
+          "wallet": "0x71e04ffee15e8f1b023ba211d9e8720c5d72b2f5",
+          "username": "0x71e04ffee15e8f1b023ba211d9e8720c5d72b2f5",
+          "usdSize": 67.481,
+          "buyCount": 1,
+          "lastBuyAt": 1795330853
+        },
+        {
+          "wallet": "0xd4eb89f83efc17e876eec81798659b143966744f",
+          "username": "0xd4eb89f83efc17e876eec81798659b143966744f",
+          "usdSize": 47.1399,
+          "buyCount": 1,
+          "lastBuyAt": 1795330853
+        },
+        {
+          "wallet": "0x6ccb24b12b085e49f01d14b03c584a900b4586e8",
+          "username": "no1fengshui",
+          "usdSize": 46.7899,
+          "buyCount": 1,
+          "lastBuyAt": 1795330853
+        },
+        {
+          "wallet": "0xf030d376c23ed2afb9987913903c229dec51dbba",
+          "username": "noosh1",
+          "usdSize": 32.4299,
+          "buyCount": 1,
+          "lastBuyAt": 1795330868
+        },
+        {
+          "wallet": "0xee07fdcc064be28bb6eb5a4447f315a69fbbfff7",
+          "username": "0xee07fdcc064be28bb6eb5a4447f315a69fbbfff7",
+          "usdSize": 32.4299,
+          "buyCount": 1,
+          "lastBuyAt": 1795330867
+        },
+        {
+          "wallet": "0xb6fb6849642a6920cd8506ad10e936c87aee2c47",
+          "username": "shinyibis",
+          "usdSize": 20.9999,
+          "buyCount": 1,
+          "lastBuyAt": 1795330867
+        },
+        {
+          "wallet": "0x941809833d47890e2383a0abf5277facff28e9f8",
+          "username": "0x941809833D47890E2383a0abf5277FACff28e9F8-1781957605159",
+          "usdSize": 20.2823,
+          "buyCount": 1,
+          "lastBuyAt": 1795330895
+        },
+        {
+          "wallet": "0x2cd37fbc8fcaf5ba547e5bcd69edd016ec3d1e7f",
+          "username": "0x0869CedA40B9e86926C51588dA1331fA09982738-1768444512849",
+          "usdSize": 19.9999,
+          "buyCount": 1,
+          "lastBuyAt": 1795331557
+        },
+        {
+          "wallet": "0xa9b73b68f02f26238e2fa948fe0b7dbeb5bff43c",
+          "username": "jensond",
+          "usdSize": 19.44,
+          "buyCount": 1,
+          "lastBuyAt": 1795330855
+        },
+        {
+          "wallet": "0xf9b5e9803ea977b7111c9b7728ac6ea97f361212",
+          "username": "0xf9B5e9803Ea977b7111c9B7728aC6eA97f361212-1765800007149",
+          "usdSize": 16.2599,
+          "buyCount": 1,
+          "lastBuyAt": 1795330867
+        },
+        {
+          "wallet": "0xb4cd4d6fe596f360137e5a0441fecc4e1ec9c041",
+          "username": "dwedwd",
+          "usdSize": 10.0099,
+          "buyCount": 1,
+          "lastBuyAt": 1795330867
+        }
+      ]
+    }
+  ],
   "combos": {
     "validation": {
       "passed": true,
