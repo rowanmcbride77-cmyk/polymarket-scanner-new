@@ -6,7 +6,7 @@ const WALLET_RE = /^0x[a-fA-F0-9]{40}$/;
 
 export async function fetchRedeemablePositionSnapshot(client, wallet, {
   limit = 1000,
-  maxPages = 100,
+  maxPages = Number(process.env.SCANNER_POSITION_MAX_PAGES ?? 10),
   includeTokenFacts = true,
   onPage,
 } = {}) {
@@ -88,7 +88,7 @@ export async function fetchClosedPositionSnapshot(client, wallet, {
   startSeconds,
   endSeconds = Math.floor(Date.now() / 1000),
   limit = 1000,
-  maxPages = 100,
+  maxPages = Number(process.env.SCANNER_POSITION_MAX_PAGES ?? 10),
   onPage,
 } = {}) {
   if (!WALLET_RE.test(wallet ?? "")) throw new TypeError("A valid proxy wallet address is required");
