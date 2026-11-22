@@ -38,33 +38,44 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   }
   const wallets = discovery.candidates;
   const candidateByWallet = new Map(wallets.map(row => [row.wallet.toLowerCase(), row]));
-  const pacedFetch = createPacedFetch();
-  const client = createDataApiClient({ fetchImpl: pacedFetch });
   process.stdout.write(`Fast consensus scan: checking current open positions for ${wallets.length} discovered wallets; no settlement audit or per-wallet activity-history lookup.\\n`);
 
-  const batch = await auditCandidates(wallets, {
-    concurrency,
-    auditWallet: async (wallet) => {
-      const candidate = candidateByWallet.get(wallet.toLowerCase());
-      const sports = candidate?.appearances?.some(row => row.category === "sports") === true;
-      const snapshot = await fetchCurrentPositionSnapshot(client, wallet, {
-        limit: 100,
-        maxPages: sports ? 4 : 2,
-      });
-      return {
-        complete: snapshot.complete,
-        qualification: { qualified: true, reason: "broad_discovery_consensus_pool" },
-        currentPositions: snapshot.records,
-        recentBuys: [],
-        coverage: "BOUNDED_CURRENT_OPEN_POSITION_SNAPSHOT",
-      };
-    },
-    onProgress: ({ completed, total, failed }) => {
-      process.stdout.write(`Open-position wallets: ${completed}/${total}; failures: ${failed}.\\n`);
-    },
-  });
+  const scanWalletBatch = async (walletRows, { intervalMs, workers, label }) => {
+    const pacedFetch = createPacedFetch({ intervalMs });
+    const client = createDataApiClient({ fetchImpl: pacedFetch, maxRetries: 10, baseDelayMs: 1000, maxDelayMs: 60_000 });
+    return auditCandidates(walletRows, {
+      concurrency: workers,
+      auditWallet: async (wallet) => {
+        const candidate = candidateByWallet.get(wallet.toLowerCase());
+        const sports = candidate?.appearances?.some(row => row.category === "sports") === true;
+        const snapshot = await fetchCurrentPositionSnapshot(client, wallet, { limit: 100, maxPages: sports ? 4 : 2 });
+        return { complete: snapshot.complete, qualification: { qualified: true, reason: "broad_discovery_consensus_pool" }, currentPositions: snapshot.records, recentBuys: [], coverage: "BOUNDED_CURRENT_OPEN_POSITION_SNAPSHOT" };
+      },
+      onProgress: ({ completed, total, failed, commonErrors, errorSamples }) => {
+        process.stdout.write(`${label}: ${completed}/${total}; failures: ${failed}; common errors: ${JSON.stringify(commonErrors ?? [])}; samples: ${JSON.stringify(errorSamples ?? [])}\\n`);
+      },
+    });
+  };
+
+  let batch = await scanWalletBatch(wallets, { intervalMs: 35, workers: concurrency, label: "Open-position wallets" });
   if (!batch.allAuditsComplete) {
-    throw new Error(`Consensus position scan incomplete: ${batch.failed}/${wallets.length} wallet requests failed; refusing to publish partial consensus.`);
+    const failedWallets = batch.results.filter(row => row?.complete !== true).map(row => candidateByWallet.get(row.wallet.toLowerCase())).filter(Boolean);
+    process.stdout.write(`Retrying ${failedWallets.length} failed wallet requests with a slower 125ms request interval and four workers.\\n`);
+    if (failedWallets.length) {
+      const retryBatch = await scanWalletBatch(failedWallets, { intervalMs: 125, workers: 4, label: "Failed-wallet retry" });
+      const retryByWallet = new Map(retryBatch.results.map(row => [row.wallet.toLowerCase(), row]));
+      batch.results = batch.results.map(row => retryByWallet.get(row.wallet.toLowerCase()) ?? row);
+      batch.failed = batch.results.filter(row => row?.complete !== true).length;
+      batch.completed = wallets.length;
+      batch.allAuditsComplete = batch.failed === 0;
+      process.stdout.write(`Retry result: recovered ${failedWallets.length - retryBatch.failed}/${failedWallets.length}; remaining failures: ${batch.failed}.\\n`);
+    }
+  }
+  if (!batch.allAuditsComplete) {
+    const remaining = batch.results.filter(row => row?.complete !== true);
+    const reasons = remaining.reduce((acc, row) => { const key = `${row.auditStage ?? "unknown"}: ${row.error ?? "incomplete"}`; acc[key] = (acc[key] ?? 0) + 1; return acc; }, {});
+    process.stdout.write(`Unrecovered wallet failure breakdown: ${JSON.stringify(reasons)}\\n`);
+    throw new Error(`Consensus position scan incomplete after retry: ${batch.failed}/${wallets.length} wallet requests failed; refusing to publish partial consensus.`);
   }
 
   const conditionIds = [...new Set(batch.results.flatMap(row => row.currentPositions ?? []).map(row => row.conditionId).filter(Boolean))];
