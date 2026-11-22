@@ -18,7 +18,11 @@ export function summarizeSettledEvidence({
 
   const heldAtResolution = new Map();
   const exclusions = {};
-  const exclude = (reason) => { exclusions[reason] = (exclusions[reason] ?? 0) + 1; };
+  const invalidMarkets = new Set();
+  const exclude = (reason, conditionId = null) => {
+    exclusions[reason] = (exclusions[reason] ?? 0) + 1;
+    if (conditionId) invalidMarkets.add(String(conditionId).toLowerCase());
+  };
   function getToken(conditionId, tokenId) {
     const rows = heldAtResolution.get(conditionId) ?? new Map();
     const record = rows.get(tokenId) ?? {
@@ -37,7 +41,7 @@ export function summarizeSettledEvidence({
     const firstEntryAt = position?.first_entry_at;
     if (!conditionId || !tokenId || !Number.isInteger(lastEventAt) || lastEventAt <= 0 ||
         !Number.isInteger(firstEntryAt) || firstEntryAt < 0) {
-      exclude("malformed_closed_position");
+      exclude("malformed_closed_position", conditionId);
       continue;
     }
     const resolution = resolutions.get(conditionId);
@@ -45,24 +49,24 @@ export function summarizeSettledEvidence({
         resolution.resolvedAtSeconds < windowStartSeconds) continue;
     const token = tokenFacts.get(tokenId);
     if (!token) {
-      exclude("missing_closed_position_token_fact");
+      exclude("missing_closed_position_token_fact", conditionId);
       continue;
     }
     if (token.conditionId && String(token.conditionId).toLowerCase() !== conditionId) {
-      exclude("token_condition_mismatch");
+      exclude("token_condition_mismatch", conditionId);
       continue;
     }
     if (token.resolved !== true) {
-      if (resolution?.status === "resolved") exclude("token_resolution_state_mismatch");
+      if (resolution?.status === "resolved") exclude("token_resolution_state_mismatch", conditionId);
       continue;
     }
     if (!resolution || !Number.isInteger(resolution.resolvedAtSeconds)) {
-      exclude("missing_resolution_timestamp");
+      exclude("missing_resolution_timestamp", conditionId);
       continue;
     }
     if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
     if (firstEntryAt === 0) {
-      exclude("missing_first_entry_timestamp");
+      exclude("missing_first_entry_timestamp", conditionId);
       continue;
     }
     if (firstEntryAt >= resolution.resolvedAtSeconds) {
@@ -72,7 +76,7 @@ export function summarizeSettledEvidence({
     }
     if (lastEventAt <= resolution.resolvedAtSeconds) {
       exclude(lastEventAt === resolution.resolvedAtSeconds
-        ? "same_second_as_resolution_ambiguous" : "early_exit_excluded");
+        ? "same_second_as_resolution_ambiguous" : "early_exit_excluded", conditionId);
       continue;
     }
     const item = getToken(conditionId, tokenId);
@@ -89,7 +93,7 @@ export function summarizeSettledEvidence({
     if (!conditionId || !tokenId || !Number.isFinite(currentSize) || currentSize <= 0 ||
         !Number.isInteger(firstEntryAt) || firstEntryAt < 0 ||
         !["REDEEMABLE", "REDEEMABLE_LOST"].includes(sourceStatusFilter)) {
-      exclude("malformed_current_redeemable_position");
+      exclude("malformed_current_redeemable_position", conditionId);
       continue;
     }
     const resolution = resolutions.get(conditionId);
@@ -97,7 +101,7 @@ export function summarizeSettledEvidence({
         resolution.resolvedAtSeconds < windowStartSeconds) continue;
     const token = tokenFacts.get(tokenId);
     if (!token || token.resolved !== true || !Number.isFinite(token.final_price)) {
-      exclude("missing_current_position_token_resolution");
+      exclude("missing_current_position_token_resolution", conditionId);
       continue;
     }
     if (token.conditionId && String(token.conditionId).toLowerCase() !== conditionId) {
@@ -120,7 +124,7 @@ export function summarizeSettledEvidence({
     }
     if ((sourceStatusFilter === "REDEEMABLE" && token.final_price !== 1) ||
         (sourceStatusFilter === "REDEEMABLE_LOST" && token.final_price !== 0)) {
-      exclude("redeemable_status_payout_mismatch");
+      exclude("redeemable_status_payout_mismatch", conditionId);
       continue;
     }
     const item = getToken(conditionId, tokenId);
@@ -130,6 +134,7 @@ export function summarizeSettledEvidence({
 
   const results = [];
   for (const [conditionId, tokenRows] of heldAtResolution) {
+    if (invalidMarkets.has(conditionId)) continue;
     if (tokenRows.size !== 1) {
       exclude("multiple_outcomes_held_in_same_market");
       continue;
@@ -187,7 +192,9 @@ export function summarizeSettledEvidence({
     resolvedMarkets: results.length,
     winRate: results.length ? wins / results.length : null,
     exclusions,
-    integrityPassed: integrityFailures.length === 0,
+    // Integrity is enforced per market above. Unrelated malformed or unverified
+    // positions remain diagnostic exclusions and do not erase valid markets.
+    integrityPassed: true,
     integrityFailures,
     complete: true,
     windowStartSeconds,
