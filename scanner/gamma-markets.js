@@ -29,7 +29,7 @@ export async function fetchGammaMarkets(conditionIds, {
   for (let i = 0; i < ids.length; i += batchSize) {
     const batch = ids.slice(i, i + batchSize);
     const url = new URL("/markets", baseUrl);
-    url.searchParams.set("condition_ids", batch.join(","));
+    for (const conditionId of batch) url.searchParams.append("condition_ids", conditionId);
     url.searchParams.set("limit", String(batch.length));
     url.searchParams.set("include_tag", "true");
     let response;
