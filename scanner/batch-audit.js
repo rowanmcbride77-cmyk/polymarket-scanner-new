@@ -60,7 +60,7 @@ export async function auditCandidatesBatch(candidates, {
         fetchClosedPositionSnapshot(client, candidate.wallet, {
           startSeconds: windowStartSeconds,
           endSeconds: nowSeconds,
-          maxPages: 100,
+          maxPages: Number(process.env.SCANNER_POSITION_MAX_PAGES ?? 10),
           onPage: (progress) => onProgress?.({ ...progress, stage: "closed_positions", wallet: candidate.wallet }),
         }),
       ]);
