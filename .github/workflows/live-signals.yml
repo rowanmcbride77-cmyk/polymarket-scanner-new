@@ -1,0 +1,52 @@
+name: Qualified Trader Live Signals
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_run:
+    workflows: ["Settlement Qualification"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: polymarket-qualified-live-signals
+  cancel-in-progress: false
+
+jobs:
+  build-live-signals:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate scanner and tests
+        run: |
+          npm run check
+          npm test
+      - name: Build same-side signals from qualified traders and observe sells
+        run: npm run consensus
+        env:
+          SCANNER_CONCURRENCY: 16
+          NODE_OPTIONS: --max-old-space-size=4096
+      - name: Publish live signal and exit-alert data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/consensus.json site/data/consensus-status.json
+          if git diff --cached --quiet; then
+            echo "Live signals unchanged."
+          else
+            git commit -m "Publish qualified trader live copy signals"
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push origin HEAD:main
+          fi
