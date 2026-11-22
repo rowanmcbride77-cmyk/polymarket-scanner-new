@@ -97,7 +97,6 @@ export async function runQualification({
   }
   const runWalletLimit = Number(process.env.SCANNER_RUN_WALLET_LIMIT ?? candidates.length);
   if (!Number.isInteger(runWalletLimit) || runWalletLimit < 1) throw new Error("SCANNER_RUN_WALLET_LIMIT must be positive");
-  const runEndOffset = Math.min(candidates.length, runWalletLimit);
   const tokenFactsCache = new Map();
   const resolutionsCache = new Map();
   const checkpointPath = "data/qualification-progress.json";
@@ -141,6 +140,7 @@ export async function runQualification({
     sharedTokenFacts: 0, sharedResolutionFacts: 0,
     uniqueTokens: 0, uniqueMarkets: 0,
   };
+  const runEndOffset = Math.min(candidates.length, combined.completed + runWalletLimit);
   if (checkpoint && resumeOffset < checkpoint.results.length) {
     process.stdout.write(`Retrying from first incomplete wallet ${resumeOffset + 1}; discarding ${checkpoint.results.length - resumeOffset} later checkpoint rows so results stay contiguous.\\n`);
   }
