@@ -81,7 +81,7 @@ test("fetches current held positions for consensus confirmation", async () => {
     async collectPages(path, params) {
       call = {path,params};
       return {rows:[
-        {proxy_wallet:wallet,condition_id:"0xcondition",token_id:"44",current_size:5},
+        {proxy_wallet:wallet,condition_id:"0xcondition",token_id:"44",current_size:5,outcome:"Yes"},
         {proxy_wallet:wallet,condition_id:"0xcondition",token_id:"55",current_size:0},
       ],pages:1,complete:true};
     },
