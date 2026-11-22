@@ -8,6 +8,8 @@ on:
       - "scanner/wallet-positions.js"
       - "scanner/batch-audit.js"
       - "scanner/audit-wallet.js"
+      - "scanner/settlement-evidence.js"
+      - "scanner/settlement-evidence.test.js"
       - ".github/workflows/settlement.yml"
   workflow_run:
     workflows: ["Discover Polymarket Wallets & Consensus"]
