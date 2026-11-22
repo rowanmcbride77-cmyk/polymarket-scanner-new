@@ -18,6 +18,24 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
       !Array.isArray(result.partitions) || !result.partitions.every((p) => p.complete === true)) {
     throw new Error("Candidate discovery was incomplete; refusing output");
   }
+  const maxCandidates = result.maxCandidates ?? DEFAULT_MAX_CANDIDATES;
+  const candidates = result.candidates;
+  if (!Number.isInteger(maxCandidates) || maxCandidates < 1) {
+    throw new Error("Candidate discovery has an invalid wallet cap");
+  }
+  if (candidates.length === 0) {
+    throw new Error("Candidate discovery returned no wallets; refusing output");
+  }
+  if (candidates.length > maxCandidates) {
+    throw new Error(`Candidate discovery exceeded its ${maxCandidates}-wallet cap (${candidates.length} rows)`);
+  }
+  const wallets = candidates.map((candidate) => String(candidate?.wallet ?? "").trim().toLowerCase());
+  if (wallets.some((wallet) => !wallet)) {
+    throw new Error("Candidate discovery contains a missing wallet");
+  }
+  if (new Set(wallets).size !== wallets.length) {
+    throw new Error("Candidate discovery contains duplicate wallets; refusing output");
+  }
   return {
     schemaVersion: 1,
     generatedAt,
@@ -27,7 +45,7 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
       categories: ["sports", "esports", "crypto", "overall"],
       sortBy: "PNL",
       pageSize: 1000,
-      maxCandidates: result.maxCandidates ?? DEFAULT_MAX_CANDIDATES,
+      maxCandidates,
       maxPagesPerPartition: 20,
     },
     validation: {
@@ -35,13 +53,13 @@ export function buildDiscoveryPayload(result, generatedAt = new Date().toISOStri
       allPageRequestsComplete: true,
       sourceExhausted: result.sourceExhausted === true,
       candidateCapReached: result.candidateCapReached === true,
-      maxCandidates: result.maxCandidates ?? DEFAULT_MAX_CANDIDATES,
+      maxCandidates,
       truncatedPartitions: result.partitions.filter((p) => p.truncated).length,
       candidateCount: result.candidates.length,
       partitionCount: result.partitions.length,
     },
     partitions: result.partitions,
-    candidates: result.candidates,
+    candidates,
   };
 }
 

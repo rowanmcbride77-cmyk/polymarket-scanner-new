@@ -6,6 +6,26 @@ import { createDataApiClient } from "./data-api.js";
 import { auditCandidatesBatch } from "./batch-audit.js";
 import { buildQualifiedLeaderboards } from "./qualification-runner.js";
 
+/**
+ * Every saved row is a terminal wallet-audit result, even when an individual
+ * audit is incomplete. Resume after the saved prefix instead of rewinding to
+ * the first failed wallet and discarding all later completed work.
+ */
+export function checkpointResumeOffset(checkpoint) {
+  return Array.isArray(checkpoint?.results) ? checkpoint.results.length : 0;
+}
+
+/**
+ * A batch is publishable only after every candidate has a terminal result.
+ * Individual incomplete audits are excluded by buildQualifiedLeaderboards.
+ */
+export function hasTerminalAuditResults(batch, candidateCount) {
+  return Number.isInteger(candidateCount) && candidateCount >= 0 &&
+    batch?.complete === true &&
+    Array.isArray(batch.results) &&
+    batch.results.length === candidateCount;
+}
+
 function createPacedFetch({
   fetchImpl = globalThis.fetch,
   sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms)),
@@ -122,28 +142,24 @@ export async function runQualification({
       }
     } catch {}
   }
-  const firstIncomplete = checkpoint
-    ? checkpoint.results.findIndex(row => row?.complete !== true)
-    : -1;
-  const resumeOffset = checkpoint
-    ? (firstIncomplete >= 0 ? firstIncomplete : checkpoint.results.length)
-    : 0;
-  const reusableResults = checkpoint?.results.slice(0, resumeOffset) ?? [];
+  const resumeOffset = checkpointResumeOffset(checkpoint);
+  const reusableResults = checkpoint?.results ?? [];
+  const savedIncompleteAudits = reusableResults.filter(row => row?.complete !== true).length;
+  if (savedIncompleteAudits) {
+    process.stdout.write(`Reusing ${savedIncompleteAudits} terminal incomplete wallet audits; those wallets remain excluded from qualification.\\n`);
+  }
   const combined = {
     results: reusableResults,
     complete: true,
-    allAuditsComplete: true,
+    allAuditsComplete: savedIncompleteAudits === 0,
     completed: reusableResults.length,
-    failed: 0,
-    errorCounts: {},
-    errorSamples: [],
+    failed: savedIncompleteAudits,
+    errorCounts: { ...(checkpoint?.errorCounts ?? {}) },
+    errorSamples: [...(checkpoint?.errorSamples ?? [])],
     sharedTokenFacts: 0, sharedResolutionFacts: 0,
     uniqueTokens: 0, uniqueMarkets: 0,
   };
   const runEndOffset = Math.min(candidates.length, combined.completed + runWalletLimit);
-  if (checkpoint && resumeOffset < checkpoint.results.length) {
-    process.stdout.write(`Retrying from first incomplete wallet ${resumeOffset + 1}; discarding ${checkpoint.results.length - resumeOffset} later checkpoint rows so results stay contiguous.\\n`);
-  }
   await writeJsonAtomic("site/data/qualification-status.json", {
     schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
     completedAt: null, validation: { passed: false, complete: false },
@@ -260,7 +276,7 @@ export async function runQualification({
     process.stdout.write(`Diagnostic sample finished: ${batch.completed}/${candidates.length}; failures ${batch.failed}. Output: ${path}\n`);
     return diagnostic;
   }
-  if (!batch.complete || !batch.allAuditsComplete) {
+  if (!hasTerminalAuditResults(batch, candidates.length)) {
     const incomplete = {
       schemaVersion: 1,
       generatedAt,
@@ -283,9 +299,9 @@ export async function runQualification({
       auditedWallets: batch.completed, fullyAuditedWallets: batch.completed - batch.failed,
       failedWalletAudits: batch.failed, qualifiedWallets: 0,
       errorCounts: batch.errorCounts,
-      message: `Audit progress saved. ${batch.completed}/${candidates.length} wallets attempted; ${batch.failed} need retry. No leaderboard published.`,
+      message: `Audit progress saved. ${batch.completed}/${candidates.length} candidates have terminal audit results. No leaderboard published.`,
     });
-    throw new Error(`Wallet audit incomplete (${batch.failed} failed). No Top 100 was published. Checkpoint saved; next scheduled run will retry incomplete wallets. Diagnostic: ${path}`);
+    throw new Error(`Candidate audit batch incomplete (${batch.completed}/${candidates.length} terminal results). No Top 100 was published. Checkpoint saved. Diagnostic: ${path}`);
   }
 
   const qualificationDiscovery = { ...discovery, candidates };

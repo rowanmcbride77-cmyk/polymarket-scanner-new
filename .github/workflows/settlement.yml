@@ -45,9 +45,16 @@ jobs:
           node --input-type=module <<'NODE'
           import { readFileSync } from "node:fs";
           const data = JSON.parse(readFileSync("data/discovery.json", "utf8"));
+          const wallets = Array.isArray(data.candidates)
+            ? data.candidates.map((row) => String(row?.wallet ?? "").trim().toLowerCase())
+            : [];
           if (data.schemaVersion !== 1 || data.validation?.passed !== true ||
-              !Array.isArray(data.candidates) || data.candidates.length !== data.validation.candidateCount) {
-            throw new Error("Latest wallet discovery snapshot is missing or invalid");
+              wallets.length === 0 ||
+              wallets.length !== data.validation.candidateCount ||
+              wallets.length > Number(data.validation.maxCandidates ?? 20000) ||
+              wallets.some((wallet) => !/^0x[a-f0-9]{40}$/.test(wallet)) ||
+              new Set(wallets).size !== wallets.length) {
+            throw new Error("Latest wallet discovery snapshot is missing, over-cap, duplicated, or invalid");
           }
           console.log(`Using ${data.candidates.length} previously discovered wallets; discovery will not run again here.`);
           NODE
@@ -84,14 +91,16 @@ jobs:
             console.log("Checkpointed progress: " + status.auditedWallets + "/" + status.discoveredWallets + ". Waiting for the next scheduled batch.");
             process.exit(0);
           }
-          if (status.state !== "success" || status.validation?.passed !== true) {
-            throw new Error("Qualification status failed validation");
+          if (status.state !== "success" || status.validation?.passed !== true ||
+              status.validation?.complete !== true ||
+              status.auditedWallets !== status.discoveredWallets) {
+            throw new Error("Qualification status failed terminal-audit validation");
           }
           for (const period of ["week", "month"]) {
             const board = JSON.parse(readFileSync(`site/data/qualified-${period}.json`, "utf8"));
             if (board.period !== period || board.validation?.passed !== true ||
                 board.validation?.complete !== true || !Array.isArray(board.traders) ||
-                board.count !== board.traders.length ||
+                board.traders.length < 1 || board.count !== board.traders.length ||
                 !board.traders.every((t, i) => t.rank === i + 1 &&
                   Number.isFinite(t.winRate) && t.winRate >= 0.9 &&
                   Number.isInteger(t.resolvedMarkets) && t.resolvedMarkets >= 10 &&
