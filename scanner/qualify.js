@@ -91,10 +91,13 @@ export async function runQualification({
   process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\n`);
   // Bound memory: raw histories from all 1,000 wallets must not coexist in
   // memory. The previous all-at-once batch exceeded the runner's 6 GB heap.
-  const chunkSize = Number(process.env.SCANNER_AUDIT_CHUNK_SIZE ?? 50);
+  const chunkSize = Number(process.env.SCANNER_AUDIT_CHUNK_SIZE ?? 25);
   if (!Number.isInteger(chunkSize) || chunkSize < 1 || chunkSize > 100) {
     throw new Error("SCANNER_AUDIT_CHUNK_SIZE must be 1..100");
   }
+  const runWalletLimit = Number(process.env.SCANNER_RUN_WALLET_LIMIT ?? candidates.length);
+  if (!Number.isInteger(runWalletLimit) || runWalletLimit < 1) throw new Error("SCANNER_RUN_WALLET_LIMIT must be positive");
+  const runEndOffset = Math.min(candidates.length, runWalletLimit);
   const tokenFactsCache = new Map();
   const resolutionsCache = new Map();
   const checkpointPath = "data/qualification-progress.json";
@@ -149,8 +152,8 @@ export async function runQualification({
     failedWalletAudits: 0, qualifiedWallets: 0,
     message: `Auditing all ${candidates.length} discovered wallets in resumable batches.`,
   });
-  for (let offset = combined.completed; offset < candidates.length; offset += chunkSize) {
-    const chunk = candidates.slice(offset, offset + chunkSize);
+  for (let offset = combined.completed; offset < runEndOffset; offset += chunkSize) {
+    const chunk = candidates.slice(offset, Math.min(offset + chunkSize, runEndOffset));
     const part = await auditCandidatesBatch(chunk, {
       client, concurrency, nowSeconds: effectiveNowSeconds, lookbackDays: 30,
       minimumResolvedMarkets: 10, minimumWinRate: 0.9,
@@ -194,7 +197,15 @@ export async function runQualification({
         allAuditsComplete: combined.allAuditsComplete,
       };
       await writeJsonAtomic(checkpointPath, saved);
-      execFileSync("git", ["add", checkpointPath], { stdio: "inherit" });
+      await writeJsonAtomic("site/data/qualification-status.json", {
+        schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
+        completedAt: null, validation: { passed: false, complete: false },
+        state: "in_progress", discoveredWallets: discovery.candidates.length,
+        auditedWallets: combined.completed, fullyAuditedWallets: combined.completed - combined.failed,
+        failedWalletAudits: combined.failed, qualifiedWallets: 0,
+        message: "Checkpoint saved: " + combined.completed + "/" + candidates.length + " wallet audits attempted.",
+      });
+      execFileSync("git", ["add", checkpointPath, "site/data/qualification-status.json"], { stdio: "inherit" });
       execFileSync("git", ["commit", "-m", `Checkpoint settlement qualification ${saved.nextOffset}/${saved.candidateCount}`], { stdio: "inherit" });
       // Discovery, deployment, and settlement workflows can all advance main.
       // Rebase this checkpoint on the latest main and prefer this run's newly
@@ -207,6 +218,26 @@ export async function runQualification({
   const batch = combined;
 
   const generatedAt = new Date(effectiveNowSeconds * 1000).toISOString();
+  if (batch.completed < candidates.length) {
+    const status = {
+      schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
+      validation: { passed: false, complete: false, allAuditsComplete: false },
+      state: "partial", discoveredWallets: discovery.candidates.length,
+      auditedWallets: batch.completed, fullyAuditedWallets: batch.completed - batch.failed,
+      failedWalletAudits: batch.failed, qualifiedWallets: 0,
+      message: "Saved " + batch.completed + "/" + candidates.length + " wallet audits. Next scheduled run resumes from checkpoint; no partial leaderboard is published.",
+    };
+    await writeJsonAtomic("site/data/qualification-status.json", status);
+    if (persistCheckpoints) {
+      execFileSync("git", ["add", "site/data/qualification-status.json"], { stdio: "inherit" });
+      execFileSync("git", ["commit", "-m", "Update settlement audit progress " + batch.completed + "/" + candidates.length], { stdio: "inherit" });
+      execFileSync("git", ["fetch", "origin", "main"], { stdio: "inherit" });
+      execFileSync("git", ["rebase", "-X", "theirs", "origin/main"], { stdio: "inherit" });
+      execFileSync("git", ["push", "origin", "HEAD:main"], { stdio: "inherit" });
+    }
+    process.stdout.write(status.message + "\n");
+    return status;
+  }
   if (diagnosticLimit > 0) {
     const diagnostic = {
       schemaVersion: 1,
