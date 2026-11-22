@@ -1,4 +1,4 @@
-name: Refresh Fast Polymarket Top 100
+name: Deploy Polymarket Scanner Website
 
 on:
   workflow_dispatch:
@@ -37,28 +37,6 @@ jobs:
         run: npm run check
       - name: Run scanner unit tests
         run: npm test
-      - name: Fetch weekly and monthly Top 100 directly from Polymarket
-        run: npm run top100
-      - name: Validate fast leaderboard output
-        run: |
-          node --input-type=module <<'NODE'
-          import { readFileSync } from "node:fs";
-          for (const period of ["week", "month"]) {
-            const board = JSON.parse(readFileSync(`site/data/${period}.json`, "utf8"));
-            if (board.validation?.passed !== true || board.validation?.complete !== true ||
-                !Array.isArray(board.traders) || board.traders.length !== 100 ||
-                board.count !== 100 ||
-                !board.traders.every((t, i) => t.rank === i + 1 &&
-                  /^0x[a-f0-9]{40}$/i.test(t.wallet) && Number.isFinite(t.pnl))) {
-              throw new Error(`${period}: invalid public Top 100 output`);
-            }
-          }
-          const status = JSON.parse(readFileSync("site/data/status.json", "utf8"));
-          if (status.state !== "success" || status.validation?.passed !== true) {
-            throw new Error("Top 100 status validation failed");
-          }
-          console.log("Validated 100 weekly and 100 monthly public leaderboard entries.");
-          NODE
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload dashboard and data
