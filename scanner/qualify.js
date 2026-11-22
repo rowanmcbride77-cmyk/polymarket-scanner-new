@@ -174,7 +174,12 @@ export async function runQualification({
       await writeJsonAtomic(checkpointPath, saved);
       execFileSync("git", ["add", checkpointPath], { stdio: "inherit" });
       execFileSync("git", ["commit", "-m", `Checkpoint settlement qualification ${saved.nextOffset}/${saved.candidateCount}`], { stdio: "inherit" });
-      execFileSync("git", ["push"], { stdio: "inherit" });
+      // Discovery, deployment, and settlement workflows can all advance main.
+      // Rebase this checkpoint on the latest main and prefer this run's newly
+      // generated checkpoint when both workflows touched the progress file.
+      execFileSync("git", ["fetch", "origin", "main"], { stdio: "inherit" });
+      execFileSync("git", ["rebase", "-X", "theirs", "origin/main"], { stdio: "inherit" });
+      execFileSync("git", ["push", "origin", "HEAD:main"], { stdio: "inherit" });
     }
   }
   const batch = combined;
