@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-22T05:25:15.000Z",
+  "generatedAt": "2026-11-22T06:08:44.000Z",
   "validation": {
     "passed": true,
     "complete": true,
@@ -9,7 +9,7 @@
   "walletUniverse": "full-discovery-pool",
   "walletsChecked": 20000,
   "qualifiedWalletsConsidered": 20000,
-  "marketsWithRecentQualifiedBuys": 1605,
+  "marketsWithRecentQualifiedBuys": 1511,
   "signalCount": 0,
   "thresholds": {
     "windowMinutes": 60,
@@ -23,9 +23,13 @@
     "basis": "Current open positions from the full discovered wallet pool; settlement qualification is a separate pipeline."
   },
   "exclusions": {
-    "wallet_below_minimum_usd": 3882,
-    "mixed_outcomes_in_market": 526,
-    "missing_market_metadata": 1079
+    "wallet_below_minimum_usd": 3444,
+    "mixed_outcomes_in_market": 485,
+    "outside_24h_resolution_window": 597,
+    "insufficient_qualified_wallets": 256,
+    "missing_market_end_date": 4,
+    "missing_market_metadata": 23,
+    "excluded_or_unclassified_category": 146
   },
   "scanDiagnostics": {
     "discoveredWallets": 20000,
@@ -33,8 +37,8 @@
     "positionPagesPerWallet": 1,
     "positionPageSize": 500,
     "positionSnapshotMayBeTruncated": true,
-    "uniqueConditions": 33831,
-    "marketMetadataReturned": 0,
+    "uniqueConditions": 33783,
+    "marketMetadataReturned": 33357,
     "failedWallets": 0
   },
   "signals": [],
