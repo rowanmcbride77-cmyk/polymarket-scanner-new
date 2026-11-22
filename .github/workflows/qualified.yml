@@ -36,6 +36,22 @@ jobs:
         env:
           SCANNER_MAX_CANDIDATES: 20000
           NODE_OPTIONS: --max-old-space-size=6144
+      - name: Build broad same-side consensus from all 20,000 discovered wallets
+        run: npm run consensus
+        env:
+          SCANNER_CONCURRENCY: 20
+          NODE_OPTIONS: --max-old-space-size=6144
+      - name: Publish broad consensus immediately, before slower settlement qualification
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/consensus.json site/data/consensus-status.json
+          if git diff --cached --quiet; then
+            echo "Consensus data unchanged."
+          else
+            git commit -m "Publish full-pool 20K wallet consensus"
+            git push
+          fi
       - name: Qualify candidates using 30-day settlement evidence
         run: npm run qualify
         env:
@@ -45,11 +61,6 @@ jobs:
           SCANNER_DIAGNOSTIC_LIMIT: 0
           SCANNER_AUDIT_CHUNK_SIZE: 10
           NODE_OPTIONS: --max-old-space-size=6144 --expose-gc
-      - name: Build same-side consensus from verified qualified wallets
-        run: npm run consensus
-        env:
-          SCANNER_CONCURRENCY: 16
-          NODE_OPTIONS: --max-old-space-size=6144
       - name: Validate settlement-qualified dashboard data
         run: |
           node --input-type=module <<'NODE'
