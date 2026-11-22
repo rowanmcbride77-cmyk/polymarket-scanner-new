@@ -106,3 +106,39 @@ test("stops when API explicitly reports has_more false", async () => {
   assert.equal(result.pages, 1);
   assert.equal(result.rows.length, 1);
 });
+
+
+test("allows an explicitly bounded snapshot to stop at its page cap", async () => {
+  let calls = 0;
+  const client = createDataApiClient({
+    fetchImpl: async () => {
+      calls += 1;
+      return jsonResponse({
+        data: [{ id: calls }],
+        pagination: { next_cursor: "cursor-" + calls, has_more: true },
+      });
+    },
+  });
+  const result = await client.collectPages("/v2/positions", { user: "0xabc" }, {
+    maxPages: 2,
+    allowTruncated: true,
+  });
+  assert.deepEqual(result.rows, [{ id: 1 }, { id: 2 }]);
+  assert.equal(result.pages, 2);
+  assert.equal(result.complete, false);
+  assert.equal(result.hasMore, true);
+  assert.equal(calls, 2);
+});
+
+test("keeps strict full-history pagination failure as the default", async () => {
+  const client = createDataApiClient({
+    fetchImpl: async () => jsonResponse({
+      data: [{ id: 1 }],
+      pagination: { next_cursor: "cursor-1", has_more: true },
+    }),
+  });
+  await assert.rejects(
+    client.collectPages("/v2/trades", {}, { maxPages: 1 }),
+    /Pagination page limit reached/,
+  );
+});
