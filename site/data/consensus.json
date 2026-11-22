@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-22T07:28:14.000Z",
+  "generatedAt": "2026-11-22T19:27:24.000Z",
   "validation": {
     "passed": true,
     "complete": true,
@@ -9,8 +9,8 @@
   "walletUniverse": "full-discovery-pool",
   "walletsChecked": 20000,
   "qualifiedWalletsConsidered": 20000,
-  "marketsWithRecentQualifiedBuys": 1565,
-  "signalCount": 1,
+  "marketsWithRecentQualifiedBuys": 1976,
+  "signalCount": 2,
   "thresholds": {
     "windowMinutes": 60,
     "maxResolutionHours": 24,
@@ -23,12 +23,13 @@
     "basis": "Current open positions from the full discovered wallet pool; settlement qualification is a separate pipeline."
   },
   "exclusions": {
-    "wallet_below_minimum_usd": 3141,
-    "mixed_outcomes_in_market": 423,
-    "insufficient_qualified_wallets": 256,
-    "outside_24h_resolution_window": 704,
-    "excluded_or_unclassified_category": 164,
-    "missing_market_metadata": 17
+    "wallet_below_minimum_usd": 4837,
+    "mixed_outcomes_in_market": 683,
+    "excluded_or_unclassified_category": 100,
+    "outside_24h_resolution_window": 922,
+    "insufficient_qualified_wallets": 222,
+    "missing_market_metadata": 46,
+    "missing_market_end_date": 1
   },
   "scanDiagnostics": {
     "discoveredWallets": 20000,
@@ -36,122 +37,159 @@
     "positionPagesPerWallet": 1,
     "positionPageSize": 500,
     "positionSnapshotMayBeTruncated": true,
-    "uniqueConditions": 33589,
-    "marketMetadataReturned": 33257,
+    "uniqueConditions": 34508,
+    "marketMetadataReturned": 34019,
     "failedWallets": 0
   },
   "signals": [
     {
-      "conditionId": "0x839454b1dbb27ad4c328a14172950e748c6de74ba41eb7b87e88c6e049bae861",
-      "tokenId": "91100783259005244371235924226192368690406751930992092916815572248721208472124",
-      "outcome": "PARIVISION",
-      "marketTitle": "Dota 2: PARIVISION vs Team Liquid (BO3) - BLAST Slam Group C",
-      "marketSlug": "dota2-pari-liquid-2026-11-22",
-      "eventId": "1433227",
-      "eventSlug": "dota2-pari-liquid-2026-11-22",
-      "category": "esports",
-      "endDate": "2026-11-22T20:00:00.000Z",
-      "minutesToResolution": 752,
-      "qualifiedWalletCount": 14,
-      "totalUsd": 2606.6129,
+      "conditionId": "0x56c7aec7b626f2b04733c80ec1807529dd353596e784233f8da69844394fe682",
+      "tokenId": "15656639317265765647027738834347889306593428487995174115466504452207871556801",
+      "outcome": "No",
+      "marketTitle": "Will Le Mans FC win on 2026-11-22?",
+      "marketSlug": "fl1-olm-lmf-2026-11-22-lmf",
+      "eventId": "1346334",
+      "eventSlug": "fl1-olm-lmf-2026-11-22",
+      "category": "sports",
+      "endDate": "2026-11-22T19:45:00.000Z",
+      "minutesToResolution": 18,
+      "qualifiedWalletCount": 9,
+      "totalUsd": 3707.1597999999994,
       "wallets": [
         {
-          "wallet": "0x92839e2d4f467ae41dc141913585afad1d474277",
-          "username": "wangyou1288",
-          "usdSize": 1574.6614,
+          "wallet": "0xd4f90db3fe7a658e744d3711779a37773c31f4ad",
+          "username": "Hellinas",
+          "usdSize": 1317.4385,
           "buyCount": 1,
-          "lastBuyAt": 1795330867
+          "lastBuyAt": 1795374290
         },
         {
-          "wallet": "0xcf0c70317fd5e4e4429758b3d80a7b7f3762f2bb",
-          "username": "0x478fhs7832bfs8f7dfdsfesh",
-          "usdSize": 620.929,
+          "wallet": "0x32bb3f0f842da76d3c3bba7d6d76376334733c1a",
+          "username": "Limousin",
+          "usdSize": 805.2278,
           "buyCount": 1,
-          "lastBuyAt": 1795330853
+          "lastBuyAt": 1795372778
         },
         {
-          "wallet": "0x4f23b6e57662f1ffc11641df7f6367868e93aec2",
-          "username": "copybot5416",
-          "usdSize": 77.76,
+          "wallet": "0x051adea0d16c85df8a8a9c7e400e0655905d1db9",
+          "username": "LightParadox",
+          "usdSize": 391.8494,
           "buyCount": 1,
-          "lastBuyAt": 1795330853
+          "lastBuyAt": 1795372648
         },
         {
-          "wallet": "0x71e04ffee15e8f1b023ba211d9e8720c5d72b2f5",
-          "username": "0x71e04ffee15e8f1b023ba211d9e8720c5d72b2f5",
-          "usdSize": 67.481,
+          "wallet": "0xbb6418f9db6d1c765965dc4c9d48cd5b4d2bdb86",
+          "username": "MadridTime",
+          "usdSize": 379.3693,
           "buyCount": 1,
-          "lastBuyAt": 1795330853
+          "lastBuyAt": 1795372771
         },
         {
-          "wallet": "0xd4eb89f83efc17e876eec81798659b143966744f",
-          "username": "0xd4eb89f83efc17e876eec81798659b143966744f",
-          "usdSize": 47.1399,
+          "wallet": "0x7c2553e6f2f56b73432bc81cd83ce015e0a8e741",
+          "username": "PM4UAI",
+          "usdSize": 351.0838,
           "buyCount": 1,
-          "lastBuyAt": 1795330853
+          "lastBuyAt": 1795372783
         },
         {
-          "wallet": "0x6ccb24b12b085e49f01d14b03c584a900b4586e8",
-          "username": "no1fengshui",
-          "usdSize": 46.7899,
+          "wallet": "0x287d1bf2317179ca126912706d773f415089a8c1",
+          "username": "elgrandes",
+          "usdSize": 292.789,
           "buyCount": 1,
-          "lastBuyAt": 1795330853
+          "lastBuyAt": 1795372780
         },
         {
-          "wallet": "0xf030d376c23ed2afb9987913903c229dec51dbba",
-          "username": "noosh1",
-          "usdSize": 32.4299,
+          "wallet": "0xe928490e92198ce4705b50ad3dd0daaf1b5903d3",
+          "username": "Wjesus2805",
+          "usdSize": 110,
           "buyCount": 1,
-          "lastBuyAt": 1795330868
+          "lastBuyAt": 1795372268
         },
         {
-          "wallet": "0xee07fdcc064be28bb6eb5a4447f315a69fbbfff7",
-          "username": "0xee07fdcc064be28bb6eb5a4447f315a69fbbfff7",
-          "usdSize": 32.4299,
+          "wallet": "0x9f41b736a8d04891178df2495921a5a3e88b8f27",
+          "username": "hedgevaultmainnet1",
+          "usdSize": 30.032,
           "buyCount": 1,
-          "lastBuyAt": 1795330867
+          "lastBuyAt": 1795374322
         },
         {
-          "wallet": "0xb6fb6849642a6920cd8506ad10e936c87aee2c47",
-          "username": "shinyibis",
-          "usdSize": 20.9999,
+          "wallet": "0xbc3c7806dbbc3265cf3bc79b024386171fb50777",
+          "username": "0xbc3c7806dbbc3265cf3bc79b024386171fb50777-1792266711397",
+          "usdSize": 29.37,
           "buyCount": 1,
-          "lastBuyAt": 1795330867
+          "lastBuyAt": 1795374290
+        }
+      ]
+    },
+    {
+      "conditionId": "0x1b30748a229e7165336f41edc80c4e2b11d056e63665e7411ed8a1b6fc04c970",
+      "tokenId": "36147666945873599855465428330679627797264143268289719028672245386591951546931",
+      "outcome": "No",
+      "marketTitle": "Will CR Vasco da Gama win on 2026-11-22?",
+      "marketSlug": "bra-bra-vas-2026-11-22-vas",
+      "eventId": "1351171",
+      "eventSlug": "bra-bra-vas-2026-11-22",
+      "category": "sports",
+      "endDate": "2026-11-22T22:30:00.000Z",
+      "minutesToResolution": 183,
+      "qualifiedWalletCount": 8,
+      "totalUsd": 2278.8475,
+      "wallets": [
+        {
+          "wallet": "0x6d3c5bd13984b2de47c3a88ddc455309aab3d294",
+          "username": "VeryLucky888",
+          "usdSize": 1265.8724,
+          "buyCount": 1,
+          "lastBuyAt": 1795373903
         },
         {
-          "wallet": "0x941809833d47890e2383a0abf5277facff28e9f8",
-          "username": "0x941809833D47890E2383a0abf5277FACff28e9F8-1781957605159",
-          "usdSize": 20.2823,
+          "wallet": "0x8ed5028ed76767753428b566801f6c96363102d7",
+          "username": "toottoot",
+          "usdSize": 312.8202,
           "buyCount": 1,
-          "lastBuyAt": 1795330895
+          "lastBuyAt": 1795373903
         },
         {
-          "wallet": "0x2cd37fbc8fcaf5ba547e5bcd69edd016ec3d1e7f",
-          "username": "0x0869CedA40B9e86926C51588dA1331fA09982738-1768444512849",
-          "usdSize": 19.9999,
+          "wallet": "0xc29198ad764bd6adaf7bb971a3757a689ece5d74",
+          "username": "SnakeBall",
+          "usdSize": 262.1109,
           "buyCount": 1,
-          "lastBuyAt": 1795331557
+          "lastBuyAt": 1795373903
         },
         {
-          "wallet": "0xa9b73b68f02f26238e2fa948fe0b7dbeb5bff43c",
-          "username": "jensond",
-          "usdSize": 19.44,
+          "wallet": "0xf317d641f3c2b0bde325d33f7c9977c162189445",
+          "username": "biying99999",
+          "usdSize": 256.2,
           "buyCount": 1,
-          "lastBuyAt": 1795330855
+          "lastBuyAt": 1795373903
         },
         {
-          "wallet": "0xf9b5e9803ea977b7111c9b7728ac6ea97f361212",
-          "username": "0xf9B5e9803Ea977b7111c9B7728aC6eA97f361212-1765800007149",
-          "usdSize": 16.2599,
+          "wallet": "0x582d5f55dcb81e70d8e6212e2e0bc2fa40222599",
+          "username": "Belisarius2",
+          "usdSize": 85.3823,
           "buyCount": 1,
-          "lastBuyAt": 1795330867
+          "lastBuyAt": 1795373903
         },
         {
-          "wallet": "0xb4cd4d6fe596f360137e5a0441fecc4e1ec9c041",
-          "username": "dwedwd",
-          "usdSize": 10.0099,
+          "wallet": "0x972bf37cae72a169e17ae0e6179821d5778b78ba",
+          "username": "k-maniac",
+          "usdSize": 32.86,
           "buyCount": 1,
-          "lastBuyAt": 1795330867
+          "lastBuyAt": 1795373903
+        },
+        {
+          "wallet": "0x49c5845733fd0b83d2ae67bfc1baf9d2e3093de7",
+          "username": "moneyline7",
+          "usdSize": 32.6699,
+          "buyCount": 1,
+          "lastBuyAt": 1795373903
+        },
+        {
+          "wallet": "0xde9f7f4e77a1595623ceb58e469f776257ccd43c",
+          "username": "tradecraft",
+          "usdSize": 30.9318,
+          "buyCount": 1,
+          "lastBuyAt": 1795373903
         }
       ]
     }
