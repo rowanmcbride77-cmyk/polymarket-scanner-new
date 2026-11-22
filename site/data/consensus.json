@@ -1,169 +1,45 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-22T22:47:34.000Z",
+  "generatedAt": "2026-11-22T23:11:19.000Z",
   "validation": {
     "passed": true,
     "complete": true,
     "failedWallets": 0
   },
-  "walletUniverse": "full-discovery-pool",
-  "walletsChecked": 20000,
-  "qualifiedWalletsConsidered": 20000,
-  "marketsWithRecentQualifiedBuys": 1852,
-  "signalCount": 1,
+  "walletUniverse": "settlement-qualified-top100",
+  "walletsChecked": 0,
+  "qualifiedWalletsConsidered": 0,
+  "qualificationBasis": {
+    "minimumWinRate": 0.9,
+    "minimumResolvedMarkets": 10,
+    "lookbackDays": 30
+  },
+  "marketsWithRecentQualifiedBuys": 0,
+  "signalCount": 0,
   "thresholds": {
     "windowMinutes": 60,
     "maxResolutionHours": 24,
-    "minWallets": 8,
+    "minWallets": 2,
     "minUsdPerWallet": 10,
     "requireCurrentHoldings": true,
-    "requireRecentBuy": false,
+    "requireRecentBuy": true,
     "sameSideOnly": true,
     "excludeDuplicateRepresentations": true,
-    "basis": "Current open positions from the full discovered wallet pool; settlement qualification is a separate pipeline."
+    "basis": "Only 90%+ settlement-qualified traders; each must have bought within 60 minutes and still hold the same outcome."
   },
-  "exclusions": {
-    "wallet_below_minimum_usd": 3603,
-    "mixed_outcomes_in_market": 614,
-    "outside_24h_resolution_window": 969,
-    "excluded_or_unclassified_category": 101,
-    "missing_market_end_date": 3,
-    "insufficient_qualified_wallets": 145,
-    "missing_market_metadata": 19
-  },
+  "exclusions": {},
   "scanDiagnostics": {
-    "discoveredWallets": 20000,
-    "positionWalletsChecked": 20000,
-    "positionPagesPerWallet": 1,
-    "positionPageSize": 500,
-    "positionSnapshotMayBeTruncated": true,
-    "uniqueConditions": 33647,
-    "marketMetadataReturned": 33244,
+    "qualifiedWallets": 0,
+    "activityWalletsChecked": 0,
+    "positionAndActivitySnapshotsComplete": true,
+    "activityWindowMinutes": 60,
+    "uniqueConditions": 0,
+    "marketMetadataReturned": 0,
     "failedWallets": 0
   },
-  "signals": [
-    {
-      "conditionId": "0x5982c34cf003d0a48f9174d6f26b0440701901a98eca7b954ad31c60cf81f0a4",
-      "tokenId": "92028218784596910156961948164013708446299238810565962883608801285435216048982",
-      "outcome": "Heat",
-      "marketTitle": "Spread: Heat (-8.5)",
-      "marketSlug": "nba-okc-mia-2026-11-22-spread-home-8pt5",
-      "eventId": "1338696",
-      "eventSlug": "nba-okc-mia-2026-11-22",
-      "category": "sports",
-      "endDate": "2026-11-22T23:00:00.000Z",
-      "minutesToResolution": 12,
-      "qualifiedWalletCount": 15,
-      "totalUsd": 4762.798699999999,
-      "wallets": [
-        {
-          "wallet": "0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98",
-          "username": "keeptheblueflagflyinghigh",
-          "usdSize": 1077.3135,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        },
-        {
-          "wallet": "0xbb6418f9db6d1c765965dc4c9d48cd5b4d2bdb86",
-          "username": "MadridTime",
-          "usdSize": 892.6772,
-          "buyCount": 1,
-          "lastBuyAt": 1795385347
-        },
-        {
-          "wallet": "0x13afac4389b343c6b2709ec7789b5f95f0ccc63a",
-          "username": "jensonsslong",
-          "usdSize": 645.54,
-          "buyCount": 1,
-          "lastBuyAt": 1795384805
-        },
-        {
-          "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
-          "username": "sportmaster777",
-          "usdSize": 491.994,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        },
-        {
-          "wallet": "0xc4fe817476491890086330a639ac417d51bf601f",
-          "username": "poshposh",
-          "usdSize": 370.2099,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        },
-        {
-          "wallet": "0x2792fc28811277f12a54e32bd8188be02c2dc4f6",
-          "username": "0x2792fc28811277f12a54e32bd8188be02c2dc4f6",
-          "usdSize": 238.3394,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        },
-        {
-          "wallet": "0xec981ed70ae69c5cbcac08c1ba063e734f6bafcd",
-          "username": "0xheavy888",
-          "usdSize": 220,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        },
-        {
-          "wallet": "0x7e5972bfc25819775ee5a9d4f191919375487b8b",
-          "username": "Gaditima",
-          "usdSize": 215,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        },
-        {
-          "wallet": "0xf7f0b0b1e9c0fe02ccad926916ee31aef74b912c",
-          "username": "wapol",
-          "usdSize": 198.24,
-          "buyCount": 1,
-          "lastBuyAt": 1795385029
-        },
-        {
-          "wallet": "0x0d233076c4dac74786a165e0337732d89437251c",
-          "username": "0x0d233076c4dac74786a165e0337732d89437251c",
-          "usdSize": 142.9996,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        },
-        {
-          "wallet": "0xe5502f3b033ebcd64233b5ffc43c44c24170be3f",
-          "username": "ferdinand2",
-          "usdSize": 106.74,
-          "buyCount": 1,
-          "lastBuyAt": 1795385350
-        },
-        {
-          "wallet": "0x5d40576be2e9c61d283f4fd80d7a5ccf2331ba95",
-          "username": "topdogbigboi",
-          "usdSize": 70.9852,
-          "buyCount": 1,
-          "lastBuyAt": 1795384808
-        },
-        {
-          "wallet": "0xd218e474776403a330142299f7796e8ba32eb5c9",
-          "username": "cigarettes",
-          "usdSize": 41,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        },
-        {
-          "wallet": "0x32bb3f0f842da76d3c3bba7d6d76376334733c1a",
-          "username": "Limousin",
-          "usdSize": 29.26,
-          "buyCount": 1,
-          "lastBuyAt": 1795384132
-        },
-        {
-          "wallet": "0xcf7b0cf147b8c7427b8474af35cbf94d3e08fea5",
-          "username": "bit-job",
-          "usdSize": 22.4999,
-          "buyCount": 1,
-          "lastBuyAt": 1795384807
-        }
-      ]
-    }
-  ],
+  "signals": [],
+  "exitAlerts": [],
+  "exitAlertCount": 0,
   "combos": {
     "validation": {
       "passed": true,
