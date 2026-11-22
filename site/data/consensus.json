@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-22T05:25:15.000Z",
+  "validation": {
+    "passed": true,
+    "complete": true,
+    "failedWallets": 0
+  },
+  "walletUniverse": "full-discovery-pool",
+  "walletsChecked": 20000,
+  "qualifiedWalletsConsidered": 20000,
+  "marketsWithRecentQualifiedBuys": 1605,
+  "signalCount": 0,
+  "thresholds": {
+    "windowMinutes": 60,
+    "maxResolutionHours": 24,
+    "minWallets": 8,
+    "minUsdPerWallet": 10,
+    "requireCurrentHoldings": true,
+    "requireRecentBuy": false,
+    "sameSideOnly": true,
+    "excludeDuplicateRepresentations": true,
+    "basis": "Current open positions from the full discovered wallet pool; settlement qualification is a separate pipeline."
+  },
+  "exclusions": {
+    "wallet_below_minimum_usd": 3882,
+    "mixed_outcomes_in_market": 526,
+    "missing_market_metadata": 1079
+  },
+  "scanDiagnostics": {
+    "discoveredWallets": 20000,
+    "positionWalletsChecked": 20000,
+    "positionPagesPerWallet": 1,
+    "positionPageSize": 500,
+    "positionSnapshotMayBeTruncated": true,
+    "uniqueConditions": 33831,
+    "marketMetadataReturned": 0,
+    "failedWallets": 0
+  },
+  "signals": [],
+  "combos": {
+    "validation": {
+      "passed": true,
+      "complete": true,
+      "failedWallets": 0
+    },
+    "walletsChecked": 0,
+    "walletsWithComboData": 0,
+    "count": 0,
+    "thresholds": {
+      "minEntryUsd": 5,
+      "maxEntryUsd": 100,
+      "minMultiplier": 10,
+      "requireCurrentHolding": true,
+      "traderWinRateRequired": false
+    },
+    "exclusions": {},
+    "opportunities": []
+  }
+}
