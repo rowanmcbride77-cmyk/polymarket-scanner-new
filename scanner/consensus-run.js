@@ -37,15 +37,17 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     throw new Error("20K discovery input failed validation");
   }
   const wallets = discovery.candidates;
+  const candidateByWallet = new Map(wallets.map(row => [row.wallet.toLowerCase(), row]));
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
   process.stdout.write(`Fast consensus scan: checking current open positions for ${wallets.length} discovered wallets; no settlement audit or per-wallet activity-history lookup.\\n`);
 
   const batch = await auditCandidates(wallets, {
     concurrency,
-    auditWallet: async (candidate) => {
-      const sports = candidate.appearances?.some(row => row.category === "sports") === true;
-      const snapshot = await fetchCurrentPositionSnapshot(client, candidate.wallet, {
+    auditWallet: async (wallet) => {
+      const candidate = candidateByWallet.get(wallet.toLowerCase());
+      const sports = candidate?.appearances?.some(row => row.category === "sports") === true;
+      const snapshot = await fetchCurrentPositionSnapshot(client, wallet, {
         limit: 100,
         maxPages: sports ? 4 : 2,
       });
