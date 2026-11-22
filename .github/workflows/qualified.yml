@@ -50,5 +50,10 @@ jobs:
             echo "Consensus data unchanged."
           else
             git commit -m "Publish full-pool 20K wallet consensus"
-            git push
+            # Other GitHub Actions can advance main while the 20K scan is running.
+            # Rebase this generated snapshot onto the latest main before pushing.
+            # Prefer this run's freshly generated discovery/consensus outputs on conflict.
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push origin HEAD:main
           fi
