@@ -106,8 +106,14 @@ export async function auditCandidatesBatch(candidates, {
   let resolutions;
   try {
     [tokenFacts, resolutions] = await Promise.all([
-      fetchTokenFacts(client, [...tokenIds]),
-      fetchMarketResolutions(client, [...conditionIds]),
+      fetchTokenFacts(client, [...tokenIds], {
+        concurrency: 8,
+        onProgress: (progress) => onProgress?.({ ...progress, failed: [...failures.values()].reduce((sum, count) => sum + count, 0) }),
+      }),
+      fetchMarketResolutions(client, [...conditionIds], {
+        concurrency: 8,
+        onProgress: (progress) => onProgress?.({ ...progress, failed: [...failures.values()].reduce((sum, count) => sum + count, 0) }),
+      }),
     ]);
   } catch (error) {
     const stage = error?.auditStage ?? "shared_settlement_facts";

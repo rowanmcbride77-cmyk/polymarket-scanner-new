@@ -15,16 +15,38 @@ function parseResolvedAt(value) {
   return NaN;
 }
 
-export async function fetchMarketResolutions(client, conditionIds, { batchSize = 20 } = {}) {
+async function mapLimit(items, concurrency, worker, onProgress) {
+  let next = 0;
+  let completed = 0;
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (true) {
+      const index = next++;
+      if (index >= items.length) return;
+      await worker(items[index], index);
+      completed += 1;
+      if (onProgress) await onProgress({ stage: "shared_market_resolutions", completed, total: items.length });
+    }
+  }));
+}
+
+export async function fetchMarketResolutions(client, conditionIds, {
+  batchSize = 20,
+  concurrency = 8,
+  onProgress,
+} = {}) {
   if (!Array.isArray(conditionIds)) throw new TypeError("conditionIds must be an array");
   if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 20) {
-    throw new RangeError("batchSize must be 1..20");
+    throw new RangeError("resolution batchSize must be 1..20");
+  }
+  if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 16) {
+    throw new RangeError("resolution lookup concurrency must be 1..16");
   }
   const ids = [...new Set(conditionIds.map((id) => String(id).toLowerCase()))];
   const requested = new Set(ids);
+  const batches = [];
+  for (let i = 0; i < ids.length; i += batchSize) batches.push(ids.slice(i, i + batchSize));
   const result = new Map();
-  for (let i = 0; i < ids.length; i += batchSize) {
-    const batch = ids.slice(i, i + batchSize);
+  await mapLimit(batches, concurrency, async (batch) => {
     const body = await client.getJson("/v2/resolutions", { condition: batch.join(",") });
     if (body.data !== null && !Array.isArray(body.data)) {
       throw new Error("Resolution lookup returned malformed data envelope");
@@ -33,17 +55,10 @@ export async function fetchMarketResolutions(client, conditionIds, { batchSize =
       if (!row || typeof row !== "object") continue;
       const status = String(row.status ?? "").toLowerCase();
       if (status !== "resolved") continue;
-
-      // The endpoint can include question-keyed UMA lifecycle rows. Those
-      // rows have questionId but no conditionId and are not condition facts.
       const conditionId = row.condition_id ?? row.conditionId;
       if (typeof conditionId !== "string" || !requested.has(conditionId.toLowerCase())) continue;
-
-      // resolvedAt is optional in the API schema. Without a real timestamp
-      // we cannot include this market in a time-windowed win-rate calculation.
       const timestamp = parseResolvedAt(row.resolved_at ?? row.resolvedAt);
       if (!Number.isFinite(timestamp) || timestamp <= 0) continue;
-
       result.set(conditionId.toLowerCase(), {
         conditionId: conditionId.toLowerCase(),
         status,
@@ -55,7 +70,7 @@ export async function fetchMarketResolutions(client, conditionIds, { batchSize =
         transactionHash: row.transaction_hash ?? row.transactionHash ?? null,
       });
     }
-  }
+  }, onProgress);
   return result;
 }
 

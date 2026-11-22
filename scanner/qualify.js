@@ -58,7 +58,7 @@ export async function runQualification({
   process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\n`);
   // Bound memory: raw histories from all 1,000 wallets must not coexist in
   // memory. The previous all-at-once batch exceeded the runner's 6 GB heap.
-  const chunkSize = Number(process.env.SCANNER_AUDIT_CHUNK_SIZE ?? 10);
+  const chunkSize = Number(process.env.SCANNER_AUDIT_CHUNK_SIZE ?? 50);
   if (!Number.isInteger(chunkSize) || chunkSize < 1 || chunkSize > 100) {
     throw new Error("SCANNER_AUDIT_CHUNK_SIZE must be 1..100");
   }
@@ -72,8 +72,8 @@ export async function runQualification({
     const part = await auditCandidatesBatch(chunk, {
       client, concurrency, nowSeconds, lookbackDays: 30,
       minimumResolvedMarkets: 10, minimumWinRate: 0.9,
-      onProgress: ({ completed, failed, commonErrors = [], errorSamples = [] }) => {
-        process.stdout.write(`Wallet audits: ${combined.completed + completed}/${candidates.length}; failures: ${combined.failed + failed}.\\n`);
+      onProgress: ({ stage = "position_snapshots", completed, total, failed, commonErrors = [], errorSamples = [] }) => {
+        process.stdout.write(`Chunk ${Math.floor(offset / chunkSize) + 1}: ${stage} ${completed}/${total}; overall wallet audits ${combined.completed}/${candidates.length}; failures: ${combined.failed + failed}.\\n`);
         for (const item of commonErrors) process.stdout.write(`  Failure ${item.count}x: ${item.error}\\n`);
         for (const sample of errorSamples) process.stdout.write(`  Sample wallet ${sample.wallet}: [${sample.stage}] ${sample.message}\\n`);
       },

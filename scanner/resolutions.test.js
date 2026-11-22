@@ -59,3 +59,22 @@ test("rejects a malformed data envelope", async () => {
   const client = { async getJson() { return { data: {} }; } };
   await assert.rejects(fetchMarketResolutions(client, ["0x1"]), /malformed data envelope/);
 });
+
+
+test("resolution batches run concurrently but remain bounded", async () => {
+  let active = 0;
+  let peak = 0;
+  const ids = Array.from({ length: 101 }, (_, i) => "0x" + i);
+  const client = { async getJson(path, params) {
+    active += 1;
+    peak = Math.max(peak, active);
+    await new Promise(resolve => setTimeout(resolve, 2));
+    active -= 1;
+    return { data: params.condition.split(",").map(condition_id => ({
+      condition_id, status: "resolved", resolved_at: "2026-11-17T12:00:00Z",
+    })) };
+  }};
+  const result = await fetchMarketResolutions(client, ids, { concurrency: 3 });
+  assert.equal(result.size, 101);
+  assert.ok(peak > 1 && peak <= 3);
+});

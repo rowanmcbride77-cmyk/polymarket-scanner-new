@@ -27,3 +27,22 @@ test("missing or malformed token facts fail closed", async () => {
 test("invalid token IDs are rejected", async () => {
   await assert.rejects(fetchTokenFacts({ getJson() {} }, ["not-an-id"]), /Invalid CLOB token id/);
 });
+
+
+test("token fact batches run concurrently but remain bounded", async () => {
+  let active = 0;
+  let peak = 0;
+  const ids = Array.from({ length: 501 }, (_, i) => String(i + 1));
+  const client = { async getJson(path, params) {
+    active += 1;
+    peak = Math.max(peak, active);
+    await new Promise(resolve => setTimeout(resolve, 2));
+    active -= 1;
+    return { data: params.token_id.split(",").map(token_id => ({
+      token_id, condition_id: "condition", resolved: true, final_price: 1,
+    })) };
+  }};
+  const facts = await fetchTokenFacts(client, ids, { concurrency: 4 });
+  assert.equal(facts.size, 501);
+  assert.ok(peak > 1 && peak <= 4);
+});
