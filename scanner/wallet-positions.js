@@ -8,6 +8,7 @@ export async function fetchRedeemablePositionSnapshot(client, wallet, {
   limit = 1000,
   maxPages = 100,
   includeTokenFacts = true,
+  onPage,
 } = {}) {
   if (!WALLET_RE.test(wallet ?? "")) throw new TypeError("A valid proxy wallet address is required");
   const statuses = ["REDEEMABLE", "REDEEMABLE_LOST"];
@@ -22,7 +23,7 @@ export async function fetchRedeemablePositionSnapshot(client, wallet, {
       include_archived: true,
       sort_by: "TIMESTAMP",
       sort_direction: "DESC",
-    }, { maxPages }),
+    }, { maxPages, onPage: (progress) => onPage?.({ ...progress, sourceStatusFilter }) }),
   })));
   const rows = partitions.flatMap(({sourceStatusFilter, result}) =>
     result.rows.map((position) => ({position, sourceStatusFilter})));
@@ -88,6 +89,7 @@ export async function fetchClosedPositionSnapshot(client, wallet, {
   endSeconds = Math.floor(Date.now() / 1000),
   limit = 1000,
   maxPages = 100,
+  onPage,
 } = {}) {
   if (!WALLET_RE.test(wallet ?? "")) throw new TypeError("A valid proxy wallet address is required");
   if (!Number.isInteger(startSeconds) || !Number.isInteger(endSeconds) || startSeconds > endSeconds) {
@@ -101,7 +103,7 @@ export async function fetchClosedPositionSnapshot(client, wallet, {
     limit,
     sort_by: "TIMESTAMP",
     sort_direction: "DESC",
-  }, { maxPages });
+  }, { maxPages, onPage });
   const malformed = result.rows.filter((row) =>
     !row || typeof row !== "object" ||
     String(row.proxy_wallet ?? "").toLowerCase() !== wallet.toLowerCase() ||
