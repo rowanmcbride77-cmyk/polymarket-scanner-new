@@ -62,6 +62,8 @@ export async function runQualification({
   if (!Number.isInteger(chunkSize) || chunkSize < 1 || chunkSize > 100) {
     throw new Error("SCANNER_AUDIT_CHUNK_SIZE must be 1..100");
   }
+  const tokenFactsCache = new Map();
+  const resolutionsCache = new Map();
   const combined = {
     results: [], complete: true, allAuditsComplete: true, completed: 0, failed: 0,
     errorCounts: {}, errorSamples: [], sharedTokenFacts: 0, sharedResolutionFacts: 0,
@@ -72,10 +74,17 @@ export async function runQualification({
     const part = await auditCandidatesBatch(chunk, {
       client, concurrency, nowSeconds, lookbackDays: 30,
       minimumResolvedMarkets: 10, minimumWinRate: 0.9,
-      onProgress: ({ stage = "position_snapshots", completed, total, failed, commonErrors = [], errorSamples = [] }) => {
-        process.stdout.write(`Chunk ${Math.floor(offset / chunkSize) + 1}: ${stage} ${completed}/${total}; overall wallet audits ${combined.completed}/${candidates.length}; failures: ${combined.failed + failed}.\\n`);
-        for (const item of commonErrors) process.stdout.write(`  Failure ${item.count}x: ${item.error}\\n`);
-        for (const sample of errorSamples) process.stdout.write(`  Sample wallet ${sample.wallet}: [${sample.stage}] ${sample.message}\\n`);
+      sharedTokenFacts: tokenFactsCache,
+      sharedResolutions: resolutionsCache,
+      onProgress: (progress) => {
+        if (Number.isInteger(progress.pageNumber)) {
+          process.stdout.write(`Chunk ${Math.floor(offset / chunkSize) + 1}: ${progress.stage} page ${progress.pageNumber}, ${progress.totalRows} rows for ${progress.wallet}\n`);
+          return;
+        }
+        const { stage = "position_snapshots", completed, total, failed = 0, commonErrors = [], errorSamples = [] } = progress;
+        process.stdout.write(`Chunk ${Math.floor(offset / chunkSize) + 1}: ${stage} ${completed}/${total}; overall wallet audits ${combined.completed}/${candidates.length}; failures: ${combined.failed + failed}\n`);
+        for (const item of commonErrors) process.stdout.write(`  Failure ${item.count}x: ${item.error}\n`);
+        for (const sample of errorSamples) process.stdout.write(`  Sample wallet ${sample.wallet}: [${sample.stage}] ${sample.message}\n`);
       },
     });
     combined.results.push(...part.results);
@@ -85,8 +94,8 @@ export async function runQualification({
     combined.allAuditsComplete = combined.allAuditsComplete && part.allAuditsComplete;
     for (const [key, count] of Object.entries(part.errorCounts)) combined.errorCounts[key] = (combined.errorCounts[key] ?? 0) + count;
     for (const sample of part.errorSamples) if (combined.errorSamples.length < 12) combined.errorSamples.push(sample);
-    combined.sharedTokenFacts += part.sharedTokenFacts;
-    combined.sharedResolutionFacts += part.sharedResolutionFacts;
+    combined.sharedTokenFacts = tokenFactsCache.size;
+    combined.sharedResolutionFacts = resolutionsCache.size;
     combined.uniqueTokens += part.uniqueTokens;
     combined.uniqueMarkets += part.uniqueMarkets;
     if (global.gc) global.gc();
