@@ -39,7 +39,7 @@ jobs:
       - name: Build broad same-side consensus from all 20,000 discovered wallets
         run: npm run consensus
         env:
-          SCANNER_CONCURRENCY: 20
+          SCANNER_CONCURRENCY: 32
           NODE_OPTIONS: --max-old-space-size=6144
       - name: Publish broad consensus immediately, before slower settlement qualification
         run: |
