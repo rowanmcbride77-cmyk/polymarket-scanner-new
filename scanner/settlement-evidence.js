@@ -71,7 +71,7 @@ export function summarizeSettledEvidence({
     }
     if (firstEntryAt >= resolution.resolvedAtSeconds) {
       exclude(firstEntryAt === resolution.resolvedAtSeconds
-        ? "same_second_entry_resolution_ambiguous" : "post_resolution_acquisition_excluded");
+        ? "same_second_entry_resolution_ambiguous" : "post_resolution_acquisition_excluded", conditionId);
       continue;
     }
     if (lastEventAt <= resolution.resolvedAtSeconds) {
@@ -105,16 +105,16 @@ export function summarizeSettledEvidence({
       continue;
     }
     if (token.conditionId && String(token.conditionId).toLowerCase() !== conditionId) {
-      exclude("token_condition_mismatch");
+      exclude("token_condition_mismatch", conditionId);
       continue;
     }
     if (!resolution || !Number.isInteger(resolution.resolvedAtSeconds)) {
-      exclude("missing_resolution_timestamp");
+      exclude("missing_resolution_timestamp", conditionId);
       continue;
     }
     if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
     if (firstEntryAt === 0) {
-      exclude("missing_first_entry_timestamp");
+      exclude("missing_first_entry_timestamp", conditionId);
       continue;
     }
     if (firstEntryAt >= resolution.resolvedAtSeconds) {
