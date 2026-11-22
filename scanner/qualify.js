@@ -35,6 +35,37 @@ async function writeJsonAtomic(path, value) {
   return target;
 }
 
+/**
+ * Checkpoints only need settlement aggregates used to rank and publish traders.
+ * Persisting every per-market result for every wallet inflated the committed
+ * checkpoint beyond 50 MB and made each subsequent checkpoint slower.
+ */
+function compactCheckpointResult(row) {
+  if (!row || typeof row !== "object") return row;
+  const summary = row.summary;
+  return {
+    wallet: row.wallet,
+    username: row.username,
+    complete: row.complete === true,
+    qualification: row.qualification ?? { qualified: false, reason: "missing_qualification_result" },
+    ...(row.auditStage ? { auditStage: row.auditStage } : {}),
+    ...(row.error ? { error: row.error } : {}),
+    ...(summary ? {
+      summary: {
+        wins: summary.wins,
+        losses: summary.losses,
+        resolvedMarkets: summary.resolvedMarkets,
+        winRate: summary.winRate,
+        exclusions: summary.exclusions ?? {},
+        integrityPassed: summary.integrityPassed === true,
+        integrityFailures: summary.integrityFailures ?? [],
+        complete: summary.complete === true,
+        windowStartSeconds: summary.windowStartSeconds,
+      },
+    } : {}),
+  };
+}
+
 export async function runQualification({
   discoveryPath = "data/discovery.json",
   outputPath = "site/data/qualification.json",
@@ -134,7 +165,7 @@ export async function runQualification({
         auditLimit,
         nowSeconds: effectiveNowSeconds,
         nextOffset: combined.results.length,
-        results: combined.results,
+        results: combined.results.map(compactCheckpointResult),
         failed: combined.failed,
         errorCounts: combined.errorCounts,
         errorSamples: combined.errorSamples,
