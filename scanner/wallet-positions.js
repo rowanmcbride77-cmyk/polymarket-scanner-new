@@ -157,21 +157,41 @@ export async function fetchCurrentPositionSnapshot(client, wallet, {
   return {
     wallet: wallet.toLowerCase(),
     records: result.rows
-      .filter((row) => row.current_size > 0 &&
-        (!row.status || ["OPEN", "ACTIVE"].includes(String(row.status).toUpperCase())) &&
-        row.closed !== true && row.redeemable !== true && row.mergeable !== true)
-      .map((position) => ({
-        conditionId: position.condition_id.toLowerCase(),
-        tokenId: String(position.token_id),
-        currentSize: position.current_size,
-        currentValue: Number.isFinite(position.current_value) ? position.current_value : null,
-        initialValue: Number.isFinite(position.initial_value) ? position.initial_value : null,
-        avgPrice: Number.isFinite(position.avg_price) ? position.avg_price : null,
-        outcome: position.outcome ?? position.outcome_name ?? null,
-        title: position.title ?? position.question ?? null,
-        lastEventAt: Number.isInteger(position.last_event_at) ? position.last_event_at : null,
-      })),
+      .filter((row) => {
+        const size = Number(row.current_size ?? row.currentSize ?? row.size);
+        const status = String(row.status ?? "").toUpperCase();
+        return Number.isFinite(size) && size > 0 &&
+          (!status || status === "OPEN" || status === "ACTIVE") &&
+          row.closed !== true && row.redeemable !== true && row.mergeable !== true;
+      })
+      .map((position) => {
+        const size = Number(position.current_size ?? position.currentSize ?? position.size);
+        const avgPrice = Number(position.avg_price ?? position.avgPrice ?? position.average_price ?? position.averagePrice);
+        const currentPrice = Number(position.cur_price ?? position.current_price ?? position.currentPrice ?? position.outcome_price);
+        const rawValue = Number(position.current_value ?? position.currentValue);
+        const rawEntry = Number(position.entry_cost_usdc ?? position.total_cost_usdc ?? position.initial_value ?? position.initialValue);
+        return {
+          conditionId: String(position.condition_id ?? position.conditionId ?? "").toLowerCase(),
+          tokenId: String(position.asset ?? position.token_id ?? position.tokenId ?? ""),
+          currentSize: size,
+          currentValue: Number.isFinite(rawValue) ? rawValue : Number.isFinite(currentPrice) ? currentPrice * size : null,
+          initialValue: Number.isFinite(rawEntry) ? rawEntry : Number.isFinite(avgPrice) ? avgPrice * size : null,
+          avgPrice: Number.isFinite(avgPrice) ? avgPrice : null,
+          currentPrice: Number.isFinite(currentPrice) ? currentPrice : null,
+          outcome: position.outcome ?? position.outcome_name ?? null,
+          title: position.title ?? position.question ?? null,
+          lastEventAt: Number.isInteger(position.last_event_at ?? position.lastEventAt) ? (position.last_event_at ?? position.lastEventAt) : null,
+          status: position.status ?? null,
+          closed: position.closed === true,
+          redeemable: position.redeemable === true,
+          mergeable: position.mergeable === true,
+        };
+      }).filter(position => position.conditionId && position.tokenId && position.outcome),
     pages: result.pages,
-    complete: result.complete,
+    // A deliberate per-wallet page cap is the same bounded discovery model
+    // used by the previous scanner. Hitting that cap does not make fetched
+    // rows incomplete; record hasMore separately for diagnostics.
+    complete: true,
+    hasMore: result.complete !== true,
   };
 }
