@@ -30,6 +30,7 @@ export async function auditCandidates(candidates, {
           summary: audit.summary ?? null,
           coverage: audit.coverage ?? null,
           recentBuys: Array.isArray(audit.recentBuys) ? audit.recentBuys : [],
+          recentSells: Array.isArray(audit.recentSells) ? audit.recentSells : [],
           currentPositions: Array.isArray(audit.currentPositions) ? audit.currentPositions : [],
           comboRows: Array.isArray(audit.comboRows) ? audit.comboRows : [],
         };
