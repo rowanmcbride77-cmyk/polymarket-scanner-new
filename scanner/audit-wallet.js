@@ -43,7 +43,7 @@ export async function auditWallet(client, wallet, {
     atStage("closed_positions", fetchClosedPositionSnapshot(client, wallet, {
       startSeconds: windowStartSeconds,
       endSeconds: nowSeconds,
-      maxPages: 100,
+      maxPages: Number(process.env.SCANNER_POSITION_MAX_PAGES ?? 10),
     })),
   ]);
   if (!positionSnapshot.complete || !closedSnapshot.complete) {
