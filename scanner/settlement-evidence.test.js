@@ -90,7 +90,8 @@ test("rejects missing resolution facts for resolved closed positions", () => {
     tokenFacts:new Map([["101",token("101",1)]]),
   });
   assert.equal(result.resolvedMarkets,0);
-  assert.equal(result.integrityPassed,false);
+  assert.equal(result.integrityPassed,true);
+  assert.equal(result.integrityFailures.includes("missing_resolution_timestamp"),true);
 });
 
 test("requires complete source snapshots", () => {
@@ -111,6 +112,24 @@ test("excludes ambiguous same-second close and token-resolution disagreement", (
     ...base, closedPositions:[closed("101")], currentPositions:[],
     tokenFacts:new Map([["101",{...token("101",1),resolved:false}]]),
   });
-  assert.equal(mismatch.integrityPassed,false);
+  assert.equal(mismatch.integrityPassed,true);
+  assert.equal(mismatch.integrityFailures.includes("token_resolution_state_mismatch"),true);
   assert.equal(mismatch.exclusions.token_resolution_state_mismatch,1);
+});
+
+
+test("a bad market does not erase other independently verified markets", () => {
+  const otherCondition = "0x" + "b".repeat(64);
+  const otherResolution = { ...resolution, conditionId: otherCondition };
+  const bad = { position: { condition_id: otherCondition, token_id: "202",
+    current_size: 0, first_entry_at: 1794000000, last_event_at: 1794916900 } };
+  const result = summarizeSettledEvidence({
+    ...base, closedPositions: [closed("101"), bad], currentPositions: [],
+    resolutions: new Map([[condition, resolution], [otherCondition, otherResolution]]),
+    tokenFacts: new Map([["101", token("101", 1)]]),
+  });
+  assert.equal(result.resolvedMarkets, 1);
+  assert.equal(result.wins, 1);
+  assert.equal(result.integrityPassed, true);
+  assert.equal(result.integrityFailures.includes("missing_closed_position_token_fact"), true);
 });
