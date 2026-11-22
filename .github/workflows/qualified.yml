@@ -10,6 +10,10 @@ on:
       - "!scanner/wallet-positions.js"
       - "!scanner/batch-audit.js"
       - "!scanner/audit-wallet.js"
+      - "!scanner/settlement-evidence.js"
+      - "!scanner/settlement-evidence.test.js"
+      - "!scanner/consensus-run.js"
+      - "!scanner/qualification-runner.js"
       - "!.github/workflows/qualified.yml"
   schedule:
     - cron: "47 */6 * * *"
