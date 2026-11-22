@@ -115,7 +115,7 @@ export function createDataApiClient({
     return { rows: body.data, nextCursor, hasMore: body.pagination.has_more === true };
   }
 
-  async function collectPages(path, params = {}, { maxPages = 10_000, onPage } = {}) {
+  async function collectPages(path, params = {}, { maxPages = 10_000, onPage, allowTruncated = false } = {}) {
     if (!Number.isInteger(maxPages) || maxPages < 1) throw new RangeError("maxPages must be a positive integer");
     const rows = [];
     const seenCursors = new Set();
@@ -123,6 +123,7 @@ export function createDataApiClient({
     let pages = 0;
     while (true) {
       if (pages >= maxPages) {
+        if (allowTruncated) return { rows, pages, complete: false, hasMore: true };
         throw new DataApiError("Pagination page limit reached; history is incomplete", {
           path, pages, complete: false,
         });
