@@ -33,6 +33,8 @@ export async function auditCandidatesBatch(candidates, {
   minimumResolvedMarkets = 10,
   minimumWinRate = 0.9,
   onProgress,
+  sharedTokenFacts = new Map(),
+  sharedResolutions = new Map(),
 } = {}) {
   if (!Array.isArray(candidates)) throw new TypeError("candidates must be an array");
   if (!client || typeof client.collectPages !== "function" || typeof client.getJson !== "function") {
@@ -52,11 +54,14 @@ export async function auditCandidatesBatch(candidates, {
   const snapshots = await mapLimit(candidates, concurrency, async (candidate) => {
     try {
       const [redeemable, closed] = await Promise.all([
-        fetchRedeemablePositionSnapshot(client, candidate.wallet, { includeTokenFacts: false }),
+        fetchRedeemablePositionSnapshot(client, candidate.wallet, { includeTokenFacts: false,
+          onPage: (progress) => onProgress?.({ ...progress, stage: "redeemable_positions", wallet: candidate.wallet }),
+        }),
         fetchClosedPositionSnapshot(client, candidate.wallet, {
           startSeconds: windowStartSeconds,
           endSeconds: nowSeconds,
           maxPages: 100,
+          onPage: (progress) => onProgress?.({ ...progress, stage: "closed_positions", wallet: candidate.wallet }),
         }),
       ]);
       if (!redeemable.complete || !closed.complete) {
@@ -102,27 +107,29 @@ export async function auditCandidatesBatch(candidates, {
     }
   }
 
-  let tokenFacts;
-  let resolutions;
+  const missingTokenIds = [...tokenIds].filter((id) => !sharedTokenFacts.has(id));
+  const missingConditionIds = [...conditionIds].filter((id) => !sharedResolutions.has(id));
   try {
-    [tokenFacts, resolutions] = await Promise.all([
-      fetchTokenFacts(client, [...tokenIds], {
+    const [newTokenFacts, newResolutions] = await Promise.all([
+      fetchTokenFacts(client, missingTokenIds,
         concurrency: 8,
         onProgress: (progress) => onProgress?.({ ...progress, failed: [...failures.values()].reduce((sum, count) => sum + count, 0) }),
       }),
-      fetchMarketResolutions(client, [...conditionIds], {
+      fetchMarketResolutions(client, missingConditionIds,
         concurrency: 8,
         onProgress: (progress) => onProgress?.({ ...progress, failed: [...failures.values()].reduce((sum, count) => sum + count, 0) }),
       }),
     ]);
+    for (const [id, fact] of newTokenFacts) sharedTokenFacts.set(id, fact);
+    for (const [id, fact] of newResolutions) sharedResolutions.set(id, fact);
   } catch (error) {
     const stage = error?.auditStage ?? "shared_settlement_facts";
     const message = error?.message ?? String(error);
     const key = `${stage}: ${message}`;
     failures.set(key, (failures.get(key) ?? 0) + usable.length);
     if (samples.length < 12) samples.push({ wallet: "BATCH", stage, message });
-    tokenFacts = new Map();
-    resolutions = new Map();
+    sharedTokenFacts.clear();
+    sharedResolutions.clear();
     for (const item of usable) item.error = { stage, message };
   }
 
@@ -140,8 +147,8 @@ export async function auditCandidatesBatch(candidates, {
     const summary = summarizeSettledEvidence({
       closedPositions: item.closed.records,
       currentPositions: item.redeemable.records,
-      tokenFacts,
-      resolutions,
+      tokenFacts: sharedTokenFacts,
+      resolutions: sharedResolutions,
       closedPositionsComplete: item.closed.complete,
       positionsComplete: item.redeemable.complete,
       windowStartSeconds,
@@ -153,8 +160,8 @@ export async function auditCandidatesBatch(candidates, {
       closedPositions: item.closed.records.length,
       closedPositionPages: item.closed.pages,
       positionPartitions: item.redeemable.partitions,
-      tokenFacts: tokenFacts.size,
-      resolutionFacts: resolutions.size,
+      tokenFacts: sharedTokenFacts.size,
+      resolutionFacts: sharedResolutions.size,
       summary,
     };
     return {
@@ -179,9 +186,11 @@ export async function auditCandidatesBatch(candidates, {
     failed,
     errorCounts: Object.fromEntries(failures),
     errorSamples: samples,
-    sharedTokenFacts: tokenFacts.size,
-    sharedResolutionFacts: resolutions.size,
+    sharedTokenFacts: sharedTokenFacts.size,
+    sharedResolutionFacts: sharedResolutions.size,
     uniqueTokens: tokenIds.size,
     uniqueMarkets: conditionIds.size,
+    tokenFactsCache: sharedTokenFacts,
+    resolutionsCache: sharedResolutions,
   };
 }
