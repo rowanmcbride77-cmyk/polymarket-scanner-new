@@ -72,7 +72,8 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
       size: position.currentSize,
       usdSize: Number.isFinite(position.initialValue) && position.initialValue > 0
         ? position.initialValue
-        : Number.isFinite(position.currentValue) ? position.currentValue : 0,
+        : Number.isFinite(position.currentValue) ? position.currentValue
+        : Number.isFinite(position.avgPrice) && Number.isFinite(position.currentSize) ? position.avgPrice * position.currentSize : 0,
     }));
     const heldByCondition = new Map();
     for (const position of audit.currentPositions ?? []) {
