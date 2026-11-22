@@ -91,6 +91,9 @@ test("fetches current held positions for consensus confirmation", async () => {
   assert.equal(snapshot.records.length,1);
   assert.deepEqual(snapshot.records[0],{
     conditionId:"0xcondition",tokenId:"44",currentSize:5,
+    currentValue:null,initialValue:null,avgPrice:null,currentPrice:null,
+    outcome:null,title:null,lastEventAt:null,status:null,
+    closed:false,redeemable:false,mergeable:false,
   });
   assert.equal(snapshot.complete,true);
 });
