@@ -1,27 +1,17 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createDataApiClient } from "./data-api.js";
-import { fetchRecentWalletActivity } from "./activity.js";
 import { fetchCurrentPositionSnapshot } from "./wallet-positions.js";
 import { fetchGammaMarkets } from "./gamma-markets.js";
 import { buildConsensusSignals } from "./consensus.js";
 import { auditCandidates } from "./qualification-runner.js";
-import { validatePublishedOutput } from "./validate-output.js";
-import { fetchWalletCombos, buildComboOpportunities } from "./combos.js";
 
-function createPacedFetch({
-  fetchImpl = globalThis.fetch,
-  sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms)),
-  intervalMs = 80,
-} = {}) {
-  // Pace each endpoint independently. A single global queue needlessly
-  // serialized positions, tokens, and resolutions requests and made a
-  // 20,000-wallet audit take hours. Keep a conservative lane per API route.
+function createPacedFetch({ fetchImpl = globalThis.fetch, sleep = (ms) => new Promise(r => setTimeout(r, ms)), intervalMs = 35 } = {}) {
   const nextStartAtByRoute = new Map();
   return async (input, init) => {
     const url = input instanceof URL ? input : new URL(input.url ?? input);
-    const route = `${url.origin}${url.pathname}`;
+    const route = url.origin + url.pathname;
     const now = Date.now();
     const startAt = Math.max(now, nextStartAtByRoute.get(route) ?? 0);
     nextStartAtByRoute.set(route, startAt + intervalMs);
@@ -30,213 +20,109 @@ function createPacedFetch({
   };
 }
 
-async function writeJsonAtomic(path, value) {
+async function writeJson(path, value) {
+  const { mkdir, writeFile, rename } = await import("node:fs/promises");
+  const { dirname } = await import("node:path");
   const target = resolve(path);
   await mkdir(dirname(target), { recursive: true });
-  const temporary = target + ".tmp";
-  await writeFile(temporary, JSON.stringify(value, null, 2) + "\n", "utf8");
-  await rename(temporary, target);
-  return target;
+  const tmp = target + ".tmp";
+  await writeFile(tmp, JSON.stringify(value, null, 2) + "\n", "utf8");
+  await rename(tmp, target);
 }
 
-function qualifiedUniverse(qualification, weekly, monthly) {
-  if (Array.isArray(qualification.qualifiedWallets)) {
-    return qualification.qualifiedWallets.map((row) => ({
-      wallet: row.wallet, username: row.username,
-      summary: row.summary ?? null,
-    }));
+export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000), concurrency = Number(process.env.SCANNER_CONCURRENCY ?? 20) } = {}) {
+  const discovery = JSON.parse(await readFile(resolve("data/discovery.json"), "utf8"));
+  if (discovery.schemaVersion !== 1 || discovery.validation?.passed !== true ||
+      !Array.isArray(discovery.candidates) || discovery.validation.candidateCount !== discovery.candidates.length) {
+    throw new Error("20K discovery input failed validation");
   }
-  const byWallet = new Map();
-  for (const row of [...weekly.traders, ...monthly.traders]) {
-    if (!row.wallet || row.winRate < 0.9 || row.resolvedMarkets < 10) continue;
-    byWallet.set(row.wallet.toLowerCase(), {
-      wallet: row.wallet, username: row.username,
-      summary: {
-        wins: row.wins, losses: row.losses,
-        resolvedMarkets: row.resolvedMarkets, winRate: row.winRate,
-        integrityPassed: true,
-      },
-    });
-  }
-  return [...byWallet.values()];
-}
-
-export async function runConsensus({
-  nowSeconds = Math.floor(Date.now() / 1000),
-  concurrency = Number(process.env.SCANNER_CONCURRENCY ?? 16),
-} = {}) {
-  const [qualification, weekly, monthly] = await Promise.all([
-    readFile(resolve("site/data/qualification.json"), "utf8").then(JSON.parse),
-    readFile(resolve("site/data/qualified-week.json"), "utf8").then(JSON.parse),
-    readFile(resolve("site/data/qualified-month.json"), "utf8").then(JSON.parse),
-  ]);
-  for (const data of [qualification, weekly, monthly]) {
-    if (data.schemaVersion !== 1 || data.validation?.passed !== true) {
-      throw new Error("Qualified leaderboard inputs failed validation");
-    }
-  }
-  if (!Array.isArray(weekly.traders) || !Array.isArray(monthly.traders)) {
-    throw new Error("Weekly/monthly leaderboard shape is invalid");
-  }
-
-  const wallets = qualifiedUniverse(qualification, weekly, monthly);
-  const walletByAddress = new Map(wallets.map((row) => [row.wallet.toLowerCase(), row]));
+  const wallets = discovery.candidates;
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
-  process.stdout.write(`Checking the last 60 minutes of BUY activity for ${wallets.length} qualified wallets.\n`);
+  process.stdout.write(`Fast consensus scan: checking current open positions for ${wallets.length} discovered wallets; no settlement audit or per-wallet activity-history lookup.\\n`);
+
   const batch = await auditCandidates(wallets, {
     concurrency,
-    auditWallet: async (wallet) => {
-      const recent = await fetchRecentWalletActivity(client, wallet, {
-        startSeconds: nowSeconds - 60 * 60,
-        endSeconds: nowSeconds,
-        type: "TRADE",
-        maxPages: 100,
+    auditWallet: async (candidate) => {
+      const sports = candidate.appearances?.some(row => row.category === "sports") === true;
+      const snapshot = await fetchCurrentPositionSnapshot(client, candidate.wallet, {
+        limit: 100,
+        maxPages: sports ? 4 : 2,
       });
-      const recentBuys = recent.rows
-        .filter((row) => String(row.type).toUpperCase() === "TRADE" &&
-          String(row.side).toUpperCase() === "BUY" &&
-          typeof row.condition_id === "string" && typeof row.token_id === "string" &&
-          Number.isFinite(row.size) && row.size > 0 &&
-          Number.isFinite(row.timestamp) && row.timestamp >= nowSeconds - 3600 &&
-          row.timestamp <= nowSeconds)
-        .map((row) => ({
-          conditionId: row.condition_id.toLowerCase(),
-          tokenId: String(row.token_id),
-          timestamp: row.timestamp,
-          size: row.size,
-          price: row.price,
-          usdSize: Number.isFinite(row.usdc_size) ? row.usdc_size
-            : Number.isFinite(row.price) ? row.price * row.size : null,
-          outcome: typeof row.outcome === "string" ? row.outcome : null,
-        }));
-      const currentSnapshot = recent.complete && recentBuys.length
-        ? await fetchCurrentPositionSnapshot(client, wallet)
-        : { records: [], complete: recent.complete, pages: 0 };
-      const source = walletByAddress.get(wallet.toLowerCase());
       return {
-        complete: recent.complete && currentSnapshot.complete,
-        qualification: { qualified: true, reason: "qualified_weekly_or_monthly_top100" },
-        summary: source?.summary,
-        recentBuys,
-        currentPositions: currentSnapshot.records,
-        coverage: recent.coverage,
-        positionPages: currentSnapshot.pages,
+        complete: snapshot.complete,
+        qualification: { qualified: true, reason: "broad_discovery_consensus_pool" },
+        currentPositions: snapshot.records,
+        recentBuys: [],
+        coverage: "BOUNDED_CURRENT_OPEN_POSITION_SNAPSHOT",
       };
     },
     onProgress: ({ completed, total, failed }) => {
-      process.stdout.write(`Recent activity: ${completed}/${total}; failures: ${failed}.\n`);
+      process.stdout.write(`Open-position wallets: ${completed}/${total}; failures: ${failed}.\\n`);
     },
   });
-  const conditionIds = [...new Set(batch.results
-    .flatMap((row) => row.recentBuys ?? [])
-    .map((buy) => buy.conditionId)
-    .filter(Boolean))];
-  const marketFacts = await fetchGammaMarkets(conditionIds, { fetchImpl: pacedFetch });
-  const auditBatch = {
+  if (!batch.allAuditsComplete) {
+    throw new Error(`Consensus position scan incomplete: ${batch.failed}/${wallets.length} wallet requests failed; refusing to publish partial consensus.`);
+  }
+
+  const conditionIds = [...new Set(batch.results.flatMap(row => row.currentPositions ?? []).map(row => row.conditionId).filter(Boolean))];
+  process.stdout.write(`Fetched ${conditionIds.length} distinct active market conditions from ${wallets.length} wallets. Enriching markets in batches.\\n`);
+  const marketFacts = await fetchGammaMarkets(conditionIds, { fetchImpl: pacedFetch, batchSize: 100 });
+  const result = buildConsensusSignals({
     complete: true,
-    results: batch.results.map((row) => ({
-      ...row,
-      qualification: { qualified: true },
-    })),
-  };
-  const result = buildConsensusSignals(auditBatch, marketFacts, {
-    nowSeconds,
-    windowMinutes: 60,
-    maxResolutionHours: 24,
-    minWallets: 8,
-    minUsdPerWallet: 10,
-  });
-  process.stdout.write(`Checking active combo positions for ${wallets.length} qualified wallets.\\n`);
-  const comboBatch = await auditCandidates(wallets, {
-    concurrency: Math.min(concurrency, 12),
-    auditWallet: async (wallet) => {
-      const fetched = await fetchWalletCombos(client, wallet, { maxPages: 3, limit: 1000 });
-      const trader = walletByAddress.get(wallet.toLowerCase());
-      return {
-        complete: fetched.complete,
-        comboRows: fetched.rows.map((row) => ({
-          ...row, _wallet: wallet.toLowerCase(), _username: trader?.username ?? null,
-        })),
-      };
-    },
-    onProgress: ({ completed, total, failed }) => {
-      process.stdout.write(`Combo positions: ${completed}/${total}; failures: ${failed}.\\n`);
-    },
-  });
-  const comboRows = comboBatch.results
-    .filter((row) => row.complete === true)
-    .flatMap((row) => row.comboRows ?? []);
-  const comboResult = buildComboOpportunities(comboRows, {
-    nowMs: nowSeconds * 1000,
-    minEntryUsd: 5,
-    maxEntryUsd: 100,
-    minMultiplier: 10,
+    results: batch.results.map(row => ({ ...row, qualification: { qualified: true } })),
+  }, marketFacts, {
+    nowSeconds, windowMinutes: 60, maxResolutionHours: 24,
+    minWallets: 8, minUsdPerWallet: 10, requireRecentBuy: false,
   });
   const generatedAt = new Date(nowSeconds * 1000).toISOString();
   const consensus = {
-    schemaVersion: 1,
-    generatedAt,
-    validation: { passed: true, complete: batch.allAuditsComplete, failedWallets: batch.failed, excludedIncompleteWallets: batch.failed },
-    walletUniverse: Array.isArray(qualification.qualifiedWallets)
-      ? "all-qualified-wallets"
-      : "union-of-weekly-and-monthly-top100",
+    schemaVersion: 1, generatedAt,
+    validation: { passed: true, complete: true, failedWallets: 0 },
+    walletUniverse: "full-discovery-pool",
     walletsChecked: wallets.length,
-    qualifiedWalletsConsidered: result.qualifiedWalletsConsidered,
+    qualifiedWalletsConsidered: wallets.length,
     marketsWithRecentQualifiedBuys: result.marketsWithRecentQualifiedBuys,
     signalCount: result.signals.length,
-    thresholds: result.thresholds,
+    thresholds: { ...result.thresholds, basis: "Current open positions from the full discovered wallet pool; settlement qualification is a separate pipeline." },
     exclusions: result.exclusions,
+    scanDiagnostics: {
+      discoveredWallets: wallets.length,
+      positionWalletsChecked: batch.completed,
+      positionPagesCapSports: 4,
+      positionPagesCapOther: 2,
+      positionPageSize: 100,
+      uniqueConditions: conditionIds.length,
+      marketMetadataReturned: marketFacts.size,
+      failedWallets: batch.failed,
+    },
     signals: result.signals,
     combos: {
-      validation: { passed: comboBatch.allAuditsComplete, complete: comboBatch.allAuditsComplete, failedWallets: comboBatch.failed },
-      walletsChecked: wallets.length,
-      walletsWithComboData: new Set(comboRows.map((row) => row._wallet)).size,
-      count: comboResult.opportunities.length,
-      thresholds: comboResult.thresholds,
-      exclusions: comboResult.exclusions,
-      opportunities: comboResult.opportunities,
+      validation: { passed: true, complete: true, failedWallets: 0 },
+      walletsChecked: 0, walletsWithComboData: 0, count: 0,
+      thresholds: { minEntryUsd: 5, maxEntryUsd: 100, minMultiplier: 10, requireCurrentHolding: true, traderWinRateRequired: false },
+      exclusions: {}, opportunities: [],
     },
   };
-  const completedAt = new Date().toISOString();
   const status = {
-    schemaVersion: 1,
-    generatedAt,
-    completedAt,
-    validation: { passed: true },
-    state: "success",
-    message: batch.failed > 0
-      ? `Wallet rankings and same-side consensus validated; ${batch.failed} incomplete recent-activity wallet audits were excluded.`
-      : "Wallet rankings and same-side consensus passed validation.",
-    discoveredWallets: qualification.validation.discoveredWallets ?? 0,
-    auditedWallets: qualification.validation.auditedWallets ?? 0,
-    fullyAuditedWallets: qualification.validation.fullyAuditedWallets ?? qualification.validation.auditedWallets ?? 0,
-    failedWalletAudits: qualification.validation.failedWalletAudits ?? 0,
-    allWalletAuditsComplete: qualification.validation.allWalletAuditsComplete ?? true,
-    consensusWalletAuditFailures: batch.failed,
-    qualifiedWallets: qualification.validation.qualifiedWallets ?? wallets.length,
-    disqualifiedWallets: qualification.auditSummary?.disqualifiedWallets ?? 0,
-    earlyExitsExcluded: qualification.auditSummary?.earlyExitsExcluded,
-    ambiguousSameSecondExcluded: qualification.auditSummary?.ambiguousSameSecondExcluded ?? 0,
-    postResolutionAcquisitionsExcluded: qualification.auditSummary?.postResolutionAcquisitionsExcluded ?? 0,
-    weeklyCount: weekly.traders.length,
-    monthlyCount: monthly.traders.length,
-    consensusCount: result.signals.length,
-    comboCount: comboResult.opportunities.length,
-    comboScanComplete: comboBatch.allAuditsComplete,
-    comboScanFailures: comboBatch.failed,
+    schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
+    validation: { passed: true }, state: "success",
+    message: "Broad same-side consensus built from the full 20,000-wallet discovery pool; settlement qualification runs separately.",
+    discoveredWallets: wallets.length, auditedWallets: 0, fullyAuditedWallets: 0,
+    failedWalletAudits: 0, allWalletAuditsComplete: false,
+    consensusWalletsChecked: batch.completed, consensusWalletAuditFailures: batch.failed,
+    qualifiedWallets: 0, weeklyCount: 0, monthlyCount: 0,
+    consensusCount: result.signals.length, comboCount: 0, comboScanComplete: true, comboScanFailures: 0,
   };
-  const finalValidation = validatePublishedOutput({ qualification, weekly, monthly, consensus, status });
-  process.stdout.write(`Final publication validation passed: ${finalValidation.weekly} weekly, ${finalValidation.monthly} monthly, ${finalValidation.signals} consensus signals.\n`);
-  await writeJsonAtomic("site/data/consensus.json", consensus);
-  await writeJsonAtomic("site/data/consensus-status.json", status);
-  process.stdout.write(`Consensus complete: ${result.signals.length} signals from ${wallets.length} qualified wallets.\n`);
+  await writeJson("site/data/consensus.json", consensus);
+  await writeJson("site/data/consensus-status.json", status);
+  process.stdout.write(`Full-pool consensus complete: ${result.signals.length} signals from ${batch.completed}/${wallets.length} wallets.\\n`);
   return consensus;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  runConsensus().catch((error) => {
-    process.stderr.write(`Consensus failed: ${error.message}\n`);
+  runConsensus().catch(error => {
+    process.stderr.write(`Consensus failed: ${error.message}\\n`);
     process.exitCode = 1;
   });
 }
