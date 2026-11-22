@@ -19,7 +19,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: polymarket-pipeline
+  group: polymarket-settlement-fast
   cancel-in-progress: true
 
 jobs:
@@ -54,6 +54,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Cancel the obsolete unbounded settlement run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run cancel 45071450228 --repo "$GITHUB_REPOSITORY" || true
       - name: Qualify candidates using 30-day settlement evidence
         run: npm run qualify
         env:
