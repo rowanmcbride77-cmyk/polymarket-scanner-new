@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-22T21:19:44.000Z",
+  "source": "Polymarket Data API v2 closed positions, redeemable positions, tokens and resolutions",
+  "qualification": {
+    "minimumResolvedMarkets": 10,
+    "minimumWinRate": 0.9,
+    "maximumEarlyExitRate": null,
+    "lookbackDays": 30,
+    "earlyExitsCounted": false,
+    "settlementIntegrityRequired": true
+  },
+  "auditSummary": {
+    "disqualifiedWallets": 1000,
+    "incompleteWalletAudits": 61,
+    "incompleteAuditErrors": {
+      "position_snapshots: Pagination page limit reached; history is incomplete": 61
+    },
+    "disqualificationReasons": {
+      "settlement_integrity_not_verified": 867,
+      "win_rate_below_threshold": 20,
+      "insufficient_resolved_markets": 52,
+      "audit_error": 61
+    },
+    "earlyExitsExcluded": 513286,
+    "ambiguousSameSecondExcluded": 8447,
+    "postResolutionAcquisitionsExcluded": 513
+  },
+  "validation": {
+    "passed": true,
+    "allWalletAuditsComplete": false,
+    "discoveredWallets": 20000,
+    "auditedWallets": 1000,
+    "fullyAuditedWallets": 939,
+    "failedWalletAudits": 61,
+    "incompleteAuditErrors": {
+      "position_snapshots: Pagination page limit reached; history is incomplete": 61
+    },
+    "qualifiedWallets": 0
+  },
+  "qualifiedWallets": [],
+  "weekly": [],
+  "monthly": []
+}
