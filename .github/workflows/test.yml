@@ -3,6 +3,11 @@ name: Tests
 on:
   push:
     branches: [main]
+    paths:
+      - "scanner/**"
+      - "site/app.js"
+      - "package.json"
+      - ".github/workflows/*.yml"
   pull_request:
     branches: [main]
   workflow_dispatch:
