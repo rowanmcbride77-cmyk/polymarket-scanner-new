@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-22T20:54:35.000Z",
+  "generatedAt": "2026-11-22T22:47:34.000Z",
   "validation": {
     "passed": true,
     "complete": true,
@@ -9,7 +9,7 @@
   "walletUniverse": "full-discovery-pool",
   "walletsChecked": 20000,
   "qualifiedWalletsConsidered": 20000,
-  "marketsWithRecentQualifiedBuys": 2032,
+  "marketsWithRecentQualifiedBuys": 1852,
   "signalCount": 1,
   "thresholds": {
     "windowMinutes": 60,
@@ -23,13 +23,13 @@
     "basis": "Current open positions from the full discovered wallet pool; settlement qualification is a separate pipeline."
   },
   "exclusions": {
-    "wallet_below_minimum_usd": 4501,
-    "mixed_outcomes_in_market": 703,
-    "outside_24h_resolution_window": 1004,
-    "excluded_or_unclassified_category": 104,
-    "insufficient_qualified_wallets": 180,
-    "missing_market_metadata": 38,
-    "missing_market_end_date": 2
+    "wallet_below_minimum_usd": 3603,
+    "mixed_outcomes_in_market": 614,
+    "outside_24h_resolution_window": 969,
+    "excluded_or_unclassified_category": 101,
+    "missing_market_end_date": 3,
+    "insufficient_qualified_wallets": 145,
+    "missing_market_metadata": 19
   },
   "scanDiagnostics": {
     "discoveredWallets": 20000,
@@ -37,87 +37,129 @@
     "positionPagesPerWallet": 1,
     "positionPageSize": 500,
     "positionSnapshotMayBeTruncated": true,
-    "uniqueConditions": 34095,
-    "marketMetadataReturned": 33569,
+    "uniqueConditions": 33647,
+    "marketMetadataReturned": 33244,
     "failedWallets": 0
   },
   "signals": [
     {
-      "conditionId": "0xb530377e2f18c416425ee5050d4512e044869691cafdb0d60d35586b5ed0b482",
-      "tokenId": "18179882587783720166024072280790611892101191704983044718827592055197964766402",
-      "outcome": "Under",
-      "marketTitle": "Nashville SC vs. FC Cincinnati: O/U 3.5",
-      "marketSlug": "mls-nas-fcc-2026-11-22-total-3pt5",
-      "eventId": "1429475",
-      "eventSlug": "mls-nas-fcc-2026-11-22-more-markets",
+      "conditionId": "0x5982c34cf003d0a48f9174d6f26b0440701901a98eca7b954ad31c60cf81f0a4",
+      "tokenId": "92028218784596910156961948164013708446299238810565962883608801285435216048982",
+      "outcome": "Heat",
+      "marketTitle": "Spread: Heat (-8.5)",
+      "marketSlug": "nba-okc-mia-2026-11-22-spread-home-8pt5",
+      "eventId": "1338696",
+      "eventSlug": "nba-okc-mia-2026-11-22",
       "category": "sports",
-      "endDate": "2026-11-22T21:00:00.000Z",
-      "minutesToResolution": 5,
-      "qualifiedWalletCount": 9,
-      "totalUsd": 1447.0548999999999,
+      "endDate": "2026-11-22T23:00:00.000Z",
+      "minutesToResolution": 12,
+      "qualifiedWalletCount": 15,
+      "totalUsd": 4762.798699999999,
       "wallets": [
         {
-          "wallet": "0x6d3c5bd13984b2de47c3a88ddc455309aab3d294",
-          "username": "VeryLucky888",
-          "usdSize": 540,
+          "wallet": "0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98",
+          "username": "keeptheblueflagflyinghigh",
+          "usdSize": 1077.3135,
           "buyCount": 1,
-          "lastBuyAt": 1795377532
+          "lastBuyAt": 1795384807
+        },
+        {
+          "wallet": "0xbb6418f9db6d1c765965dc4c9d48cd5b4d2bdb86",
+          "username": "MadridTime",
+          "usdSize": 892.6772,
+          "buyCount": 1,
+          "lastBuyAt": 1795385347
+        },
+        {
+          "wallet": "0x13afac4389b343c6b2709ec7789b5f95f0ccc63a",
+          "username": "jensonsslong",
+          "usdSize": 645.54,
+          "buyCount": 1,
+          "lastBuyAt": 1795384805
+        },
+        {
+          "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+          "username": "sportmaster777",
+          "usdSize": 491.994,
+          "buyCount": 1,
+          "lastBuyAt": 1795384807
+        },
+        {
+          "wallet": "0xc4fe817476491890086330a639ac417d51bf601f",
+          "username": "poshposh",
+          "usdSize": 370.2099,
+          "buyCount": 1,
+          "lastBuyAt": 1795384807
+        },
+        {
+          "wallet": "0x2792fc28811277f12a54e32bd8188be02c2dc4f6",
+          "username": "0x2792fc28811277f12a54e32bd8188be02c2dc4f6",
+          "usdSize": 238.3394,
+          "buyCount": 1,
+          "lastBuyAt": 1795384807
         },
         {
           "wallet": "0xec981ed70ae69c5cbcac08c1ba063e734f6bafcd",
           "username": "0xheavy888",
-          "usdSize": 432,
+          "usdSize": 220,
           "buyCount": 1,
-          "lastBuyAt": 1795377532
+          "lastBuyAt": 1795384807
         },
         {
-          "wallet": "0xbef8eadacfcb7fb4044f1464ddb6ee34bca11b42",
-          "username": "0xBEF8eaDAcfcB7fb4044F1464dDb6Ee34BCA11B42-1782230279115",
-          "usdSize": 292.6,
+          "wallet": "0x7e5972bfc25819775ee5a9d4f191919375487b8b",
+          "username": "Gaditima",
+          "usdSize": 215,
           "buyCount": 1,
-          "lastBuyAt": 1795377592
+          "lastBuyAt": 1795384807
         },
         {
-          "wallet": "0x9703676286b93c2eca71ca96e8757104519a69c2",
-          "username": "AnonymousUsername",
-          "usdSize": 68.04,
+          "wallet": "0xf7f0b0b1e9c0fe02ccad926916ee31aef74b912c",
+          "username": "wapol",
+          "usdSize": 198.24,
           "buyCount": 1,
-          "lastBuyAt": 1795380140
+          "lastBuyAt": 1795385029
         },
         {
-          "wallet": "0xb8f6c79e452d7247d0cf47d16eaf7911953c4f7f",
-          "username": "sweise",
-          "usdSize": 49.7502,
+          "wallet": "0x0d233076c4dac74786a165e0337732d89437251c",
+          "username": "0x0d233076c4dac74786a165e0337732d89437251c",
+          "usdSize": 142.9996,
           "buyCount": 1,
-          "lastBuyAt": 1795377532
+          "lastBuyAt": 1795384807
         },
         {
-          "wallet": "0xd5e480d77cd73a003160cdffd2f20cb2013545bb",
-          "username": "-Mooner-",
-          "usdSize": 21.8,
+          "wallet": "0xe5502f3b033ebcd64233b5ffc43c44c24170be3f",
+          "username": "ferdinand2",
+          "usdSize": 106.74,
           "buyCount": 1,
-          "lastBuyAt": 1795377532
+          "lastBuyAt": 1795385350
         },
         {
-          "wallet": "0x9e3ed7b661a903fc97afcf49e0f014ebe869f882",
-          "username": "0x9e3ed7b661a903fc97afcf49e0f014ebe869f882-1783406009396",
-          "usdSize": 19.0399,
+          "wallet": "0x5d40576be2e9c61d283f4fd80d7a5ccf2331ba95",
+          "username": "topdogbigboi",
+          "usdSize": 70.9852,
           "buyCount": 1,
-          "lastBuyAt": 1795380713
+          "lastBuyAt": 1795384808
         },
         {
-          "wallet": "0xb70dda36cf895d3490322ffd65c8279c87a15925",
-          "username": "Newnasew",
-          "usdSize": 13.1004,
+          "wallet": "0xd218e474776403a330142299f7796e8ba32eb5c9",
+          "username": "cigarettes",
+          "usdSize": 41,
           "buyCount": 1,
-          "lastBuyAt": 1795377574
+          "lastBuyAt": 1795384807
         },
         {
-          "wallet": "0x592997c2d8119d82d71f21119957c6434d244684",
-          "username": "kitopesivan",
-          "usdSize": 10.7244,
+          "wallet": "0x32bb3f0f842da76d3c3bba7d6d76376334733c1a",
+          "username": "Limousin",
+          "usdSize": 29.26,
           "buyCount": 1,
-          "lastBuyAt": 1795377532
+          "lastBuyAt": 1795384132
+        },
+        {
+          "wallet": "0xcf7b0cf147b8c7427b8474af35cbf94d3e08fea5",
+          "username": "bit-job",
+          "usdSize": 22.4999,
+          "buyCount": 1,
+          "lastBuyAt": 1795384807
         }
       ]
     }
