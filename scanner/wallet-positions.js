@@ -141,7 +141,7 @@ export async function fetchCurrentPositionSnapshot(client, wallet, {
     include_archived: true,
     sort_by: "TIMESTAMP",
     sort_direction: "DESC",
-  }, { maxPages });
+  }, { maxPages, allowTruncated: true });
   const malformed = result.rows.filter((row) =>
     !row || typeof row !== "object" ||
     String(row.proxy_wallet ?? "").toLowerCase() !== wallet.toLowerCase() ||
@@ -192,6 +192,6 @@ export async function fetchCurrentPositionSnapshot(client, wallet, {
     // used by the previous scanner. Hitting that cap does not make fetched
     // rows incomplete; record hasMore separately for diagnostics.
     complete: true,
-    hasMore: result.complete !== true,
+    hasMore: result.hasMore === true || result.complete !== true,
   };
 }
