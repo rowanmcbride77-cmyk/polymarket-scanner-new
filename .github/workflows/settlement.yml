@@ -25,7 +25,8 @@ permissions:
 
 concurrency:
   group: polymarket-settlement-fast
-  cancel-in-progress: false
+  # New scanner logic supersedes a stuck older run; preserve checkpoints before replacement.
+  cancel-in-progress: true
 
 jobs:
   qualify-and-publish:
