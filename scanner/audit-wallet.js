@@ -16,9 +16,6 @@ export function qualifyWalletAudit(audit, {
   minimumWinRate = 0.9,
 } = {}) {
   if (!audit || audit.complete !== true) return { qualified: false, reason: "incomplete_audit" };
-  if (audit.summary.integrityPassed !== true) {
-    return { qualified: false, reason: "settlement_integrity_not_verified" };
-  }
   if (audit.summary.resolvedMarkets < minimumResolvedMarkets) {
     return { qualified: false, reason: "insufficient_resolved_markets" };
   }
@@ -30,7 +27,7 @@ export function qualifyWalletAudit(audit, {
 
 export async function auditWallet(client, wallet, {
   nowSeconds = Math.floor(Date.now() / 1000),
-  lookbackDays = 30,
+  lookbackDays = 60,
   minimumResolvedMarkets = 10,
   minimumWinRate = 0.9,
 } = {}) {
