@@ -147,7 +147,7 @@ export async function runQualification({
         saved.results.length === saved.nextOffset &&
         savedWallets.every((wallet) => /^0x[a-f0-9]{40}$/.test(wallet)) &&
         new Set(savedWallets).size === savedWallets.length;
-      if (saved.schemaVersion === 1 &&
+      if (saved.schemaVersion === 2 &&
           saved.auditLimit <= auditLimit &&
           savedResultsValid &&
           Number.isInteger(saved.nowSeconds)) {
@@ -228,7 +228,7 @@ export async function runQualification({
       if (global.gc) global.gc();
       if (persistCheckpoints) {
         const saved = {
-          schemaVersion: 1,
+          schemaVersion: 2,
           discoveryGeneratedAt: discovery.generatedAt,
           candidateCount: candidates.length,
           auditLimit,
@@ -299,7 +299,7 @@ export async function runQualification({
     if (global.gc) global.gc();
     if (persistCheckpoints) {
       const saved = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         discoveryGeneratedAt: discovery.generatedAt,
         candidateCount: candidates.length,
         auditLimit,
@@ -423,15 +423,15 @@ export async function runQualification({
       minimumWinRate: 0.9,
       maximumEarlyExitRate: null,
       lookbackDays: 60,
-      earlyExitsCounted: true,
-      settlementIntegrityRequired: false,
+      earlyExitsCounted: false,
+      settlementIntegrityRequired: true,
     },
     auditSummary: {
       disqualifiedWallets: batch.results.length - boards.qualifiedWalletCount,
       incompleteWalletAudits: batch.failed,
       incompleteAuditErrors: batch.errorCounts,
       disqualificationReasons,
-      earlyExitsIncluded: true,
+      earlyExitsIncluded: false,
     },
     validation: {
       passed: true,
@@ -483,7 +483,7 @@ export async function runQualification({
     fullyAuditedWallets: batch.completed - batch.failed,
     failedWalletAudits: batch.failed,
     qualifiedWallets: boards.qualifiedWalletCount,
-    earlyExitsIncluded: true,
+    earlyExitsIncluded: false,
     weeklyCount: boards.weekly.length,
     monthlyCount: boards.monthly.length,
     qualification: payload.qualification,

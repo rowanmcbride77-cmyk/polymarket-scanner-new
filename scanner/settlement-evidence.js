@@ -70,6 +70,12 @@ export function summarizeSettledEvidence({
       continue;
     }
     if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
+    // A CLOSED position whose last economic event predates resolution was exited early.
+    // It is not a settled prediction and must not enter wins, losses, the denominator, or accuracy.
+    if (lastEventAt < resolution.resolvedAtSeconds) {
+      exclude("pre_resolution_exit");
+      continue;
+    }
     if (firstEntryAt === 0) {
       exclude("missing_first_entry_timestamp", conditionId);
       continue;

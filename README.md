@@ -6,8 +6,8 @@ A static dashboard for trader performance, same-side consensus and low-cost high
 - Audits up to **20,000** unique wallets selected from the overall weekly and monthly leaderboard pages. The audit is processed in parallel batches within one qualification run; no leaderboard is published until every candidate has a terminal audit result.
 - Audit the trailing **60 days** of closed-market results.
 - Require **90%+ win rate** and at least **10 closed markets**.
-- Include early exits in the win/loss calculation; do not require holding through market resolution.
-- Early exits are included; no early-exit or holding-period filter is applied.
+- Count only positions held through actual market resolution. Positions exited before resolution are excluded from wins, losses, the resolved-market denominator and settlement accuracy.
+- Track pre-resolution exits separately as exclusions; they never qualify a trader or change settlement W/L.
 - Exclude incomplete wallet audits from qualification and ranking; missing evidence is not counted as a win or loss.
 
 The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket leaderboard P&L, but eligibility is based on the same verified settlement criteria. A board can contain fewer than 100 traders if fewer pass.
