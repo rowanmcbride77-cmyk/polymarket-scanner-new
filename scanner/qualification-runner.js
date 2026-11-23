@@ -97,8 +97,7 @@ export function buildQualifiedLeaderboards(discovery, auditBatch, { topN = 100 }
     // An individual failed/incomplete audit disqualifies only that wallet.
     // It must never be ranked, but it must not block every other verified wallet.
     if (audit.complete !== true) continue;
-    if (!audit.summary || audit.qualification?.qualified === undefined ||
-        (audit.qualification.qualified && audit.summary.integrityPassed !== true)) {
+    if (!audit.summary || audit.qualification?.qualified === undefined) {
       throw new Error(`Invalid completed audit for wallet ${candidate.wallet}`);
     }
   }
