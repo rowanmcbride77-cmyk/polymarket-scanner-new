@@ -36,7 +36,7 @@ jobs:
         id: qualification
         run: |
           node --input-type=module <<'NODE'
-          import { readFileSync } from "node:fs";
+          import { readFileSync, appendFileSync } from "node:fs";
           const read = (path) => JSON.parse(readFileSync(path, "utf8"));
           const status = read("site/data/qualification-status.json");
           const ready = status.schemaVersion === 1 &&
