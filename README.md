@@ -1,13 +1,13 @@
 # Polymarket Consensus & Combo Scanner
 
-A static dashboard for settlement-verified trader performance, same-side consensus and low-cost high-multiplier combo opportunities.
+A static dashboard for trader performance, same-side consensus and low-cost high-multiplier combo opportunities.
 
 ## Trader qualification
-- Audits up to **20,000** unique wallets selected from the overall weekly and monthly leaderboard pages. The audit is checkpointed in batches of **1,000 wallets per workflow run**; no leaderboard is published until every candidate has a terminal audit result.
+- Audits up to **20,000** unique wallets selected from the overall weekly and monthly leaderboard pages. The audit is processed in parallel batches within one qualification run; no leaderboard is published until every candidate has a terminal audit result.
 - Audit the trailing **60 days** of closed-market results.
 - Require **90%+ win rate** and at least **10 closed markets**.
 - Include early exits in the win/loss calculation; do not require holding through market resolution.
-- Early exits are included. No early-exit or holding-period filter is applied.
+- Early exits are included; no early-exit or holding-period filter is applied.
 - Exclude incomplete wallet audits from qualification and ranking; missing evidence is not counted as a win or loss.
 
 The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket leaderboard P&L, but eligibility is based on the same verified settlement criteria. A board can contain fewer than 100 traders if fewer pass.
@@ -30,7 +30,7 @@ The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket lea
 
 ## Pipeline
 1. Discover up to 20,000 overall weekly/monthly leaderboard wallets.
-2. Audit 30-day closed-market results and build weekly/monthly Top 100.
+2. Audit 60-day closed-market results and build weekly/monthly Top 100.
 3. Check qualified wallets' last-hour BUY activity and current holdings.
 4. Verify Gamma market state, outcome token, category and 24-hour resolution window.
 5. Fetch combo positions and calculate verified entry/potential payout multiples.
