@@ -7,7 +7,7 @@ A static dashboard for settlement-verified trader performance, same-side consens
 - Audit the trailing **30 days** of settlement evidence.
 - Require **90%+ verified settlement win rate** and at least **10 resolved markets**.
 - Count only positions verifiably held through market resolution.
-- Exclude early exits from wins/losses and allow no more than **20% observed early exits** among classifiable resolved/early-exit positions.
+- Exclude early exits from wins, losses, win rate and the resolved-market denominator. Do not apply a separate early-exit-rate disqualifier.
 - Exclude incomplete wallet audits from qualification and ranking; never treat missing evidence as a win or loss. Ambiguous same-second events and unverifiable settlement evidence also disqualify the affected wallet.
 
 The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket leaderboard P&L, but eligibility is based on the same verified settlement criteria. A board can contain fewer than 100 traders if fewer pass.
