@@ -29,7 +29,7 @@ export async function auditCandidatesBatch(candidates, {
   client,
   concurrency = 16,
   nowSeconds = Math.floor(Date.now() / 1000),
-  lookbackDays = 30,
+  lookbackDays = 60,
   minimumResolvedMarkets = 10,
   minimumWinRate = 0.9,
   onProgress,
