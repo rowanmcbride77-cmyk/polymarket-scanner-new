@@ -26,6 +26,15 @@ export function hasTerminalAuditResults(batch, candidateCount) {
     batch.results.length === candidateCount;
 }
 
+export function incompleteCheckpointIndexesForExpandedHistory(checkpoint, currentMaxPages = 10) {
+  const previousMaxPages = Number(checkpoint?.positionMaxPages ?? 10);
+  if (!Number.isInteger(currentMaxPages) || currentMaxPages < 1 ||
+      currentMaxPages <= previousMaxPages || !Array.isArray(checkpoint?.results)) return [];
+  return checkpoint.results
+    .map((row, index) => row?.complete === true ? -1 : index)
+    .filter((index) => index >= 0);
+}
+
 function createPacedFetch({
   fetchImpl = globalThis.fetch,
   sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms)),
@@ -121,7 +130,12 @@ export async function runQualification({
   const resolutionsCache = new Map();
   const checkpointPath = "data/qualification-progress.json";
   const persistCheckpoints = process.env.SCANNER_PERSIST_CHECKPOINTS === "1" && diagnosticLimit === 0;
+  const currentPositionMaxPages = Number(process.env.SCANNER_POSITION_MAX_PAGES ?? 10);
+  if (!Number.isInteger(currentPositionMaxPages) || currentPositionMaxPages < 1) {
+    throw new Error("SCANNER_POSITION_MAX_PAGES must be a positive integer");
+  }
   let checkpoint = null;
+  let retryIncompleteIndexes = [];
   if (persistCheckpoints) {
     try {
       const saved = JSON.parse(await readFile(resolve(checkpointPath), "utf8"));
@@ -137,6 +151,7 @@ export async function runQualification({
           savedPrefixMatches &&
           Number.isInteger(saved.nowSeconds)) {
         checkpoint = saved;
+        retryIncompleteIndexes = incompleteCheckpointIndexesForExpandedHistory(saved, currentPositionMaxPages);
         effectiveNowSeconds = saved.nowSeconds;
         process.stdout.write(`Resuming settlement qualification at wallet ${saved.nextOffset}/${candidates.length}; reusing ${saved.results.length} saved results.\\n`);
       }
@@ -159,13 +174,78 @@ export async function runQualification({
     sharedTokenFacts: 0, sharedResolutionFacts: 0,
     uniqueTokens: 0, uniqueMarkets: 0,
   };
+  if (retryIncompleteIndexes.length) {
+    process.stdout.write(`Retrying ${retryIncompleteIndexes.length} previously incomplete wallet audits because position history coverage increased to ${currentPositionMaxPages} pages.\\n`);
+    for (let retryOffset = 0; retryOffset < retryIncompleteIndexes.length; retryOffset += chunkSize) {
+      const indexes = retryIncompleteIndexes.slice(retryOffset, retryOffset + chunkSize);
+      const retryCandidates = indexes.map((index) => candidates[index]);
+      const part = await auditCandidatesBatch(retryCandidates, {
+        client, concurrency, nowSeconds: effectiveNowSeconds, lookbackDays: 30,
+        minimumResolvedMarkets: 10, minimumWinRate: 0.9,
+        sharedTokenFacts: tokenFactsCache,
+        sharedResolutions: resolutionsCache,
+        onProgress: (progress) => {
+          if (Number.isInteger(progress.pageNumber)) {
+            process.stdout.write(`Retry history: ${progress.stage} page ${progress.pageNumber}, ${progress.totalRows} rows for ${progress.wallet}\\n`);
+          } else {
+            process.stdout.write(`Retry history: ${progress.stage} ${progress.completed}/${progress.total}; failures: ${progress.failed ?? 0}\\n`);
+          }
+        },
+      });
+      part.results.forEach((row, index) => {
+        combined.results[indexes[index]] = row;
+      });
+      combined.failed = combined.results.filter((row) => row?.complete !== true).length;
+      combined.allAuditsComplete = combined.failed === 0;
+      combined.errorCounts = {};
+      combined.errorSamples = [];
+      for (const row of combined.results.filter((item) => item?.complete !== true)) {
+        const key = `${row.auditStage ?? "unknown"}: ${row.error ?? "incomplete audit"}`;
+        combined.errorCounts[key] = (combined.errorCounts[key] ?? 0) + 1;
+        if (combined.errorSamples.length < 12) {
+          combined.errorSamples.push({ wallet: row.wallet, stage: row.auditStage ?? "unknown", message: row.error ?? "incomplete audit" });
+        }
+      }
+      if (global.gc) global.gc();
+      if (persistCheckpoints) {
+        const saved = {
+          schemaVersion: 1,
+          discoveryGeneratedAt: discovery.generatedAt,
+          candidateCount: candidates.length,
+          auditLimit,
+          nowSeconds: effectiveNowSeconds,
+          positionMaxPages: currentPositionMaxPages,
+          nextOffset: combined.results.length,
+          results: combined.results.map(compactCheckpointResult),
+          failed: combined.failed,
+          errorCounts: combined.errorCounts,
+          errorSamples: combined.errorSamples,
+          allAuditsComplete: combined.allAuditsComplete,
+        };
+        await writeJsonAtomic(checkpointPath, saved);
+        await writeJsonAtomic("site/data/qualification-status.json", {
+          schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
+          completedAt: null, validation: { passed: false, complete: false },
+          state: "in_progress", discoveredWallets: discovery.candidates.length,
+          auditedWallets: combined.completed, fullyAuditedWallets: combined.completed - combined.failed,
+          failedWalletAudits: combined.failed, qualifiedWallets: 0,
+          message: `Rechecked incomplete audits with expanded history: ${combined.completed}/${candidates.length}; ${combined.failed} remain incomplete.`,
+        });
+        execFileSync("git", ["add", checkpointPath, "site/data/qualification-status.json"], { stdio: "inherit" });
+        execFileSync("git", ["commit", "-m", `Retry incomplete settlement audits at ${currentPositionMaxPages} pages`], { stdio: "inherit" });
+        execFileSync("git", ["fetch", "origin", "main"], { stdio: "inherit" });
+        execFileSync("git", ["rebase", "-X", "theirs", "origin/main"], { stdio: "inherit" });
+        execFileSync("git", ["push", "origin", "HEAD:main"], { stdio: "inherit" });
+      }
+    }
+  }
   const runEndOffset = Math.min(candidates.length, combined.completed + runWalletLimit);
   await writeJsonAtomic("site/data/qualification-status.json", {
     schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
     completedAt: null, validation: { passed: false, complete: false },
     state: "in_progress", discoveredWallets: discovery.candidates.length,
     auditedWallets: combined.completed, fullyAuditedWallets: combined.completed,
-    failedWalletAudits: 0, qualifiedWallets: 0,
+    failedWalletAudits: combined.failed, qualifiedWallets: 0,
     message: `Auditing all ${candidates.length} discovered wallets in resumable batches.`,
   });
   for (let offset = combined.completed; offset < runEndOffset; offset += chunkSize) {
@@ -205,6 +285,7 @@ export async function runQualification({
         candidateCount: candidates.length,
         auditLimit,
         nowSeconds: effectiveNowSeconds,
+        positionMaxPages: currentPositionMaxPages,
         nextOffset: combined.results.length,
         results: combined.results.map(compactCheckpointResult),
         failed: combined.failed,
