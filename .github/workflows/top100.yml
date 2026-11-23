@@ -9,11 +9,11 @@ on:
     paths:
       - "scanner/**"
       - "site/**"
+      - "!site/data/qualification-status.json"
       - "package.json"
       - ".github/workflows/top100.yml"
   workflow_run:
     workflows:
-      - "Discover Polymarket Wallets & Consensus"
       - "Settlement Qualification"
     types: [completed]
     branches: [main]
