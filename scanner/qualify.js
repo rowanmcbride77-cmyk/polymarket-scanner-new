@@ -143,7 +143,6 @@ export async function runQualification({
         saved.results.every((row, index) =>
           row?.wallet?.toLowerCase() === candidates[index]?.wallet?.toLowerCase());
       if (saved.schemaVersion === 1 &&
-          saved.discoveryGeneratedAt === discovery.generatedAt &&
           saved.candidateCount <= candidates.length &&
           saved.auditLimit <= auditLimit &&
           Array.isArray(saved.results) && saved.results.length === saved.nextOffset &&
