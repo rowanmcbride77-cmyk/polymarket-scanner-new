@@ -214,7 +214,9 @@ export async function runQualification({
           candidateCount: candidates.length,
           auditLimit,
           nowSeconds: effectiveNowSeconds,
-          positionMaxPages: currentPositionMaxPages,
+          positionMaxPages: retryOffset + chunkSize >= retryIncompleteIndexes.length
+            ? currentPositionMaxPages
+            : Number(checkpoint?.positionMaxPages ?? 10),
           nextOffset: combined.results.length,
           results: combined.results.map(compactCheckpointResult),
           failed: combined.failed,
@@ -244,7 +246,7 @@ export async function runQualification({
     schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
     completedAt: null, validation: { passed: false, complete: false },
     state: "in_progress", discoveredWallets: discovery.candidates.length,
-    auditedWallets: combined.completed, fullyAuditedWallets: combined.completed,
+    auditedWallets: combined.completed, fullyAuditedWallets: combined.completed - combined.failed,
     failedWalletAudits: combined.failed, qualifiedWallets: 0,
     message: `Auditing all ${candidates.length} discovered wallets in resumable batches.`,
   });
