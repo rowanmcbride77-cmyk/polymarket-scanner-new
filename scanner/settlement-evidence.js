@@ -74,11 +74,6 @@ export function summarizeSettledEvidence({
         ? "same_second_entry_resolution_ambiguous" : "post_resolution_acquisition_excluded", conditionId);
       continue;
     }
-    if (lastEventAt <= resolution.resolvedAtSeconds) {
-      exclude(lastEventAt === resolution.resolvedAtSeconds
-        ? "same_second_as_resolution_ambiguous" : "early_exit_excluded", conditionId);
-      continue;
-    }
     const item = getToken(conditionId, tokenId);
     item.closedEvidence = true;
   }
