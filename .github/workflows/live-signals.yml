@@ -32,12 +32,50 @@ jobs:
         run: |
           npm run check
           npm test
+      - name: Wait for a complete settlement-qualified leaderboard
+        id: qualification
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const read = (path) => JSON.parse(readFileSync(path, "utf8"));
+          const status = read("site/data/qualification-status.json");
+          const ready = status.schemaVersion === 1 &&
+            status.state === "success" &&
+            status.validation?.passed === true &&
+            status.validation?.complete === true &&
+            status.auditedWallets === status.discoveredWallets;
+          if (!ready) {
+            console.log("Settlement audit is not complete (" +
+              (status.auditedWallets ?? 0) + "/" +
+              (status.discoveredWallets ?? 0) +
+              "). Skipping live signals; this is expected while qualification is checkpointing.");
+            await import("node:fs").then(({ appendFileSync }) =>
+              appendFileSync(process.env.GITHUB_OUTPUT, "ready=false\\n"));
+            process.exit(0);
+          }
+          for (const period of ["week", "month"]) {
+            const board = read(`site/data/qualified-${period}.json`);
+            if (board.schemaVersion !== 1 || board.period !== period ||
+                board.validation?.passed !== true || board.validation?.complete !== true ||
+                !Array.isArray(board.traders) ||
+                !board.traders.every((trader, index) =>
+                  trader.rank === index + 1 && trader.winRate >= 0.9 &&
+                  trader.resolvedMarkets >= 10)) {
+              throw new Error(period + " settlement-qualified board failed validation");
+            }
+          }
+          await import("node:fs").then(({ appendFileSync }) =>
+            appendFileSync(process.env.GITHUB_OUTPUT, "ready=true\\n"));
+          console.log("Both complete settlement-qualified boards are ready.");
+          NODE
       - name: Build same-side signals from qualified traders and observe sells
+        if: steps.qualification.outputs.ready == 'true'
         run: npm run consensus
         env:
           SCANNER_CONCURRENCY: 16
           NODE_OPTIONS: --max-old-space-size=4096
       - name: Publish live signal and exit-alert data
+        if: steps.qualification.outputs.ready == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
