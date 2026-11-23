@@ -37,8 +37,8 @@ test("includes a closed position whose last event preceded resolution", () => {
     ...base, closedPositions:[closed("101",1794916700)], currentPositions:[],
     tokenFacts:new Map([["101",token("101",1)]]),
   });
-  assert.equal(result.resolvedMarkets,0);
-  assert.equal(result.exclusions.early_exit_excluded,1);
+  assert.equal(result.resolvedMarkets,1);
+  assert.equal(result.wins,1);
   assert.equal(result.integrityPassed,true);
 });
 
