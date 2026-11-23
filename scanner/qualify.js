@@ -128,7 +128,7 @@ export async function runQualification({
   if (!Number.isInteger(runWalletLimit) || runWalletLimit < 1) throw new Error("SCANNER_RUN_WALLET_LIMIT must be positive");
   const tokenFactsCache = new Map();
   const resolutionsCache = new Map();
-  const checkpointPath = "data/qualification-progress.json";
+  const checkpointPath = "data/qualification-progress-60d.json";
   const persistCheckpoints = process.env.SCANNER_PERSIST_CHECKPOINTS === "1" && diagnosticLimit === 0;
   const currentPositionMaxPages = Number(process.env.SCANNER_POSITION_MAX_PAGES ?? 10);
   if (!Number.isInteger(currentPositionMaxPages) || currentPositionMaxPages < 1) {
@@ -408,17 +408,11 @@ export async function runQualification({
   const qualificationDiscovery = { ...discovery, candidates };
   const boards = buildQualifiedLeaderboards(qualificationDiscovery, batch, { topN: 100 });
   const disqualificationReasons = {};
-  let earlyExitsExcluded = 0;
-  let ambiguousSameSecondExcluded = 0;
-  let postResolutionAcquisitionsExcluded = 0;
   for (const row of batch.results) {
     if (!row.qualification.qualified) {
       const reason = row.qualification.reason ?? "unknown";
       disqualificationReasons[reason] = (disqualificationReasons[reason] ?? 0) + 1;
     }
-    earlyExitsExcluded += row.summary?.exclusions?.early_exit_excluded ?? 0;
-    ambiguousSameSecondExcluded += row.summary?.exclusions?.same_second_as_resolution_ambiguous ?? 0;
-    postResolutionAcquisitionsExcluded += row.summary?.exclusions?.post_resolution_acquisition_excluded ?? 0;
   }
   const payload = {
     schemaVersion: 1,
@@ -438,8 +432,6 @@ export async function runQualification({
       incompleteAuditErrors: batch.errorCounts,
       disqualificationReasons,
       earlyExitsIncluded: true,
-      ambiguousSameSecondExcluded,
-      postResolutionAcquisitionsExcluded,
     },
     validation: {
       passed: true,
@@ -461,8 +453,6 @@ export async function runQualification({
           losses: row.summary.losses,
           resolvedMarkets: row.summary.resolvedMarkets,
           winRate: row.summary.winRate,
-          integrityPassed: row.summary.integrityPassed,
-          earlyExitCount: row.summary.exclusions?.early_exit_excluded ?? 0,
         } : null,
       })),
     weekly: boards.weekly,
