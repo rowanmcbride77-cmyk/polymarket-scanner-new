@@ -47,6 +47,10 @@ export function buildConsensusSignals(auditBatch, marketFacts, {
   if (auditBatch?.complete !== true || !Array.isArray(auditBatch.results)) {
     throw new Error("Consensus requires a complete wallet audit batch");
   }
+  const auditWallets = auditBatch.results.map(row => String(row?.wallet ?? "").toLowerCase());
+  if (auditWallets.some(wallet => !wallet) || new Set(auditWallets).size !== auditWallets.length) {
+    throw new Error("Consensus requires one audit row per distinct wallet");
+  }
   if (!(marketFacts instanceof Map)) throw new TypeError("marketFacts must be a Map");
   if (!Number.isInteger(nowSeconds) || !Number.isInteger(windowMinutes) ||
       !Number.isInteger(maxResolutionHours) || !Number.isInteger(minWallets) ||

@@ -29,16 +29,29 @@ async function loadConsensus(){
    json("./data/qualification-status.json").catch(()=>null)
   ]);
   const signals=Array.isArray(consensus.signals)?consensus.signals:[];
-  // Consensus is built from the settlement-qualified trader boards. Only show
-  // a complete consensus snapshot generated after the current qualification run.
+  const validQualification=q=>q?.minimumWinRate===0.9&&q?.minimumResolvedMarkets===10&&
+   q?.lookbackDays===60&&q?.earlyExitsCounted===false&&q?.settlementIntegrityRequired===true;
+  const conditionIds=signals.map(s=>String(s.conditionId||"").toLowerCase());
+  const validSignals=signals.length>0&&new Set(conditionIds).size===conditionIds.length&&
+   signals.every(s=>{
+    const wallets=Array.isArray(s.wallets)?s.wallets.map(w=>String(w?.wallet||"").toLowerCase()):[];
+    return Boolean(s.conditionId&&s.tokenId&&s.outcome)&&Number.isInteger(s.qualifiedWalletCount)&&
+     s.qualifiedWalletCount>=8&&wallets.length===s.qualifiedWalletCount&&
+     new Set(wallets).size===wallets.length;
+   });
+  // Only display one complete same-outcome group per market, built from the
+  // current 60-day settlement-qualified boards with pre-resolution exits excluded.
   const qualificationAt=Date.parse(qualification?.completedAt||qualification?.generatedAt||"");
   const consensusAt=Date.parse(consensus.generatedAt||"");
-  const validated=qualification?.state==="success"&&Number.isFinite(qualificationAt)&&
+  const validated=qualification?.state==="success"&&qualification.validation?.passed===true&&
+   qualification.validation?.complete===true&&qualification.earlyExitsIncluded===false&&
+   validQualification(qualification.qualification)&&Number.isFinite(qualificationAt)&&
    Number.isFinite(consensusAt)&&consensusAt>=qualificationAt&&
    status?.state==="success"&&status.generatedAt===consensus.generatedAt&&
-   consensus.schemaVersion===1&&consensus.validation?.passed===true&&
-   consensus.validation?.complete===true&&Number.isInteger(consensus.walletsChecked)&&
-   consensus.walletsChecked===consensus.qualifiedWalletsConsidered&&
+   consensus.schemaVersion===1&&consensus.walletUniverse==="settlement-qualified-top100"&&
+   validQualification(consensus.qualificationBasis)&&consensus.qualificationBasis?.earlyExitsCounted===false&&
+   consensus.validation?.passed===true&&consensus.validation?.complete===true&&validSignals&&
+   Number.isInteger(consensus.walletsChecked)&&consensus.walletsChecked===consensus.qualifiedWalletsConsidered&&
    consensus.scanDiagnostics?.activityWalletsChecked===consensus.walletsChecked&&
    consensus.scanDiagnostics?.failedWallets===0;
   if(target){
@@ -72,14 +85,19 @@ async function start(){
   } catch {
    throw new Error("Settlement-qualified Top 100 has not been published yet. Consensus scanning is independent and appears above.");
   }
-  if(status.schemaVersion!==1||status.state!=="success"||status.validation?.passed!==true) {
-   throw new Error("Settlement-qualified Top 100 is still being built. Consensus scanning is independent and appears above.");
+  const validQualification=q=>q?.minimumWinRate===0.9&&q?.minimumResolvedMarkets===10&&
+   q?.lookbackDays===60&&q?.earlyExitsCounted===false&&q?.settlementIntegrityRequired===true;
+  if(status.schemaVersion!==1||status.state!=="success"||status.validation?.passed!==true||
+     status.validation?.complete!==true||status.earlyExitsIncluded!==false||
+     !validQualification(status.qualification)||!Number.isFinite(Date.parse(status.completedAt||""))) {
+   throw new Error("Settlement-qualified Top 100 is still being built or does not have verified 60-day settlement rules.");
   }
   const [week,month]=await Promise.all([
    json("./data/qualified-week.json"),
    json("./data/qualified-month.json")
   ]);
-  const validBoard=board=>board.schemaVersion===1&&board.validation?.passed===true&&board.validation?.complete===true&&Array.isArray(board.traders)&&
+  const validBoard=board=>board.schemaVersion===1&&board.validation?.passed===true&&board.validation?.complete===true&&
+   validQualification(board.qualification)&&Array.isArray(board.traders)&&board.traders.length>0&&
    board.traders.every((t,i)=>t.rank===i+1&&Number.isFinite(t.winRate)&&t.winRate>=0.9&&Number.isInteger(t.resolvedMarkets)&&t.resolvedMarkets>=10&&
     Number.isInteger(t.wins)&&Number.isInteger(t.losses)&&t.wins+t.losses===t.resolvedMarkets&&
     Math.abs(t.winRate-t.wins/t.resolvedMarkets)<1e-9&&Number.isFinite(t.leaderboardPnl));
@@ -91,7 +109,7 @@ async function start(){
   const panel=$(".status");if(panel)panel.classList.add("status-success");
   set("#status-title","Settlement-qualified Top 100");
   const incomplete=Number(status.failedWalletAudits||0);
-  set("#status-detail","Only traders with at least 90% wins across at least 10 closed markets in the last 60 days are shown. Early exits are included. "+(incomplete?incomplete+" incomplete wallet audits were excluded.":"All candidate wallet audits completed."));
+  set("#status-detail","Only traders with at least 90% wins across at least 10 resolved markets in the last 60 days are shown. Positions exited before resolution are excluded from wins, losses, the denominator and settlement accuracy. "+(incomplete?incomplete+" incomplete wallet audits were excluded.":"All candidate wallet audits completed."));
   set("#last-scan",new Date(status.completedAt||status.generatedAt).toLocaleString());
   const period=$("#leader-period");render(period?.value==="month"?"month":"week");
   if(period)period.addEventListener("change",()=>render(period.value==="month"?"month":"week"));

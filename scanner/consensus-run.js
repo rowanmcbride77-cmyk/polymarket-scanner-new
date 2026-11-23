@@ -31,12 +31,23 @@ async function writeJson(path, value) {
   await rename(tmp, target);
 }
 
+function validQualificationRules(value) {
+  return value?.minimumWinRate === 0.9 &&
+    value?.minimumResolvedMarkets === 10 &&
+    value?.lookbackDays === 60 &&
+    value?.earlyExitsCounted === false &&
+    value?.settlementIntegrityRequired === true;
+}
+
 function qualifiedWalletsFromBoards(week, month) {
   const byWallet = new Map();
   for (const row of [...(week.traders ?? []), ...(month.traders ?? [])]) {
     if (!/^0x[a-f0-9]{40}$/i.test(row.wallet ?? "") ||
         !Number.isFinite(row.winRate) || row.winRate < 0.9 ||
-        !Number.isInteger(row.resolvedMarkets) || row.resolvedMarkets < 10) continue;
+        !Number.isInteger(row.resolvedMarkets) || row.resolvedMarkets < 10 ||
+        !Number.isInteger(row.wins) || !Number.isInteger(row.losses) ||
+        row.wins + row.losses !== row.resolvedMarkets ||
+        Math.abs(row.winRate - row.wins / row.resolvedMarkets) > 1e-9) continue;
     byWallet.set(row.wallet.toLowerCase(), {
       wallet: row.wallet.toLowerCase(),
       username: row.username ?? null,
@@ -56,9 +67,12 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   if (status.schemaVersion !== 1 || status.state !== "success" ||
       status.validation?.passed !== true || status.validation?.complete !== true ||
       status.auditedWallets !== status.discoveredWallets ||
+      status.earlyExitsIncluded !== false || !validQualificationRules(status.qualification) ||
       week.period !== "week" || month.period !== "month" ||
       week.validation?.passed !== true || week.validation?.complete !== true ||
-      month.validation?.passed !== true || month.validation?.complete !== true) {
+      !validQualificationRules(week.qualification) ||
+      month.validation?.passed !== true || month.validation?.complete !== true ||
+      !validQualificationRules(month.qualification)) {
     throw new Error("Fresh validated 90% settlement-qualified trader boards are required before consensus scanning");
   }
   const wallets = qualifiedWalletsFromBoards(week, month);
@@ -140,6 +154,10 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     minWallets: 8, minUsdPerWallet: 10, requireRecentBuy: true,
   });
 
+  if (result.signals.length === 0) {
+    throw new Error("No same-side consensus markets met the current thresholds; preserving the previous published consensus snapshot.");
+  }
+
   const currentHoldings = new Set();
   for (const row of batch.results) for (const p of row.currentPositions ?? []) {
     currentHoldings.add(`${row.wallet.toLowerCase()}:${p.conditionId}:${p.tokenId}`);
@@ -171,7 +189,7 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     walletUniverse: "settlement-qualified-top100",
     walletsChecked: wallets.length,
     qualifiedWalletsConsidered: wallets.length,
-    qualificationBasis: { minimumWinRate: 0.9, minimumResolvedMarkets: 10, lookbackDays: 30 },
+    qualificationBasis: { minimumWinRate: 0.9, minimumResolvedMarkets: 10, lookbackDays: 60, earlyExitsCounted: false },
     marketsWithRecentQualifiedBuys: result.marketsWithRecentQualifiedBuys,
     signalCount: result.signals.length,
     thresholds: { ...result.thresholds, basis: "Only 90%+ settlement-qualified traders; each must have bought within 60 minutes and still hold the same outcome." },

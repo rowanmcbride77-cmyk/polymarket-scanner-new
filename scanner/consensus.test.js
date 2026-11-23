@@ -44,6 +44,15 @@ test("excludes a market if qualified wallets bought both outcomes", () => {
   assert.equal(result.exclusions.mixed_outcomes_in_market,1);
 });
 
+test("rejects duplicate wallet audit rows instead of double-counting one trader", () => {
+  const results = Array.from({length:8},(_,i)=>audit(`wallet-${i}`));
+  results.push(audit("wallet-0"));
+  assert.throws(
+    () => buildConsensusSignals({complete:true,results},new Map([[condition,market()]]),{nowSeconds:now}),
+    /distinct wallet/,
+  );
+});
+
 test("only qualified wallets with at least ten dollars count", () => {
   const results = [
     ...Array.from({length:7},(_,i)=>audit(`wallet-${i}`)),
