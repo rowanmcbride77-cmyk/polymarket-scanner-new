@@ -50,7 +50,7 @@ jobs:
               (status.discoveredWallets ?? 0) +
               "). Skipping live signals; this is expected while qualification is checkpointing.");
             await import("node:fs").then(({ appendFileSync }) =>
-              appendFileSync(process.env.GITHUB_OUTPUT, "ready=false\\n"));
+              appendFileSync(process.env.GITHUB_OUTPUT, "ready=false\n"));
             process.exit(0);
           }
           for (const period of ["week", "month"]) {
@@ -65,7 +65,7 @@ jobs:
             }
           }
           await import("node:fs").then(({ appendFileSync }) =>
-            appendFileSync(process.env.GITHUB_OUTPUT, "ready=true\\n"));
+            appendFileSync(process.env.GITHUB_OUTPUT, "ready=true\n"));
           console.log("Both complete settlement-qualified boards are ready.");
           NODE
       - name: Build same-side signals from qualified traders and observe sells
