@@ -16,6 +16,9 @@ export function qualifyWalletAudit(audit, {
   minimumWinRate = 0.9,
 } = {}) {
   if (!audit || audit.complete !== true) return { qualified: false, reason: "incomplete_audit" };
+  if (!audit.summary || audit.summary.integrityPassed !== true) {
+    return { qualified: false, reason: "settlement_integrity_not_verified" };
+  }
   if (audit.summary.resolvedMarkets < minimumResolvedMarkets) {
     return { qualified: false, reason: "insufficient_resolved_markets" };
   }
@@ -81,7 +84,7 @@ export async function auditWallet(client, wallet, {
   const result = {
     wallet: wallet.toLowerCase(),
     complete: true,
-    coverage: "30_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+    coverage: "60_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
     closedPositions: closedSnapshot.records.length,
     closedPositionPages: closedSnapshot.pages,
     positionPartitions: positionSnapshot.partitions,
