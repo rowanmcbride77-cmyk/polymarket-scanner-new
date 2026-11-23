@@ -117,7 +117,7 @@ export async function runQualification({
   const candidates = (diagnosticLimit > 0 ? auditCandidates.slice(0, diagnosticLimit) : auditCandidates);
   const pacedFetch = createPacedFetch();
   const client = createDataApiClient({ fetchImpl: pacedFetch });
-  process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 30-day settlement window; concurrency ${concurrency}.\n`);
+  process.stdout.write(`Auditing ${candidates.length} candidate wallets${diagnosticLimit > 0 ? ` (diagnostic sample of ${discovery.candidates.length})` : ""}; 60-day closed-market window; concurrency ${concurrency}.\n`);
   // Bound memory: raw histories from all 1,000 wallets must not coexist in
   // memory. The previous all-at-once batch exceeded the runner's 6 GB heap.
   const chunkSize = Number(process.env.SCANNER_AUDIT_CHUNK_SIZE ?? 25);
@@ -211,7 +211,7 @@ export async function runQualification({
       const wallets = retryIncompleteWallets.slice(retryOffset, retryOffset + chunkSize);
       const retryCandidates = wallets.map((wallet) => candidateByWallet.get(wallet));
       const part = await auditCandidatesBatch(retryCandidates, {
-        client, concurrency, nowSeconds: effectiveNowSeconds, lookbackDays: 30,
+        client, concurrency, nowSeconds: effectiveNowSeconds, lookbackDays: 60,
         minimumResolvedMarkets: 10, minimumWinRate: 0.9,
         sharedTokenFacts: tokenFactsCache,
         sharedResolutions: resolutionsCache,
@@ -275,7 +275,7 @@ export async function runQualification({
   for (let offset = 0; offset < runCandidates.length; offset += chunkSize) {
     const chunk = runCandidates.slice(offset, offset + chunkSize);
     const part = await auditCandidatesBatch(chunk, {
-      client, concurrency, nowSeconds: effectiveNowSeconds, lookbackDays: 30,
+      client, concurrency, nowSeconds: effectiveNowSeconds, lookbackDays: 60,
       minimumResolvedMarkets: 10, minimumWinRate: 0.9,
       sharedTokenFacts: tokenFactsCache,
       sharedResolutions: resolutionsCache,
@@ -428,16 +428,16 @@ export async function runQualification({
       minimumResolvedMarkets: 10,
       minimumWinRate: 0.9,
       maximumEarlyExitRate: null,
-      lookbackDays: 30,
-      earlyExitsCounted: false,
-      settlementIntegrityRequired: true,
+      lookbackDays: 60,
+      earlyExitsCounted: true,
+      settlementIntegrityRequired: false,
     },
     auditSummary: {
       disqualifiedWallets: batch.results.length - boards.qualifiedWalletCount,
       incompleteWalletAudits: batch.failed,
       incompleteAuditErrors: batch.errorCounts,
       disqualificationReasons,
-      earlyExitsExcluded,
+      earlyExitsIncluded: true,
       ambiguousSameSecondExcluded,
       postResolutionAcquisitionsExcluded,
     },
@@ -493,7 +493,7 @@ export async function runQualification({
     fullyAuditedWallets: batch.completed - batch.failed,
     failedWalletAudits: batch.failed,
     qualifiedWallets: boards.qualifiedWalletCount,
-    earlyExitsExcluded,
+    earlyExitsIncluded: true,
     weeklyCount: boards.weekly.length,
     monthlyCount: boards.monthly.length,
     qualification: payload.qualification,
