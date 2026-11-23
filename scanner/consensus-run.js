@@ -53,9 +53,12 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     readFile(resolve("site/data/qualified-week.json"), "utf8").then(JSON.parse),
     readFile(resolve("site/data/qualified-month.json"), "utf8").then(JSON.parse),
   ]);
-  if (status.schemaVersion !== 1 || status.state !== "success" || status.validation?.passed !== true ||
+  if (status.schemaVersion !== 1 || status.state !== "success" ||
+      status.validation?.passed !== true || status.validation?.complete !== true ||
+      status.auditedWallets !== status.discoveredWallets ||
       week.period !== "week" || month.period !== "month" ||
-      week.validation?.passed !== true || month.validation?.passed !== true) {
+      week.validation?.passed !== true || week.validation?.complete !== true ||
+      month.validation?.passed !== true || month.validation?.complete !== true) {
     throw new Error("Fresh validated 90% settlement-qualified trader boards are required before consensus scanning");
   }
   const wallets = qualifiedWalletsFromBoards(week, month);
