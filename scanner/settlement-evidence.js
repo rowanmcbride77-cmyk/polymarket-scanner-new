@@ -47,6 +47,11 @@ export function summarizeSettledEvidence({
     const resolution = resolutions.get(conditionId);
     if (resolution && Number.isInteger(resolution.resolvedAtSeconds) &&
         resolution.resolvedAtSeconds < windowStartSeconds) continue;
+    if (resolution && Number.isInteger(resolution.resolvedAtSeconds) &&
+        lastEventAt === resolution.resolvedAtSeconds) {
+      exclude("same_second_as_resolution_ambiguous", conditionId);
+      continue;
+    }
     const token = tokenFacts.get(tokenId);
     if (!token) {
       exclude("missing_closed_position_token_fact", conditionId);
