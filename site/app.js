@@ -10,7 +10,7 @@ function render(period){
  const rows=boards[period];target.replaceChildren();target.className="table-wrap";
  if(!Array.isArray(rows)||rows.length===0){target.className="empty";target.textContent="No traders currently meet both settlement qualification requirements.";return;}
  const table=node("table",""),thead=node("thead",""),hr=node("tr","");
- for(const label of ["#","Trader","30-Day Win Rate","Resolved Markets","W–L","Leaderboard P&L"])hr.append(node("th",label));
+ for(const label of ["#","Trader","60-Day Win Rate","Resolved Markets","W–L","Leaderboard P&L"])hr.append(node("th",label));
  thead.append(hr);table.append(thead);const body=node("tbody","");
  for(const t of rows){
   const tr=node("tr","");
@@ -91,7 +91,7 @@ async function start(){
   const panel=$(".status");if(panel)panel.classList.add("status-success");
   set("#status-title","Settlement-qualified Top 100");
   const incomplete=Number(status.failedWalletAudits||0);
-  set("#status-detail","Only traders with at least 90% wins across at least 10 resolved markets in the last 30 days are shown. Early exits are excluded. "+(incomplete?incomplete+" incomplete wallet audits were excluded.":"All candidate wallet audits completed."));
+  set("#status-detail","Only traders with at least 90% wins across at least 10 closed markets in the last 60 days are shown. Early exits are included. "+(incomplete?incomplete+" incomplete wallet audits were excluded.":"All candidate wallet audits completed."));
   set("#last-scan",new Date(status.completedAt||status.generatedAt).toLocaleString());
   const period=$("#leader-period");render(period?.value==="month"?"month":"week");
   if(period)period.addEventListener("change",()=>render(period.value==="month"?"month":"week"));
