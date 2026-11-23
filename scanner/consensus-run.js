@@ -134,7 +134,7 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   const marketFacts = await fetchGammaMarkets(conditionIds, { tokenIds, fetchImpl: createPacedFetch({ intervalMs: 90 }), batchSize: 100 });
   const result = buildConsensusSignals({ complete: true, results: batch.results }, marketFacts, {
     nowSeconds, windowMinutes, maxResolutionHours: 24,
-    minWallets: 2, minUsdPerWallet: 10, requireRecentBuy: true,
+    minWallets: 8, minUsdPerWallet: 10, requireRecentBuy: true,
   });
 
   const currentHoldings = new Set();
@@ -149,7 +149,7 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     const coverage = auditRow?.coverage;
     const stillHeld = currentHoldings.has(key);
     return {
-      trader: trader?.username && !/^0x[a-f0-9]{40}$/i.test(trader.username) ? trader.username : `Trader #${wallets.findIndex(w => w.wallet === sell.wallet) + 1}`,
+      trader: trader?.username && !/^0x[a-f0-9]{40}(?:-|$)/i.test(trader.username) ? trader.username : `Trader #${wallets.findIndex(w => w.wallet === sell.wallet) + 1}`,
       conditionId: sell.conditionId,
       tokenId: sell.tokenId,
       marketTitle: market?.title ?? "Market details unavailable",
