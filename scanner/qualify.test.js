@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkpointResumeOffset, hasTerminalAuditResults } from "./qualify.js";
+import { checkpointResumeOffset, hasTerminalAuditResults, incompleteCheckpointIndexesForExpandedHistory } from "./qualify.js";
 
 test("checkpoint resumes after all saved results, including earlier incomplete audits", () => {
   const checkpoint = {
@@ -29,4 +29,19 @@ test("all terminal wallet results can publish while incomplete wallets remain ex
 test("a batch without a terminal result for every candidate cannot publish", () => {
   const batch = { complete: false, results: [{ wallet: "w1", complete: true }] };
   assert.equal(hasTerminalAuditResults(batch, 2), false);
+});
+
+test("expanded position history retries only previously incomplete checkpoint rows", () => {
+  const checkpoint = {
+    positionMaxPages: 10,
+    results: [
+      { wallet: "w1", complete: true },
+      { wallet: "w2", complete: false },
+      { wallet: "w3", complete: true },
+      { wallet: "w4", complete: false },
+    ],
+  };
+  assert.deepEqual(incompleteCheckpointIndexesForExpandedHistory(checkpoint, 30), [1, 3]);
+  assert.deepEqual(incompleteCheckpointIndexesForExpandedHistory(checkpoint, 10), []);
+  assert.deepEqual(incompleteCheckpointIndexesForExpandedHistory(checkpoint, 5), []);
 });
