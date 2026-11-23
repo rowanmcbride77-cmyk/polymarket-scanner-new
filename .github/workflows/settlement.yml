@@ -71,16 +71,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh run cancel 45071450228 --repo "$GITHUB_REPOSITORY" || true
-      - name: Qualify candidates using 30-day settlement evidence
+      - name: Qualify candidates using 60-day closed-market results
         run: npm run qualify
         env:
-          SCANNER_CONCURRENCY: 24
+          SCANNER_CONCURRENCY: 32
           SCANNER_AUDIT_LIMIT: 20000
-          SCANNER_RUN_WALLET_LIMIT: 2000
+          SCANNER_RUN_WALLET_LIMIT: 20000
           SCANNER_API_INTERVAL_MS: 40
           SCANNER_POSITION_MAX_PAGES: 100
           SCANNER_DIAGNOSTIC_LIMIT: 0
-          SCANNER_AUDIT_CHUNK_SIZE: 25
+          SCANNER_AUDIT_CHUNK_SIZE: 100
           SCANNER_PERSIST_CHECKPOINTS: 1
           NODE_OPTIONS: --max-old-space-size=6144 --expose-gc
       - name: Validate settlement-qualified dashboard data
