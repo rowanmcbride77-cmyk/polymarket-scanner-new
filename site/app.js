@@ -23,17 +23,25 @@ function render(period){
 async function loadConsensus(){
  const target=$("#consensus");
  try{
-  const [consensus,status]=await Promise.all([
+  const [consensus,status,qualification]=await Promise.all([
    json("./data/consensus.json"),
-   json("./data/consensus-status.json").catch(()=>null)
+   json("./data/consensus-status.json").catch(()=>null),
+   json("./data/qualification-status.json").catch(()=>null)
   ]);
   const signals=Array.isArray(consensus.signals)?consensus.signals:[];
   // Consensus is an independent product from settlement qualification. Its own
   // complete scan attestation is authoritative; a stale/missing qualification
   // status file must never hide a successfully published consensus snapshot.
-  const validated=consensus.schemaVersion===1&&consensus.validation?.passed===true&&
+  const qualificationAt=Date.parse(qualification?.completedAt||qualification?.generatedAt||"");
+  const consensusAt=Date.parse(consensus.generatedAt||"");
+  const validated=qualification?.state==="success"&&Number.isFinite(qualificationAt)&&
+   Number.isFinite(consensusAt)&&consensusAt>=qualificationAt&&
+   status?.state==="success"&&status.generatedAt===consensus.generatedAt&&
+   consensus.schemaVersion===1&&consensus.validation?.passed===true&&
    consensus.validation?.complete===true&&Number.isInteger(consensus.walletsChecked)&&
-   consensus.walletsChecked===20000&&consensus.scanDiagnostics?.failedWallets===0;
+   consensus.walletsChecked===consensus.qualifiedWalletsConsidered&&
+   consensus.scanDiagnostics?.activityWalletsChecked===consensus.walletsChecked&&
+   consensus.scanDiagnostics?.failedWallets===0;
   if(target){
    target.replaceChildren();
    if(!validated){
