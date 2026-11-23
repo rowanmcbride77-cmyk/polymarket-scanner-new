@@ -29,9 +29,8 @@ async function loadConsensus(){
    json("./data/qualification-status.json").catch(()=>null)
   ]);
   const signals=Array.isArray(consensus.signals)?consensus.signals:[];
-  // Consensus is an independent product from settlement qualification. Its own
-  // complete scan attestation is authoritative; a stale/missing qualification
-  // status file must never hide a successfully published consensus snapshot.
+  // Consensus is built from the settlement-qualified trader boards. Only show
+  // a complete consensus snapshot generated after the current qualification run.
   const qualificationAt=Date.parse(qualification?.completedAt||qualification?.generatedAt||"");
   const consensusAt=Date.parse(consensus.generatedAt||"");
   const validated=qualification?.state==="success"&&Number.isFinite(qualificationAt)&&
@@ -47,8 +46,8 @@ async function loadConsensus(){
    if(!validated){
     target.className="signal-list empty";
     target.textContent=status?.state==="scanning"
-     ? "The 20,000-wallet consensus scan is running. Previous results are hidden until the new scan is validated."
-     : "Waiting for a fresh, validated 20,000-wallet consensus scan. Previous results are hidden.";
+     ? "The qualified-trader consensus scan is running. Previous results are hidden until the new scan is validated."
+     : "Waiting for a fresh, validated consensus scan from the qualified trader boards. Previous results are hidden.";
     return;
    }
    target.className=signals.length?"signal-list":"signal-list empty";
