@@ -152,7 +152,7 @@ export async function runQualification({
           savedResultsValid &&
           Number.isInteger(saved.nowSeconds)) {
         checkpoint = saved;
-        retryIncompleteIndexes = incompleteCheckpointIndexesForExpandedHistory(saved, currentPositionMaxPages);
+        // Do not block the 20K scan by replaying failed wallets before new work.\n        // Incomplete audits remain safely excluded from ranking; retries are opt-in\n        // after the full discovery set has received a terminal audit result.\n        retryIncompleteIndexes = process.env.SCANNER_RETRY_INCOMPLETE === "1"\n          ? incompleteCheckpointIndexesForExpandedHistory(saved, currentPositionMaxPages)\n          : [];
         effectiveNowSeconds = saved.nowSeconds;
         process.stdout.write(`Resuming settlement qualification with ${saved.results.length} saved wallet audits; current discovery has ${candidates.length} candidates.\\n`);
       }
