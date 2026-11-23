@@ -112,13 +112,13 @@ jobs:
               throw new Error(`${period}: settlement-qualified board failed validation`);
             }
           }
-          console.log("Validated weekly and monthly boards: every displayed trader meets 90% / 10 resolved markets.");
+          console.log("Validated weekly and monthly boards: every displayed trader meets 90% / 10 closed markets.");
           NODE
       - name: Commit qualified data for the fast Pages deploy
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A data/qualification-progress.json site/data/qualification.json site/data/qualified-week.json site/data/qualified-month.json site/data/qualification-status.json
+          git add -A data/qualification-progress-60d.json site/data/qualification.json site/data/qualified-week.json site/data/qualified-month.json site/data/qualification-status.json
           if git diff --cached --quiet; then
             echo "Qualified data is unchanged; no commit needed."
           else
