@@ -37,7 +37,7 @@ async function loadConsensus(){
     const wallets=Array.isArray(s.wallets)?s.wallets.map(w=>String(w?.wallet||"").toLowerCase()):[];
     return Boolean(s.conditionId&&s.tokenId&&s.outcome)&&Number.isInteger(s.qualifiedWalletCount)&&
      s.qualifiedWalletCount>=8&&wallets.length===s.qualifiedWalletCount&&
-     new Set(wallets).size===wallets.length;
+     new Set(wallets).size===wallets.length&&wallets.every(w=>/^0x[a-f0-9]{40}$/.test(w));
    });
   // Only display one complete same-outcome group per market, built from the
   // current 60-day settlement-qualified boards with pre-resolution exits excluded.
