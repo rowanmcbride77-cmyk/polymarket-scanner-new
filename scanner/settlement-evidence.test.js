@@ -32,7 +32,7 @@ test("counts a closed position whose last economic event occurred after resoluti
   assert.equal(result.integrityPassed,true);
 });
 
-test("excludes a closed position whose last event preceded resolution", () => {
+test("includes a closed position whose last event preceded resolution", () => {
   const result = summarizeSettledEvidence({
     ...base, closedPositions:[closed("101",1794916700)], currentPositions:[],
     tokenFacts:new Map([["101",token("101",1)]]),
@@ -63,7 +63,7 @@ test("counts still-held winners and losers from redeemable position snapshots", 
   assert.equal(losers.losses,1);
 });
 
-test("excludes early exits because no post-resolution or current position evidence exists", () => {
+test("does not invent a closed market when there is no closed or current position evidence", () => {
   const result = summarizeSettledEvidence({
     ...base, closedPositions:[], currentPositions:[], tokenFacts:new Map(),
   });
