@@ -10,7 +10,7 @@ function render(period){
  const rows=boards[period];target.replaceChildren();target.className="table-wrap";
  if(!Array.isArray(rows)||rows.length===0){target.className="empty";target.textContent="No traders currently meet both settlement qualification requirements.";return;}
  const table=node("table",""),thead=node("thead",""),hr=node("tr","");
- for(const label of ["#","Trader","60-Day Win Rate","Resolved Markets","W–L","Leaderboard P&L"])hr.append(node("th",label));
+ for(const label of ["#","Trader","60-Day Win Rate","Closed Markets","W–L","Leaderboard P&L"])hr.append(node("th",label));
  thead.append(hr);table.append(thead);const body=node("tbody","");
  for(const t of rows){
   const tr=node("tr","");
