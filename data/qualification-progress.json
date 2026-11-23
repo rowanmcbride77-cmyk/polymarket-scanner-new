@@ -22366,13 +22366,28 @@
     {
       "wallet": "0x21d0a97aac03917e752857a551bbe5103a00e8d7",
       "username": "PBot-6",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "win_rate_below_threshold"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 4179,
+        "losses": 4238,
+        "resolvedMarkets": 8417,
+        "winRate": 0.4964951883093739,
+        "exclusions": {
+          "same_second_as_resolution_ambiguous": 14,
+          "missing_resolution_timestamp": 367,
+          "multiple_outcomes_held_in_same_market": 1131
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x75f0f34cf77708d3fffd51da622151763e7f2b66",
@@ -22645,13 +22660,26 @@
     {
       "wallet": "0x3a6f503fb3bff13ba3857a861df404cfd8908b59",
       "username": "0x3a6f503fb3Bff13BA3857a861Df404Cfd8908B59-1777189846773",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "exclusions": {
+          "missing_resolution_timestamp": 2
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x2e3218b105f4ce606342a31b2cc35537afd91b5d",
@@ -22912,13 +22940,26 @@
     {
       "wallet": "0xf9b7876ba2c35370e0bedb7f8ee772da722aa37c",
       "username": "0xf9b7876ba2c35370e0bedb7f8ee772da722aa37c",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "win_rate_below_threshold"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 553,
+        "losses": 274,
+        "resolvedMarkets": 827,
+        "winRate": 0.6686819830713422,
+        "exclusions": {
+          "early_exit_excluded": 944,
+          "same_second_as_resolution_ambiguous": 82,
+          "multiple_outcomes_held_in_same_market": 6612
+        },
+        "integrityPassed": true,
+        "integrityFailures": [],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0xd1c769317bd15de7768a70d0214cf0bbcc531d2b",
@@ -23095,13 +23136,24 @@
     {
       "wallet": "0x452a9d5e371c8b1cda67954dc567d376a4c84ada",
       "username": "aberry-48",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "exclusions": {
+          "early_exit_excluded": 6
+        },
+        "integrityPassed": true,
+        "integrityFailures": [],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x65d7230b638392ddaddfcaf2fa72d7b7bbd660b3",
@@ -23734,13 +23786,29 @@
     {
       "wallet": "0xc4c915914de877a79fae0a2c2dfe69d9d690617d",
       "username": "wenzai168",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "exclusions": {
+          "early_exit_excluded": 72,
+          "redeemable_status_payout_mismatch": 56,
+          "missing_resolution_timestamp": 178
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch",
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0xbe46e15f93af4598d5e38a60c34427e731bb0c10",
@@ -24101,24 +24169,46 @@
     {
       "wallet": "0x41fa6f340b7f775c5d030da142c20b9fe638c765",
       "username": "0x0E7DA656EB8C8B7FE7aB8fFd7b8e8e8Eb3681082-1779887580828",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "exclusions": {
+          "missing_first_entry_timestamp": 8
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_first_entry_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0xa0a18aa3594b95281268c05e8e3ce894fb0631e3",
       "username": "SwingXBT",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "exclusions": {},
+        "integrityPassed": true,
+        "integrityFailures": [],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x5f0e3501b7c629f3fe5721f56cac7052323c7397",
@@ -24307,13 +24397,28 @@
     {
       "wallet": "0x9b04046717675a9290b4f6c1bdcfe96fc87b032a",
       "username": "EZTRADNL1",
-      "complete": false,
+      "complete": true,
       "qualification": {
-        "qualified": false,
-        "reason": "audit_error"
+        "qualified": true,
+        "reason": "all_thresholds_met"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 538,
+        "losses": 0,
+        "resolvedMarkets": 538,
+        "winRate": 1,
+        "exclusions": {
+          "same_second_as_resolution_ambiguous": 9,
+          "redeemable_status_payout_mismatch": 366,
+          "multiple_outcomes_held_in_same_market": 6736
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0xadc1df72951c02bc37da9d8d27d4f2f3c782c19b",
@@ -24398,13 +24503,29 @@
     {
       "wallet": "0x0636f92e002f073307b83f28bfdc246b8563d49a",
       "username": "crabfavor",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 2,
+        "losses": 0,
+        "resolvedMarkets": 2,
+        "winRate": 1,
+        "exclusions": {
+          "early_exit_excluded": 862,
+          "same_second_as_resolution_ambiguous": 5,
+          "redeemable_status_payout_mismatch": 91,
+          "multiple_outcomes_held_in_same_market": 3
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x76697d10520591cc163e194d533a5cd4a960f58c",
@@ -24460,13 +24581,31 @@
     {
       "wallet": "0xdc3f46236700a2c7e89e2b952a123cd757ad4fa0",
       "username": "rabadabadoo",
-      "complete": false,
+      "complete": true,
       "qualification": {
-        "qualified": false,
-        "reason": "audit_error"
+        "qualified": true,
+        "reason": "all_thresholds_met"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 823,
+        "losses": 0,
+        "resolvedMarkets": 823,
+        "winRate": 1,
+        "exclusions": {
+          "early_exit_excluded": 274,
+          "missing_resolution_timestamp": 1385,
+          "same_second_as_resolution_ambiguous": 34,
+          "redeemable_status_payout_mismatch": 1793,
+          "multiple_outcomes_held_in_same_market": 9761
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0xa3e9a711841e655def080044768452b60f4263d0",
@@ -24734,13 +24873,24 @@
     {
       "wallet": "0x20180a4347da632a77691873f77f932cad8e0e63",
       "username": "skibidipa",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 1,
+        "losses": 0,
+        "resolvedMarkets": 1,
+        "winRate": 1,
+        "exclusions": {
+          "early_exit_excluded": 31
+        },
+        "integrityPassed": true,
+        "integrityFailures": [],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x737065237e1c5bec13feaa43c7274e6006a15c33",
@@ -24909,13 +25059,29 @@
     {
       "wallet": "0x44b98ae72a08021ae1baae4e402a711210d28967",
       "username": "Rocksxc",
-      "complete": false,
+      "complete": true,
       "qualification": {
-        "qualified": false,
-        "reason": "audit_error"
+        "qualified": true,
+        "reason": "all_thresholds_met"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 37,
+        "losses": 0,
+        "resolvedMarkets": 37,
+        "winRate": 1,
+        "exclusions": {
+          "same_second_as_resolution_ambiguous": 8,
+          "redeemable_status_payout_mismatch": 434,
+          "post_resolution_acquisition_excluded": 2,
+          "multiple_outcomes_held_in_same_market": 7
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x505ce45b1ad31a7387fbd23da6f3f1a321726c87",
@@ -25243,13 +25409,26 @@
     {
       "wallet": "0xef3aae76a4be5bc8ce20ac7b669550251da1e23a",
       "username": "vovanicz",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 0,
+        "losses": 1,
+        "resolvedMarkets": 1,
+        "winRate": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 1
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x4132070d75f124a5f2a4d13ec0a4497dee6ba5a5",
@@ -25647,13 +25826,28 @@
     {
       "wallet": "0x84413583462b68f0a379f533bcbdcd089acfbc73",
       "username": "OBParasite",
-      "complete": false,
+      "complete": true,
       "qualification": {
-        "qualified": false,
-        "reason": "audit_error"
+        "qualified": true,
+        "reason": "all_thresholds_met"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 3727,
+        "losses": 0,
+        "resolvedMarkets": 3727,
+        "winRate": 1,
+        "exclusions": {
+          "same_second_as_resolution_ambiguous": 153,
+          "redeemable_status_payout_mismatch": 8005,
+          "multiple_outcomes_held_in_same_market": 4582
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x3957fb024ae4314fafd2fae943965fdebeda35f0",
@@ -26072,13 +26266,28 @@
     {
       "wallet": "0x9bfbb4565e7cd5aa50c17e46aadc4c049ac3dc47",
       "username": "xffxx",
-      "complete": false,
+      "complete": true,
       "qualification": {
-        "qualified": false,
-        "reason": "audit_error"
+        "qualified": true,
+        "reason": "all_thresholds_met"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 593,
+        "losses": 0,
+        "resolvedMarkets": 593,
+        "winRate": 1,
+        "exclusions": {
+          "same_second_as_resolution_ambiguous": 26,
+          "redeemable_status_payout_mismatch": 4514,
+          "multiple_outcomes_held_in_same_market": 623
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x3a959c179cf018395db289eb553d09e70e0f343b",
@@ -26361,13 +26570,28 @@
     {
       "wallet": "0xae68447c01fc86864fd0e5e58aae986eeb8abf83",
       "username": "sdfljsegoisvn",
-      "complete": false,
+      "complete": true,
       "qualification": {
-        "qualified": false,
-        "reason": "audit_error"
+        "qualified": true,
+        "reason": "all_thresholds_met"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 19,
+        "losses": 0,
+        "resolvedMarkets": 19,
+        "winRate": 1,
+        "exclusions": {
+          "same_second_as_resolution_ambiguous": 12,
+          "redeemable_status_payout_mismatch": 102,
+          "multiple_outcomes_held_in_same_market": 7608
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x7cbd40119902cf65ca6e9d934809cea9d30dd591",
@@ -27102,13 +27326,31 @@
     {
       "wallet": "0xdc4f58a48ed4467743609fdce11eea483c759804",
       "username": "MeistersApprenticeship",
-      "complete": false,
+      "complete": true,
       "qualification": {
-        "qualified": false,
-        "reason": "audit_error"
+        "qualified": true,
+        "reason": "all_thresholds_met"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 37,
+        "losses": 0,
+        "resolvedMarkets": 37,
+        "winRate": 1,
+        "exclusions": {
+          "early_exit_excluded": 3961,
+          "same_second_as_resolution_ambiguous": 48,
+          "missing_resolution_timestamp": 3661,
+          "redeemable_status_payout_mismatch": 1895,
+          "multiple_outcomes_held_in_same_market": 38
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x26b5ed5376dd6569a90e6dff78d21ef1c196ae60",
@@ -27404,13 +27646,31 @@
     {
       "wallet": "0x1e3bb7def89b002d45fd86d37f35918c2618e232",
       "username": "0x1E3bB7DEf89B002D45FD86D37F35918c2618e232-1747406253166",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "win_rate_below_threshold"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 23,
+        "losses": 158,
+        "resolvedMarkets": 181,
+        "winRate": 0.1270718232044199,
+        "exclusions": {
+          "early_exit_excluded": 4074,
+          "missing_resolution_timestamp": 1119,
+          "same_second_as_resolution_ambiguous": 63,
+          "redeemable_status_payout_mismatch": 1548,
+          "multiple_outcomes_held_in_same_market": 49
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x1ad3c7487efda687979025a47cb0ae46eeed6749",
@@ -34963,13 +35223,28 @@
     {
       "wallet": "0x239e726f1f4131ca78a7e5abf1fec86bfc151c10",
       "username": "EZTRADENL2",
-      "complete": false,
+      "complete": true,
       "qualification": {
-        "qualified": false,
-        "reason": "audit_error"
+        "qualified": true,
+        "reason": "all_thresholds_met"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 372,
+        "losses": 0,
+        "resolvedMarkets": 372,
+        "winRate": 1,
+        "exclusions": {
+          "same_second_as_resolution_ambiguous": 8,
+          "redeemable_status_payout_mismatch": 289,
+          "multiple_outcomes_held_in_same_market": 7749
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0xbd050887b28ef80590e25b0d0e4110154d930a55",
@@ -35743,13 +36018,26 @@
     {
       "wallet": "0x7d26d98cd61a2de8ce4a37a05cf9537ec85fa7d1",
       "username": "Decayer",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "insufficient_resolved_markets"
       },
-      "auditStage": "position_snapshots",
-      "error": "Polymarket Data API returned HTTP 429"
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "exclusions": {
+          "missing_resolution_timestamp": 53
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0x79bfe69e715f54fca27308e6044e4f0c157cbcdf",
@@ -36949,13 +37237,32 @@
     {
       "wallet": "0x48ac40fc545cf327edd5365435c3a9f385614a7e",
       "username": "BoneOhio",
-      "complete": false,
+      "complete": true,
       "qualification": {
         "qualified": false,
-        "reason": "audit_error"
+        "reason": "win_rate_below_threshold"
       },
-      "auditStage": "position_snapshots",
-      "error": "Pagination page limit reached; history is incomplete"
+      "summary": {
+        "wins": 8158,
+        "losses": 2129,
+        "resolvedMarkets": 10287,
+        "winRate": 0.793039758919024,
+        "exclusions": {
+          "same_second_entry_resolution_ambiguous": 2,
+          "post_resolution_acquisition_excluded": 18,
+          "same_second_as_resolution_ambiguous": 27,
+          "missing_resolution_timestamp": 327,
+          "redeemable_status_payout_mismatch": 2,
+          "multiple_outcomes_held_in_same_market": 1061
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1792829725
+      }
     },
     {
       "wallet": "0xfcdfb33afbc0fcef6ab4a2ac032cb3f8a59456c9",
@@ -37333,10 +37640,10 @@
       }
     }
   ],
-  "failed": 139,
+  "failed": 118,
   "errorCounts": {
-    "position_snapshots: Pagination page limit reached; history is incomplete": 58,
-    "position_snapshots: Polymarket Data API returned HTTP 429": 81
+    "position_snapshots: Pagination page limit reached; history is incomplete": 49,
+    "position_snapshots: Polymarket Data API returned HTTP 429": 69
   },
   "errorSamples": [
     {
