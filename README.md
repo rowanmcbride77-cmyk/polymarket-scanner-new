@@ -3,7 +3,7 @@
 A static dashboard for settlement-verified trader performance, same-side consensus and low-cost high-multiplier combo opportunities.
 
 ## Trader qualification
-- The initial production pass audits up to **1,000** unique wallets selected from the overall weekly and monthly leaderboard pages. The cap can be raised to 20,000 with the `SCANNER_MAX_CANDIDATES` workflow environment variable after throughput is proven.
+- Audits up to **20,000** unique wallets selected from the overall weekly and monthly leaderboard pages. The audit is checkpointed in batches of **1,000 wallets per workflow run**; no leaderboard is published until every candidate has a terminal audit result.
 - Audit the trailing **30 days** of settlement evidence.
 - Require **90%+ verified settlement win rate** and at least **10 resolved markets**.
 - Count only positions verifiably held through market resolution.
@@ -29,7 +29,7 @@ The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket lea
 - Label potential payout/profit as estimates, never realized returns.
 
 ## Pipeline
-1. Discover up to 1,000 overall weekly/monthly leaderboard wallets for the initial production pass.
+1. Discover up to 20,000 overall weekly/monthly leaderboard wallets.
 2. Audit 30-day settlement evidence and build weekly/monthly Top 100.
 3. Check qualified wallets' last-hour BUY activity and current holdings.
 4. Verify Gamma market state, outcome token, category and 24-hour resolution window.
