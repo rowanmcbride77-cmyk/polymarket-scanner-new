@@ -45,3 +45,47 @@ test("expanded position history retries only previously incomplete checkpoint ro
   assert.deepEqual(incompleteCheckpointIndexesForExpandedHistory(checkpoint, 10), []);
   assert.deepEqual(incompleteCheckpointIndexesForExpandedHistory(checkpoint, 5), []);
 });
+
+
+test("pauses the endpoint lane after a 429 Retry-After response", async () => {
+  let clock = 0;
+  let calls = 0;
+  const waits = [];
+  const fetchImpl = async () => ({
+    status: ++calls === 1 ? 429 : 200,
+    headers: { get: (name) => name.toLowerCase() === "retry-after" ? "0.5" : null },
+  });
+  const sleep = async (ms) => { waits.push(ms); clock += ms; };
+  const { createPacedFetch } = await import("./qualify.js");
+  const pacedFetch = createPacedFetch({
+    fetchImpl, sleep, intervalMs: 0, now: () => clock, retryAfterSafetyMs: 100,
+  });
+
+  const url = "https://data-api.polymarket.com/v2/positions";
+  assert.equal((await pacedFetch(url)).status, 429);
+  assert.equal((await pacedFetch(url)).status, 200);
+  assert.equal(calls, 2);
+  assert.ok(clock >= 600);
+  assert.deepEqual(waits, [600]);
+});
+
+test("a 429 on one endpoint does not block a different endpoint", async () => {
+  let clock = 0;
+  let calls = 0;
+  const { createPacedFetch } = await import("./qualify.js");
+  const pacedFetch = createPacedFetch({
+    fetchImpl: async () => ({
+      status: ++calls === 1 ? 429 : 200,
+      headers: { get: (name) => name.toLowerCase() === "retry-after" ? "5" : null },
+    }),
+    sleep: async (ms) => { clock += ms; },
+    intervalMs: 0,
+    now: () => clock,
+    retryAfterSafetyMs: 0,
+  });
+
+  await pacedFetch("https://data-api.polymarket.com/v2/positions");
+  await pacedFetch("https://data-api.polymarket.com/v2/tokens");
+  assert.equal(clock, 0);
+  assert.equal(calls, 2);
+});
