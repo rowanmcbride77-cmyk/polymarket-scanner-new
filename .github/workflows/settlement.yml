@@ -72,11 +72,10 @@ jobs:
         run: npm run qualify
         env:
           SCANNER_CONCURRENCY: 24
-          SCANNER_AUDIT_LIMIT: 1000
-          # Run a focused 1,000-wallet proof of concept from the discovered leaderboard pool.
-          # The durable checkpoint resumes automatically; 25 pages per positions
-          # status keeps very large histories bounded. Truncated wallets are
-          # marked incomplete and excluded rather than receiving estimated stats.
+          SCANNER_AUDIT_LIMIT: 20000
+          # Audit the full discovered 20K candidate universe in resumable 1K batches.
+          # Each completed batch commits its checkpoint; the workflow dispatches
+          # the next batch until all 20K have terminal audit results.
           SCANNER_RUN_WALLET_LIMIT: 1000
           SCANNER_API_INTERVAL_MS: 55
           SCANNER_POSITION_MAX_PAGES: 25
@@ -115,6 +114,26 @@ jobs:
           }
           console.log("Validated weekly and monthly boards: every displayed trader meets 90% / 10 closed markets.");
           NODE
+      - name: Queue the next 1K audit batch when the 20K universe is incomplete
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const status = JSON.parse(readFileSync("site/data/qualification-status.json", "utf8"));
+          if (status.state === "partial" && status.auditUniverseComplete === true &&
+              status.auditedWallets < status.discoveredWallets) {
+            console.log(`Queueing next batch: ${status.auditedWallets}/${status.discoveredWallets}`);
+            process.exit(10);
+          }
+          NODE
+          result=$?
+          if [ "$result" -eq 10 ]; then
+            gh workflow run settlement.yml --repo "$GITHUB_REPOSITORY" --ref main
+          elif [ "$result" -ne 0 ]; then
+            exit "$result"
+          fi
       - name: Commit qualified data for the fast Pages deploy
         run: |
           git config user.name "github-actions[bot]"
