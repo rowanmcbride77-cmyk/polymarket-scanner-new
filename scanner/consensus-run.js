@@ -66,6 +66,8 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   ]);
   if (status.schemaVersion !== 1 || status.state !== "success" ||
       status.validation?.passed !== true || status.validation?.complete !== true ||
+      status.auditUniverseComplete !== true ||
+      status.sourceCandidateCount !== status.discoveredWallets ||
       status.auditedWallets !== status.discoveredWallets ||
       status.earlyExitsIncluded !== true || !validQualificationRules(status.qualification) ||
       week.period !== "week" || month.period !== "month" ||
