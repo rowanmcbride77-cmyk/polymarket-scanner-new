@@ -3,7 +3,7 @@
 A static dashboard for trader performance, same-side consensus and low-cost high-multiplier combo opportunities.
 
 ## Trader qualification
-- Discovers up to **20,000** unique wallets from the overall weekly and monthly leaderboard pages. The current first pass audits the first **2,000** ranked candidates and labels that scope on the dashboard; set `SCANNER_AUDIT_LIMIT=20000` for a full-universe run. The audit resumes from durable checkpoints.
+- Discovers up to **20,000** unique wallets from the overall weekly and monthly leaderboard pages. The current first pass audits the first **2,000** candidates in the validated discovery ordering and labels that scope on the dashboard; set `SCANNER_AUDIT_LIMIT=20000` for a full-universe run. The audit resumes from durable checkpoints.
 - Audit the trailing **60 days** of closed-market results.
 - Require **90%+ win rate** and at least **10 closed markets**.
 - Count every verifiable closed market in the 60-day window, including positions exited before resolution. For an early exit, use the market’s eventual resolved outcome (YES/NO final result) to classify the trader’s position as a win or loss.
