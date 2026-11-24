@@ -1,29 +1,18 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T11:13:54.000Z",
-  "completedAt": "2026-11-24T17:43:35.079Z",
+  "generatedAt": "2026-11-24T17:49:43.000Z",
+  "completedAt": null,
   "validation": {
-    "passed": true,
-    "complete": true,
-    "allAuditsComplete": false
+    "passed": false,
+    "complete": false
   },
-  "state": "success",
-  "discoveredWallets": 1000,
+  "state": "in_progress",
+  "discoveredWallets": 20000,
   "sourceCandidateCount": 20000,
-  "auditUniverseComplete": false,
-  "auditedWallets": 1000,
-  "fullyAuditedWallets": 928,
-  "failedWalletAudits": 72,
-  "qualifiedWallets": 339,
-  "earlyExitsIncluded": true,
-  "weeklyCount": 100,
-  "monthlyCount": 100,
-  "qualification": {
-    "minimumResolvedMarkets": 10,
-    "minimumWinRate": 0.9,
-    "maximumEarlyExitRate": null,
-    "lookbackDays": 60,
-    "earlyExitsCounted": true,
-    "settlementIntegrityRequired": true
-  }
+  "auditUniverseComplete": true,
+  "auditedWallets": 100,
+  "fullyAuditedWallets": 95,
+  "failedWalletAudits": 5,
+  "qualifiedWallets": 0,
+  "message": "Checkpoint saved: 100/20000 wallet audits attempted."
 }
