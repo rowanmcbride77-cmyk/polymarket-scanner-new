@@ -151,7 +151,9 @@ export async function runQualification({
 
   let effectiveNowSeconds = nowSeconds;
   const auditLimit = Number(process.env.SCANNER_AUDIT_LIMIT ?? discovery.candidates.length);
-  if (!Number.isInteger(auditLimit) || auditLimit < 1) throw new Error("SCANNER_AUDIT_LIMIT must be a positive integer");
+  if (!Number.isInteger(auditLimit) || auditLimit < 1 || auditLimit > discovery.candidates.length) {
+    throw new Error(`SCANNER_AUDIT_LIMIT must be between 1 and ${discovery.candidates.length}`);
+  }
   const auditCandidates = discovery.candidates.slice(0, auditLimit);
   const diagnosticLimit = Number(process.env.SCANNER_DIAGNOSTIC_LIMIT ?? 0);
   if (!Number.isInteger(diagnosticLimit) || diagnosticLimit < 0) throw new Error("SCANNER_DIAGNOSTIC_LIMIT must be a non-negative integer");
@@ -189,7 +191,7 @@ export async function runQualification({
         savedWallets.every((wallet) => /^0x[a-f0-9]{40}$/.test(wallet)) &&
         new Set(savedWallets).size === savedWallets.length;
       if (saved.schemaVersion === 3 &&
-          saved.auditLimit <= auditLimit &&
+          saved.candidateCount === discovery.candidates.length &&
           savedResultsValid &&
           Number.isInteger(saved.nowSeconds)) {
         checkpoint = saved;
@@ -288,7 +290,9 @@ export async function runQualification({
         await writeJsonAtomic("site/data/qualification-status.json", {
           schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
           completedAt: null, validation: { passed: false, complete: false },
-          state: "in_progress", discoveredWallets: discovery.candidates.length,
+          state: "in_progress", discoveredWallets: candidates.length,
+       sourceCandidateCount: discovery.candidates.length,
+       auditUniverseComplete: candidates.length === discovery.candidates.length,
           auditedWallets: combined.completed, fullyAuditedWallets: combined.completed - combined.failed,
           failedWalletAudits: combined.failed, qualifiedWallets: 0,
           message: `Rechecked incomplete audits with expanded history: ${combined.completed}/${candidates.length}; ${combined.failed} remain incomplete.`,
@@ -308,7 +312,9 @@ export async function runQualification({
   await writeJsonAtomic("site/data/qualification-status.json", {
     schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
     completedAt: null, validation: { passed: false, complete: false },
-    state: "in_progress", discoveredWallets: discovery.candidates.length,
+    state: "in_progress", discoveredWallets: candidates.length,
+       sourceCandidateCount: discovery.candidates.length,
+       auditUniverseComplete: candidates.length === discovery.candidates.length,
     auditedWallets: combined.completed, fullyAuditedWallets: combined.completed - combined.failed,
     failedWalletAudits: combined.failed, qualifiedWallets: 0,
     message: `Auditing ${runCandidates.length} additional wallets; ${combined.completed}/${candidates.length} current candidates already have saved audit results.`,
@@ -357,7 +363,9 @@ export async function runQualification({
       await writeJsonAtomic("site/data/qualification-status.json", {
         schemaVersion: 1, generatedAt: new Date(effectiveNowSeconds * 1000).toISOString(),
         completedAt: null, validation: { passed: false, complete: false },
-        state: "in_progress", discoveredWallets: discovery.candidates.length,
+        state: "in_progress", discoveredWallets: candidates.length,
+       sourceCandidateCount: discovery.candidates.length,
+       auditUniverseComplete: candidates.length === discovery.candidates.length,
         auditedWallets: combined.completed, fullyAuditedWallets: combined.completed - combined.failed,
         failedWalletAudits: combined.failed, qualifiedWallets: 0,
         message: "Checkpoint saved: " + combined.completed + "/" + candidates.length + " wallet audits attempted.",
@@ -380,7 +388,9 @@ export async function runQualification({
     const status = {
       schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
       validation: { passed: false, complete: false, allAuditsComplete: false },
-      state: "partial", discoveredWallets: discovery.candidates.length,
+      state: "partial", discoveredWallets: candidates.length,
+       sourceCandidateCount: discovery.candidates.length,
+       auditUniverseComplete: candidates.length === discovery.candidates.length,
       auditedWallets: batch.completed, fullyAuditedWallets: batch.completed - batch.failed,
       failedWalletAudits: batch.failed, qualifiedWallets: 0,
       message: "Saved " + batch.completed + "/" + candidates.length + " wallet audits. Next scheduled run resumes from checkpoint; no partial leaderboard is published.",
@@ -401,7 +411,9 @@ export async function runQualification({
       schemaVersion: 1,
       generatedAt,
       sampleSize: candidates.length,
-      discoveredWallets: discovery.candidates.length,
+      discoveredWallets: candidates.length,
+       sourceCandidateCount: discovery.candidates.length,
+       auditUniverseComplete: candidates.length === discovery.candidates.length,
       completed: batch.completed,
       failed: batch.failed,
       complete: batch.complete,
@@ -425,7 +437,9 @@ export async function runQualification({
       validation: {
         passed: false,
         allWalletAuditsComplete: false,
-        discoveredWallets: discovery.candidates.length,
+        discoveredWallets: candidates.length,
+       sourceCandidateCount: discovery.candidates.length,
+       auditUniverseComplete: candidates.length === discovery.candidates.length,
         auditedWallets: batch.completed,
         failedWalletAudits: batch.failed,
         errorCounts: batch.errorCounts,
@@ -437,7 +451,9 @@ export async function runQualification({
     await writeJsonAtomic("site/data/qualification-status.json", {
       schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
       validation: { passed: false, complete: false, allAuditsComplete: false },
-      state: "incomplete", discoveredWallets: discovery.candidates.length,
+      state: "incomplete", discoveredWallets: candidates.length,
+       sourceCandidateCount: discovery.candidates.length,
+       auditUniverseComplete: candidates.length === discovery.candidates.length,
       auditedWallets: batch.completed, fullyAuditedWallets: batch.completed - batch.failed,
       failedWalletAudits: batch.failed, qualifiedWallets: 0,
       errorCounts: batch.errorCounts,
@@ -458,6 +474,11 @@ export async function runQualification({
   const payload = {
     schemaVersion: 1,
     generatedAt,
+    auditUniverse: {
+      auditedCandidateCount: candidates.length,
+      discoveredCandidateCount: discovery.candidates.length,
+      complete: candidates.length === discovery.candidates.length,
+    },
     source: "Polymarket Data API v2 closed positions, redeemable positions, tokens and resolutions",
     qualification: {
       minimumResolvedMarkets: 10,
@@ -477,7 +498,9 @@ export async function runQualification({
     validation: {
       passed: true,
       allWalletAuditsComplete: batch.allAuditsComplete,
-      discoveredWallets: discovery.candidates.length,
+      discoveredWallets: candidates.length,
+      sourceCandidateCount: discovery.candidates.length,
+      auditUniverseComplete: candidates.length === discovery.candidates.length,
       auditedWallets: batch.completed,
       fullyAuditedWallets: batch.completed - batch.failed,
       failedWalletAudits: batch.failed,
@@ -519,7 +542,9 @@ export async function runQualification({
     schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
     validation: { passed: true, complete: batch.complete, allAuditsComplete: batch.allAuditsComplete },
     state: "success",
-    discoveredWallets: discovery.candidates.length,
+    discoveredWallets: candidates.length,
+       sourceCandidateCount: discovery.candidates.length,
+       auditUniverseComplete: candidates.length === discovery.candidates.length,
     auditedWallets: batch.completed,
     fullyAuditedWallets: batch.completed - batch.failed,
     failedWalletAudits: batch.failed,
