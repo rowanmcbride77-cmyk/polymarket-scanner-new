@@ -35,23 +35,63 @@ export function incompleteCheckpointIndexesForExpandedHistory(checkpoint, curren
     .filter((index) => index >= 0);
 }
 
-function createPacedFetch({
+export function createPacedFetch({
   fetchImpl = globalThis.fetch,
   sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms)),
-  intervalMs = Number(process.env.SCANNER_API_INTERVAL_MS ?? 60),
+  intervalMs = Number(process.env.SCANNER_API_INTERVAL_MS ?? 55),
+  now = () => Date.now(),
+  retryAfterSafetyMs = 250,
 } = {}) {
-  // Pace each endpoint independently. A single global queue needlessly
-  // serialized positions, tokens, and resolutions requests and made a
-  // 20,000-wallet audit take hours. Keep a conservative lane per API route.
+  if (typeof fetchImpl !== "function") throw new TypeError("A fetch implementation is required");
+  if (!Number.isFinite(intervalMs) || intervalMs < 0) throw new RangeError("intervalMs must be non-negative");
+  if (typeof now !== "function" || !Number.isFinite(retryAfterSafetyMs) || retryAfterSafetyMs < 0) {
+    throw new TypeError("Invalid paced-fetch clock or retry safety margin");
+  }
+
+  // The Data API returns 429/503 plus Retry-After when a heavy query cannot
+  // be served. Pause the whole endpoint lane, not just the one request being
+  // retried; otherwise the other in-flight workers continue to overload it.
   const nextStartAtByRoute = new Map();
+  const blockedUntilByRoute = new Map();
+  const retryAfterMs = (response) => {
+    const header = response.headers?.get?.("retry-after");
+    if (header !== null && header !== undefined) {
+      const seconds = Number(header);
+      if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+      const dateMs = Date.parse(header);
+      if (Number.isFinite(dateMs)) return Math.max(0, dateMs - now());
+    }
+    return Math.max(1000, intervalMs * 10);
+  };
+
   return async (input, init) => {
     const url = input instanceof URL ? input : new URL(input.url ?? input);
     const route = `${url.origin}${url.pathname}`;
-    const now = Date.now();
-    const startAt = Math.max(now, nextStartAtByRoute.get(route) ?? 0);
-    nextStartAtByRoute.set(route, startAt + intervalMs);
-    if (startAt > now) await sleep(startAt - now);
-    return fetchImpl(input, init);
+
+    while (true) {
+      const current = now();
+      const startAt = Math.max(
+        current,
+        nextStartAtByRoute.get(route) ?? 0,
+        blockedUntilByRoute.get(route) ?? 0,
+      );
+      nextStartAtByRoute.set(route, startAt + intervalMs);
+      if (startAt > current) await sleep(startAt - current);
+
+      // A 429 may have arrived while this request was sleeping. Re-check the
+      // shared block before issuing another request.
+      const afterSleep = now();
+      const blockedUntil = blockedUntilByRoute.get(route) ?? 0;
+      if (afterSleep < blockedUntil) continue;
+
+      const response = await fetchImpl(input, init);
+      if (response.status === 429 || response.status === 503) {
+        const until = now() + retryAfterMs(response) + retryAfterSafetyMs;
+        blockedUntilByRoute.set(route, Math.max(blockedUntilByRoute.get(route) ?? 0, until));
+        nextStartAtByRoute.set(route, Math.max(nextStartAtByRoute.get(route) ?? 0, until));
+      }
+      return response;
+    }
   };
 }
 
