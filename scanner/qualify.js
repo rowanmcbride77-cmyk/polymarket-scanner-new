@@ -16,6 +16,31 @@ export function checkpointResumeOffset(checkpoint) {
 }
 
 /**
+ * A partial checkpoint is reusable for a larger audit universe when it was
+ * created for that same full candidate limit. Requiring results.length to
+ * equal candidateCount here defeats batching: the first 1K of a 20K audit
+ * must be accepted so the next run can continue with the remaining 19K.
+ */
+export function isReusableCheckpoint(checkpoint, candidateCount) {
+  if (!Number.isInteger(candidateCount) || candidateCount < 1) return false;
+  const results = checkpoint?.results;
+  const wallets = Array.isArray(results)
+    ? results.map((row) => String(row?.wallet ?? "").toLowerCase())
+    : [];
+  const savedAuditLimit = Number(checkpoint?.auditLimit ?? checkpoint?.candidateCount);
+  return checkpoint?.schemaVersion === 3 &&
+    Number.isInteger(savedAuditLimit) &&
+    savedAuditLimit >= candidateCount &&
+    checkpoint?.candidateCount === savedAuditLimit &&
+    Array.isArray(results) &&
+    results.length <= candidateCount &&
+    results.length === checkpoint?.nextOffset &&
+    wallets.every((wallet) => /^0x[a-f0-9]{40}$/.test(wallet)) &&
+    new Set(wallets).size === wallets.length &&
+    Number.isInteger(checkpoint?.nowSeconds);
+}
+
+/**
  * A batch is publishable only after every candidate has a terminal result.
  * Individual incomplete audits are excluded by buildQualifiedLeaderboards.
  */
@@ -185,22 +210,7 @@ export async function runQualification({
   if (persistCheckpoints) {
     try {
       const saved = JSON.parse(await readFile(resolve(checkpointPath), "utf8"));
-      const savedWallets = Array.isArray(saved.results)
-        ? saved.results.map((row) => String(row?.wallet ?? "").toLowerCase())
-        : [];
-      const savedResultsValid = Array.isArray(saved.results) &&
-        saved.results.length === saved.nextOffset &&
-        savedWallets.every((wallet) => /^0x[a-f0-9]{40}$/.test(wallet)) &&
-        new Set(savedWallets).size === savedWallets.length;
-      const savedAuditLimit = Number(saved.auditLimit ?? saved.candidateCount);
-      const checkpointCoversSelectedAudit = Number.isInteger(savedAuditLimit) &&
-        savedAuditLimit >= candidates.length &&
-        saved.candidateCount === savedAuditLimit &&
-        saved.results.length >= candidates.length;
-      if (saved.schemaVersion === 3 &&
-          checkpointCoversSelectedAudit &&
-          savedResultsValid &&
-          Number.isInteger(saved.nowSeconds)) {
+      if (isReusableCheckpoint(saved, candidates.length)) {
         checkpoint = saved;
         // Do not block the 20K scan by replaying failed wallets before new work.\n        // Incomplete audits remain safely excluded from ranking; retries are opt-in\n        // after the full discovery set has received a terminal audit result.\n        retryIncompleteIndexes = process.env.SCANNER_RETRY_INCOMPLETE === "1"\n          ? incompleteCheckpointIndexesForExpandedHistory(saved, currentPositionMaxPages)\n          : [];
         effectiveNowSeconds = saved.nowSeconds;
