@@ -150,7 +150,9 @@ export async function runQualification({
   }
 
   let effectiveNowSeconds = nowSeconds;
-  const auditLimit = Number(process.env.SCANNER_AUDIT_LIMIT ?? discovery.candidates.length);
+  // Start with a fast 2K candidate screen by default; raise SCANNER_AUDIT_LIMIT
+  // to the full discovery count only when a full-universe run is intended.
+  const auditLimit = Number(process.env.SCANNER_AUDIT_LIMIT ?? Math.min(2000, discovery.candidates.length));
   if (!Number.isInteger(auditLimit) || auditLimit < 1 || auditLimit > discovery.candidates.length) {
     throw new Error(`SCANNER_AUDIT_LIMIT must be between 1 and ${discovery.candidates.length}`);
   }
