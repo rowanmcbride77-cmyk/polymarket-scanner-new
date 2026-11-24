@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkpointResumeOffset, hasTerminalAuditResults, incompleteCheckpointIndexesForExpandedHistory } from "./qualify.js";
+import { checkpointResumeOffset, hasTerminalAuditResults, incompleteCheckpointIndexesForExpandedHistory, isReusableCheckpoint } from "./qualify.js";
 
 test("checkpoint resumes after all saved results, including earlier incomplete audits", () => {
   const checkpoint = {
@@ -88,4 +88,33 @@ test("a 429 on one endpoint does not block a different endpoint", async () => {
   await pacedFetch("https://data-api.polymarket.com/v2/tokens");
   assert.equal(clock, 0);
   assert.equal(calls, 2);
+});
+
+test("a 1K checkpoint from a 20K audit is reusable by the next batch", () => {
+  const checkpoint = {
+    schemaVersion: 3,
+    candidateCount: 20000,
+    auditLimit: 20000,
+    nowSeconds: 1795545600,
+    nextOffset: 1000,
+    results: Array.from({ length: 1000 }, (_, index) => ({
+      wallet: "0x" + index.toString(16).padStart(40, "0"),
+      complete: true,
+    })),
+  };
+  assert.equal(isReusableCheckpoint(checkpoint, 20000), true);
+  assert.equal(checkpointResumeOffset(checkpoint), 1000);
+});
+
+test("checkpoint validation rejects malformed or oversized progress", () => {
+  const base = {
+    schemaVersion: 3, candidateCount: 20000, auditLimit: 20000,
+    nowSeconds: 1795545600, nextOffset: 1,
+    results: [{ wallet: "0x" + "1".repeat(40), complete: true }],
+  };
+  assert.equal(isReusableCheckpoint(base, 20000), true);
+  assert.equal(isReusableCheckpoint({ ...base, nextOffset: 0 }, 20000), false);
+  assert.equal(isReusableCheckpoint({ ...base, results: [{ wallet: "bad" }] }, 20000), false);
+  assert.equal(isReusableCheckpoint({ ...base, results: [base.results[0], base.results[0]], nextOffset: 2 }, 20000), false);
+  assert.equal(isReusableCheckpoint({ ...base, results: Array(20001).fill(base.results[0]), nextOffset: 20001 }, 20000), false);
 });
