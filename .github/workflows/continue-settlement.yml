@@ -1,0 +1,42 @@
+name: Continue Settlement Batches
+
+on:
+  workflow_run:
+    workflows: ["Settlement Qualification"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: settlement-batch-continuation
+  cancel-in-progress: false
+
+jobs:
+  continue:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check latest committed qualification progress
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Dispatch next batch when qualification is partial
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          STATE=$(node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const status = JSON.parse(readFileSync("site/data/qualification-status.json", "utf8"));
+          console.log(status.state ?? "missing");
+          NODE
+          )
+          if [[ "$STATE" == "partial" ]]; then
+            echo "Qualification is checkpointed and incomplete. Starting the next batch immediately."
+            gh workflow run settlement.yml --ref main --repo "$GITHUB_REPOSITORY"
+          else
+            echo "No continuation needed; qualification state is $STATE."
+          fi
