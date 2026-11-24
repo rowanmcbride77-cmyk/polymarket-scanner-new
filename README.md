@@ -3,7 +3,7 @@
 A static dashboard for trader performance, same-side consensus and low-cost high-multiplier combo opportunities.
 
 ## Trader qualification
-- Discovers up to **20,000** unique wallets from the overall weekly and monthly leaderboard pages. The current first pass audits the first **2,000** candidates in the validated discovery ordering and labels that scope on the dashboard; set `SCANNER_AUDIT_LIMIT=20000` for a full-universe run. The audit resumes from durable checkpoints.
+- Discovers up to **20,000** unique wallets from the overall weekly and monthly leaderboard pages. The current first pass audits the first **1,000** candidates in the validated discovery ordering and labels that scope on the dashboard; set `SCANNER_AUDIT_LIMIT=20000` for a full-universe run. The audit resumes from durable checkpoints, and the current proof-of-concept is limited to 1,000 wallets.
 - Audit the trailing **60 days** of closed-market results.
 - Require **90%+ win rate** and at least **10 closed markets**.
 - Count every verifiable closed market in the 60-day window, including positions exited before resolution. For an early exit, use the market’s eventual resolved outcome (YES/NO final result) to classify the trader’s position as a win or loss.
@@ -30,7 +30,7 @@ The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket lea
 
 ## Pipeline
 1. Discover up to 20,000 overall weekly/monthly leaderboard wallets.
-2. Audit the first 2,000 candidates from the 20,000-wallet discovery pool using 60-day closed-market results and build the first-pass weekly/monthly Top 100. Full-universe auditing is configurable.
+2. Audit the first 1,000 candidates from the 20,000-wallet discovery pool using 60-day closed-market results and build the first-pass weekly/monthly Top 100. Full-universe auditing is configurable.
 3. Check qualified wallets' last-hour BUY activity and current holdings.
 4. Verify Gamma market state, outcome token, category and 24-hour resolution window.
 5. Fetch combo positions and calculate verified entry/potential payout multiples.
