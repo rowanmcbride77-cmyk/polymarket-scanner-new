@@ -4,131 +4,58 @@ const node=(tag,value)=>{const e=document.createElement(tag);e.textContent=Strin
 const money=v=>Number.isFinite(Number(v))?new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(Number(v)):"—";
 const percent=v=>Number.isFinite(Number(v))?(Number(v)*100).toFixed(1)+"%":"—";
 async function json(path){const r=await fetch(path,{cache:"no-store"});if(!r.ok)throw new Error("Could not load "+path);return r.json();}
-let boards={week:[],month:[]};
-function render(period){
+function render(rows){
  const target=$("#leaderboard");if(!target)throw new Error("Dashboard markup is missing #leaderboard");
- const rows=boards[period];target.replaceChildren();target.className="table-wrap";
- if(!Array.isArray(rows)||rows.length===0){target.className="empty";target.textContent="No traders currently meet both settlement qualification requirements.";return;}
+ target.replaceChildren();target.className="table-wrap";
+ if(!Array.isArray(rows)||rows.length===0){target.className="empty";target.textContent="No traders currently meet both requirements.";return;}
  const table=node("table",""),thead=node("thead",""),hr=node("tr","");
- for(const label of ["#","Trader","60-Day Win Rate","Closed Markets","W–L","Leaderboard P&L"])hr.append(node("th",label));
+ for(const label of ["#","Trader","Win Rate (60 days)","Closed Markets","Wins–Losses","P&L"])hr.append(node("th",label));
  thead.append(hr);table.append(thead);const body=node("tbody","");
  for(const t of rows){
   const tr=node("tr","");
-  const displayName=t.username&& !/^0x[a-f0-9]{40}(?:-|$)/i.test(t.username) ? t.username : "Trader #"+t.rank;
+  const displayName=t.username&&!/^0x[a-f0-9]{40}(?:-|$)/i.test(t.username)?t.username:"Trader #"+t.rank;
   tr.append(node("td",t.rank),node("td",displayName),node("td",percent(t.winRate)),node("td",t.resolvedMarkets),node("td",String(t.wins)+"–"+String(t.losses)),node("td",money(t.leaderboardPnl)));
   body.append(tr);
  }
  table.append(body);target.append(table);
 }
-async function loadConsensus(){
- const target=$("#consensus");
- try{
-  const [consensus,status,qualification]=await Promise.all([
-   json("./data/consensus.json"),
-   json("./data/consensus-status.json").catch(()=>null),
-   json("./data/qualification-status.json").catch(()=>null)
-  ]);
-  const signals=Array.isArray(consensus.signals)?consensus.signals:[];
-  const validQualification=q=>q?.minimumWinRate===0.9&&q?.minimumResolvedMarkets===10&&
-   q?.lookbackDays===60&&q?.earlyExitsCounted===true&&q?.settlementIntegrityRequired===true;
-  const conditionIds=signals.map(s=>String(s.conditionId||"").toLowerCase());
-  const validSignals=new Set(conditionIds).size===conditionIds.length&&
-   signals.every(s=>{
-    const wallets=Array.isArray(s.wallets)?s.wallets.map(w=>String(w?.wallet||"").toLowerCase()):[];
-    return Boolean(s.conditionId&&s.tokenId&&s.outcome)&&Number.isInteger(s.qualifiedWalletCount)&&
-     s.qualifiedWalletCount>=8&&wallets.length===s.qualifiedWalletCount&&
-     new Set(wallets).size===wallets.length&&wallets.every(w=>/^0x[a-f0-9]{40}$/.test(w));
-   });
-  // Only display complete same-outcome groups from the current 60-day
-  // settlement-qualified boards. Early exits count by eventual market outcome.
-  const qualificationAt=Date.parse(qualification?.completedAt||qualification?.generatedAt||"");
-  const consensusAt=Date.parse(consensus.generatedAt||"");
-  const validated=qualification?.state==="success"&&qualification.validation?.passed===true&&
-   qualification.validation?.complete===true&&qualification.earlyExitsIncluded===true&&
-   validQualification(qualification.qualification)&&Number.isFinite(qualificationAt)&&
-   Number.isFinite(consensusAt)&&consensusAt>=qualificationAt&&
-   status?.state==="success"&&status.generatedAt===consensus.generatedAt&&
-   consensus.schemaVersion===1&&consensus.walletUniverse==="settlement-qualified-top100"&&
-   validQualification(consensus.qualificationBasis)&&consensus.qualificationBasis?.earlyExitsCounted===true&&
-   consensus.validation?.passed===true&&consensus.validation?.complete===true&&validSignals&&
-   Number.isInteger(consensus.walletsChecked)&&consensus.walletsChecked===consensus.qualifiedWalletsConsidered&&
-   consensus.scanDiagnostics?.activityWalletsChecked===consensus.walletsChecked&&
-   consensus.scanDiagnostics?.failedWallets===0;
-  if(target){
-   target.replaceChildren();
-   if(!validated){
-    target.className="signal-list empty";
-    target.textContent=status?.state==="scanning"
-     ? "The qualified-trader consensus scan is running. Previous results are hidden until the new scan is validated."
-     : "Waiting for a fresh, validated consensus scan from the qualified trader boards. Previous results are hidden.";
-    return;
-   }
-   target.className=signals.length?"signal-list":"signal-list empty";
-   target.append(node("strong",signals.length+" active same-side consensus markets"));
-   if(!signals.length) target.append(node("p","The latest completed scan found no markets meeting the consensus thresholds."));
-   for(const signal of signals.slice(0,12)){
-    const item=node("p","");
-    item.textContent=(signal.marketTitle||"Market")+" — "+(signal.outcome||"")+" · "+signal.qualifiedWalletCount+" traders · "+money(signal.totalUsd);
-    target.append(item);
-   }
-  }
- }catch(error){
-  if(target){target.className="signal-list empty";target.textContent="Consensus data is temporarily unavailable.";}
- }
-}
 async function start(){
- loadConsensus();
  try{
-  let status;
-  try {
-   status=await json("./data/qualification-status.json");
-  } catch {
-   throw new Error("Settlement-qualified Top 100 has not been published yet. Consensus scanning is independent and appears above.");
+  const status=await json("./data/qualification-status.json");
+  const validQualification=q=>q?.minimumWinRate===0.9&&q?.minimumResolvedMarkets===10&&q?.lookbackDays===60&&q?.earlyExitsCounted===true;
+  if(status.schemaVersion!==1||status.state!=="success"||status.validation?.passed!==true||status.validation?.complete!==true||
+     status.earlyExitsIncluded!==true||!validQualification(status.qualification)||!Number.isFinite(Date.parse(status.completedAt||""))) {
+   throw new Error("The latest scan is still running or has not passed validation. The previous results are hidden until a complete scan is published.");
   }
-  const validQualification=q=>q?.minimumWinRate===0.9&&q?.minimumResolvedMarkets===10&&
-   q?.lookbackDays===60&&q?.earlyExitsCounted===true&&q?.settlementIntegrityRequired===true;
-  if(status.schemaVersion!==1||status.state!=="success"||status.validation?.passed!==true||
-     status.validation?.complete!==true||status.earlyExitsIncluded!==true||
-     !validQualification(status.qualification)||!Number.isFinite(Date.parse(status.completedAt||""))) {
-   throw new Error("Settlement-qualified Top 100 is still being built or does not have verified 60-day settlement rules.");
-  }
-  const [week,month]=await Promise.all([
-   json("./data/qualified-week.json"),
-   json("./data/qualified-month.json")
-  ]);
+  const [week,month]=await Promise.all([json("./data/qualified-week.json"),json("./data/qualified-month.json")]);
   const validBoard=board=>board.schemaVersion===1&&board.validation?.passed===true&&board.validation?.complete===true&&
    validQualification(board.qualification)&&Array.isArray(board.traders)&&
    board.traders.every((t,i)=>t.rank===i+1&&Number.isFinite(t.winRate)&&t.winRate>=0.9&&Number.isInteger(t.resolvedMarkets)&&t.resolvedMarkets>=10&&
     Number.isInteger(t.wins)&&Number.isInteger(t.losses)&&t.wins+t.losses===t.resolvedMarkets&&
     Math.abs(t.winRate-t.wins/t.resolvedMarkets)<1e-9&&Number.isFinite(t.leaderboardPnl));
-  const valid=status.schemaVersion===1&&status.state==="success"&&status.validation?.passed===true&&
-   week.period==="week"&&month.period==="month"&&validBoard(week)&&validBoard(month)&&
-   status.weeklyCount===week.traders.length&&status.monthlyCount===month.traders.length;
-  if(!valid)throw new Error("Settlement-qualified leaderboard data failed validation.");
-  boards={week:week.traders,month:month.traders};
+  if(week.period!=="week"||month.period!=="month"||!validBoard(week)||!validBoard(month)||
+     status.weeklyCount!==week.traders.length||status.monthlyCount!==month.traders.length) {
+   throw new Error("The published Top 100 data did not pass validation. No unverified results are being shown.");
+  }
+  const period=$("#leader-period");
+  const show=()=>render(period?.value==="month"?month.traders:week.traders);
+  show();if(period)period.addEventListener("change",show);
   const panel=$(".status");if(panel)panel.classList.add("status-success");
-  set("#status-title",status.auditUniverseComplete===false
-   ?"Settlement-qualified Top 100 — first 2,000-wallet screen"
-   :"Settlement-qualified Top 100");
-  const incomplete=Number(status.failedWalletAudits||0);
-  const scope=status.auditUniverseComplete===false
-   ? "First-pass coverage: "+Number(status.auditedWallets||0).toLocaleString()+" audited candidates from "+Number(status.sourceCandidateCount||0).toLocaleString()+" discovered wallets; this is not yet the full discovery pool."
-   : "The full discovered candidate pool was audited.";
-  set("#status-detail","Only traders with at least 90% wins across at least 10 resolved markets in the last 60 days are shown. Positions exited before resolution are included using the market’s eventual resolved outcome. "+scope+" "+(incomplete?incomplete+" incomplete wallet audits were excluded.":"All selected candidate audits completed."));
+  set("#status-title","Top 100 scan complete");
+  const total=Number(status.sourceCandidateCount||status.discoveredWallets||0);
+  const checked=Number(status.auditedWallets||0);
+  const coverage=status.auditUniverseComplete===false
+   ? checked.toLocaleString()+" of "+total.toLocaleString()+" discovered wallets checked so far."
+   : "The full discovered wallet list was checked.";
+  const failed=Number(status.failedWalletAudits||0);
+  set("#status-detail","Showing traders with at least 90% wins across 10 or more resolved markets in the last 60 days. Early exits are scored by the market's final result. "+coverage+(failed?" "+failed+" wallet histories could not be fully checked and were excluded.":""));
   set("#last-scan",new Date(status.completedAt||status.generatedAt).toLocaleString());
-  const period=$("#leader-period");render(period?.value==="month"?"month":"week");
-  if(period)period.addEventListener("change",()=>render(period.value==="month"?"month":"week"));
-  set("#combos","Combo scanning runs separately from settlement qualification.");
-  set("#combo-status","Settlement-qualified leaderboard refresh");
  }catch(error){
   const panel=$(".status");if(panel)panel.classList.remove("status-success");
-  const missingQualificationFiles=/Could not load \.\/data\/(qualified-week|qualified-month|qualification-status)\.json/.test(error?.message||"");
-  set("#status-title",missingQualificationFiles?"Top 100 data not published yet":"Waiting for verified settlement qualification");
-  set("#status-detail",missingQualificationFiles
-   ?"The settlement-qualified leaderboard files have not been published yet. The consensus scan runs separately and will appear above after its data is validated."
-   :(error?.message||"Unknown dashboard error"));
+  set("#status-title","Top 100 not yet verified");
+  set("#status-detail",error?.message||"The latest scan could not be loaded.");
   set("#last-scan","Not yet available");
-  const target=$("#leaderboard");if(target){target.className="empty";target.textContent="Awaiting the first validated 90% / 10-market qualification run.";}
+  const target=$("#leaderboard");if(target){target.className="empty";target.textContent="Waiting for a complete, verified Top 100 scan.";}
  }
 }
 start();
