@@ -32,15 +32,15 @@ async function loadConsensus(){
   const validQualification=q=>q?.minimumWinRate===0.9&&q?.minimumResolvedMarkets===10&&
    q?.lookbackDays===60&&q?.earlyExitsCounted===true&&q?.settlementIntegrityRequired===true;
   const conditionIds=signals.map(s=>String(s.conditionId||"").toLowerCase());
-  const validSignals=signals.length>0&&new Set(conditionIds).size===conditionIds.length&&
+  const validSignals=new Set(conditionIds).size===conditionIds.length&&
    signals.every(s=>{
     const wallets=Array.isArray(s.wallets)?s.wallets.map(w=>String(w?.wallet||"").toLowerCase()):[];
     return Boolean(s.conditionId&&s.tokenId&&s.outcome)&&Number.isInteger(s.qualifiedWalletCount)&&
      s.qualifiedWalletCount>=8&&wallets.length===s.qualifiedWalletCount&&
      new Set(wallets).size===wallets.length&&wallets.every(w=>/^0x[a-f0-9]{40}$/.test(w));
    });
-  // Only display one complete same-outcome group per market, built from the
-  // current 60-day settlement-qualified boards with pre-resolution exits excluded.
+  // Only display complete same-outcome groups from the current 60-day
+  // settlement-qualified boards. Early exits count by eventual market outcome.
   const qualificationAt=Date.parse(qualification?.completedAt||qualification?.generatedAt||"");
   const consensusAt=Date.parse(consensus.generatedAt||"");
   const validated=qualification?.state==="success"&&qualification.validation?.passed===true&&
@@ -97,7 +97,7 @@ async function start(){
    json("./data/qualified-month.json")
   ]);
   const validBoard=board=>board.schemaVersion===1&&board.validation?.passed===true&&board.validation?.complete===true&&
-   validQualification(board.qualification)&&Array.isArray(board.traders)&&board.traders.length>0&&
+   validQualification(board.qualification)&&Array.isArray(board.traders)&&
    board.traders.every((t,i)=>t.rank===i+1&&Number.isFinite(t.winRate)&&t.winRate>=0.9&&Number.isInteger(t.resolvedMarkets)&&t.resolvedMarkets>=10&&
     Number.isInteger(t.wins)&&Number.isInteger(t.losses)&&t.wins+t.losses===t.resolvedMarkets&&
     Math.abs(t.winRate-t.wins/t.resolvedMarkets)<1e-9&&Number.isFinite(t.leaderboardPnl));
@@ -107,9 +107,14 @@ async function start(){
   if(!valid)throw new Error("Settlement-qualified leaderboard data failed validation.");
   boards={week:week.traders,month:month.traders};
   const panel=$(".status");if(panel)panel.classList.add("status-success");
-  set("#status-title","Settlement-qualified Top 100");
+  set("#status-title",status.auditUniverseComplete===false
+   ?"Settlement-qualified Top 100 — first 2,000-wallet screen"
+   :"Settlement-qualified Top 100");
   const incomplete=Number(status.failedWalletAudits||0);
-  set("#status-detail","Only traders with at least 90% wins across at least 10 resolved markets in the last 60 days are shown. Positions exited before resolution are included using the market’s eventual resolved outcome. "+(incomplete?incomplete+" incomplete wallet audits were excluded.":"All candidate wallet audits completed."));
+  const scope=status.auditUniverseComplete===false
+   ? "First-pass coverage: "+Number(status.auditedWallets||0).toLocaleString()+" audited candidates from "+Number(status.sourceCandidateCount||0).toLocaleString()+" discovered wallets; this is not yet the full discovery pool."
+   : "The full discovered candidate pool was audited.";
+  set("#status-detail","Only traders with at least 90% wins across at least 10 resolved markets in the last 60 days are shown. Positions exited before resolution are included using the market’s eventual resolved outcome. "+scope+" "+(incomplete?incomplete+" incomplete wallet audits were excluded.":"All selected candidate audits completed."));
   set("#last-scan",new Date(status.completedAt||status.generatedAt).toLocaleString());
   const period=$("#leader-period");render(period?.value==="month"?"month":"week");
   if(period)period.addEventListener("change",()=>render(period.value==="month"?"month":"week"));
@@ -120,7 +125,7 @@ async function start(){
   const missingQualificationFiles=/Could not load \.\/data\/(qualified-week|qualified-month|qualification-status)\.json/.test(error?.message||"");
   set("#status-title",missingQualificationFiles?"Top 100 data not published yet":"Waiting for verified settlement qualification");
   set("#status-detail",missingQualificationFiles
-   ?"The settlement-qualified leaderboard files have not been published yet. The 20,000-wallet consensus scan runs separately and will appear above as soon as its data is published."
+   ?"The settlement-qualified leaderboard files have not been published yet. The consensus scan runs separately and will appear above after its data is validated."
    :(error?.message||"Unknown dashboard error"));
   set("#last-scan","Not yet available");
   const target=$("#leaderboard");if(target){target.className="empty";target.textContent="Awaiting the first validated 90% / 10-market qualification run.";}
