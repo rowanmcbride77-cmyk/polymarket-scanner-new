@@ -35,6 +35,10 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      # A rerun of a failed job can leave the previous attempt's artifact behind.
+      # Unique names prevent deploy-pages from seeing multiple matching artifacts.
+      PAGES_ARTIFACT_NAME: github-pages-attempt-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,12 +54,14 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
+          name: ${{ env.PAGES_ARTIFACT_NAME }}
       - name: Wait for uploaded Pages artifact to be visible to the Actions API
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           node --input-type=module <<'NODE'
-          const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts?name=github-pages`;
+          const artifactName = process.env.PAGES_ARTIFACT_NAME;
+          const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts?name=${encodeURIComponent(artifactName)}`;
           for (let attempt = 1; attempt <= 15; attempt++) {
             const response = await fetch(url, {
               headers: {
@@ -66,10 +72,14 @@ jobs:
             });
             if (!response.ok) throw new Error(`Artifact list returned HTTP ${response.status}`);
             const payload = await response.json();
-            const artifact = payload.artifacts?.find(item => item.name === "github-pages");
-            if (artifact) {
-              console.log(`Pages artifact ${artifact.id} is visible after attempt ${attempt}.`);
+            const matches = (payload.artifacts ?? []).filter(item => item.name === artifactName);
+            if (matches.length === 1) {
+              console.log(`Pages artifact ${matches[0].id} is visible after attempt ${attempt}; allowing the Pages service 10 seconds to index it.`);
+              await new Promise(resolve => setTimeout(resolve, 10000));
               process.exit(0);
+            }
+            if (matches.length > 1) {
+              throw new Error(`Expected one artifact named ${artifactName}, found ${matches.length}.`);
             }
             console.log(`Pages artifact not visible yet (attempt ${attempt}/15).`);
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -79,3 +89,5 @@ jobs:
       - name: Deploy new scanner dashboard
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: ${{ env.PAGES_ARTIFACT_NAME }}
