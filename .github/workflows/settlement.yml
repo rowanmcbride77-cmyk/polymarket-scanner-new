@@ -24,7 +24,7 @@ permissions:
 concurrency:
   group: polymarket-settlement-fast
   # New scanner logic supersedes a stuck older run; preserve checkpoints before replacement.
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   qualify-and-publish:
@@ -115,21 +115,6 @@ jobs:
           }
           console.log("Validated weekly and monthly boards: every displayed trader meets 90% / 10 closed markets.");
           NODE
-      - name: Queue the next 1K audit batch when the 20K universe is incomplete
-        if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          queue_next=$(node --input-type=module <<'NODE'
-          import { readFileSync } from "node:fs";
-          const status = JSON.parse(readFileSync("site/data/qualification-status.json", "utf8"));
-          console.log(status.state === "partial" && status.auditUniverseComplete === true &&
-            status.auditedWallets < status.discoveredWallets ? "true" : "false");
-          NODE
-          )
-          if [ "$queue_next" = "true" ]; then
-            gh workflow run settlement.yml --repo "$GITHUB_REPOSITORY" --ref main
-          fi
       - name: Commit qualified data for the fast Pages deploy
         run: |
           git config user.name "github-actions[bot]"
