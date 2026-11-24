@@ -3,12 +3,12 @@
 A static dashboard for trader performance, same-side consensus and low-cost high-multiplier combo opportunities.
 
 ## Trader qualification
-- Audits up to **20,000** unique wallets selected from the overall weekly and monthly leaderboard pages. The audit is processed in parallel batches within one qualification run; no leaderboard is published until every candidate has a terminal audit result.
+- Discovers up to **20,000** unique wallets from the overall weekly and monthly leaderboard pages. The current first pass audits the first **2,000** ranked candidates and labels that scope on the dashboard; set `SCANNER_AUDIT_LIMIT=20000` for a full-universe run. The audit resumes from durable checkpoints.
 - Audit the trailing **60 days** of closed-market results.
 - Require **90%+ win rate** and at least **10 closed markets**.
 - Count every verifiable closed market in the 60-day window, including positions exited before resolution. For an early exit, use the market’s eventual resolved outcome (YES/NO final result) to classify the trader’s position as a win or loss.
 - Track early exits as a separate diagnostic count, but include their eventual market outcomes in wins, losses, the denominator and win rate.
-- Exclude incomplete wallet audits from qualification and ranking; missing evidence is not counted as a win or loss.
+- Exclude incomplete wallet audits and histories truncated by the **25-page per-status cap** from qualification and ranking; missing evidence is not counted as a win or loss. Incomplete audits are reported separately.
 
 The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket leaderboard P&L, but eligibility is based on the same verified settlement criteria. A board can contain fewer than 100 traders if fewer pass.
 
@@ -30,10 +30,10 @@ The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket lea
 
 ## Pipeline
 1. Discover up to 20,000 overall weekly/monthly leaderboard wallets.
-2. Audit 60-day closed-market results and build weekly/monthly Top 100.
+2. Audit the first 2,000 candidates from the 20,000-wallet discovery pool using 60-day closed-market results and build the first-pass weekly/monthly Top 100. Full-universe auditing is configurable.
 3. Check qualified wallets' last-hour BUY activity and current holdings.
 4. Verify Gamma market state, outcome token, category and 24-hour resolution window.
 5. Fetch combo positions and calculate verified entry/potential payout multiples.
-6. Validate output schemas and publish the dashboard only after every candidate has a terminal audit result. Any individual incomplete audit is excluded from ranking and reported in the dashboard; fully audited wallets can still be published.
+6. Validate output schemas and publish only after every selected audit candidate has a terminal result. The dashboard explicitly shows whether the audit universe is a 2,000-wallet first pass or the complete 20,000-wallet discovery pool. Any incomplete individual audit is excluded from ranking and reported.
 
 A zero-signal result is valid if no market meets the filters. It must not be replaced with fabricated signals. The dashboard publishes only after the full candidate batch and consensus scan finish and pass output validation. Wallets with incomplete individual audits are excluded and counted explicitly; their partial data is never used to qualify or rank them.
