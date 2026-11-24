@@ -33,11 +33,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Gate consensus on a complete 20K audit universe
+        id: gate
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const status = JSON.parse(readFileSync("site/data/qualification-status.json", "utf8"));
+          const ready = status.state === "success" && status.validation?.passed === true &&
+            status.validation?.complete === true && status.auditUniverseComplete === true &&
+            status.sourceCandidateCount === status.discoveredWallets &&
+            status.auditedWallets === status.discoveredWallets;
+          console.log("ready=" + ready);
+          NODE
+          if grep -q "ready=true" <<< "$(node --input-type=module -e 'import {readFileSync} from "node:fs";const s=JSON.parse(readFileSync("site/data/qualification-status.json","utf8"));console.log("ready="+(s.state==="success"&&s.validation?.passed===true&&s.validation?.complete===true&&s.auditUniverseComplete===true&&s.sourceCandidateCount===s.discoveredWallets&&s.auditedWallets===s.discoveredWallets))')"; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping consensus: the complete 20K audit is not ready yet."
+          fi
       - name: Check scanner and dashboard syntax
+        if: steps.gate.outputs.ready == 'true'
         run: npm run check
       - name: Run scanner unit tests
+        if: steps.gate.outputs.ready == 'true'
         run: npm test
       - name: Require fresh 60-day settlement-qualified Top 100 data
+        if: steps.gate.outputs.ready == 'true'
         run: |
           node --input-type=module <<'NODE'
           import { readFileSync } from "node:fs";
@@ -79,11 +100,13 @@ jobs:
           console.log("Fresh weekly/monthly Top 100 validated; early exits count by eventual resolution.");
           NODE
       - name: Scan recent activity and current holdings for same-side consensus
+        if: steps.gate.outputs.ready == 'true'
         run: npm run consensus
         env:
           SCANNER_CONCURRENCY: 16
           NODE_OPTIONS: --max-old-space-size=4096
       - name: Validate completed consensus snapshot
+        if: steps.gate.outputs.ready == 'true'
         run: |
           node --input-type=module <<'NODE'
           import { readFileSync } from "node:fs";
@@ -115,6 +138,7 @@ jobs:
             consensus.walletsChecked + " qualified traders.");
           NODE
       - name: Publish fresh consensus data
+        if: steps.gate.outputs.ready == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
