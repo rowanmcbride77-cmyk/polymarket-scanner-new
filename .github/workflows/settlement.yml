@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/workflows/settlement.yml"
       - "scanner/wallet-positions.js"
       - "scanner/batch-audit.js"
       - "scanner/audit-wallet.js"
