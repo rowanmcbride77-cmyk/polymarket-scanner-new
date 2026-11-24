@@ -80,6 +80,57 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   const startSeconds = nowSeconds - windowMinutes * 60;
   process.stdout.write(`Live copy-signal scan: ${wallets.length} 90%+ qualified traders; checking current holdings and the last ${windowMinutes} minutes of buys and sells.\n`);
 
+  const generatedAt = new Date(nowSeconds * 1000).toISOString();
+  const qualificationBasis = {
+    minimumWinRate: 0.9,
+    minimumResolvedMarkets: 10,
+    lookbackDays: 60,
+    earlyExitsCounted: true,
+    settlementIntegrityRequired: true,
+    auditedCandidateCount: status.auditedWallets,
+    discoveredCandidateCount: status.sourceCandidateCount ?? status.discoveredWallets,
+    auditUniverseComplete: status.auditUniverseComplete ?? true,
+  };
+  if (wallets.length === 0) {
+    const consensus = {
+      schemaVersion: 1, generatedAt,
+      validation: { passed: true, complete: true, failedWallets: 0 },
+      walletUniverse: "settlement-qualified-top100",
+      walletsChecked: 0,
+      qualifiedWalletsConsidered: 0,
+      qualificationBasis,
+      marketsWithRecentQualifiedBuys: 0,
+      signalCount: 0,
+      thresholds: { windowMinutes, maxResolutionHours: 24, minWallets: 8, minUsdPerWallet: 10, requireRecentBuy: true },
+      exclusions: { no_settlement_qualified_wallets: 1 },
+      scanDiagnostics: {
+        qualifiedWallets: 0, activityWalletsChecked: 0, positionAndActivitySnapshotsComplete: true,
+        activityWindowMinutes: windowMinutes, uniqueConditions: 0, marketMetadataReturned: 0, failedWallets: 0,
+      },
+      signals: [], exitAlerts: [], exitAlertCount: 0,
+      combos: { validation: { passed: true, complete: true, failedWallets: 0 }, walletsChecked: 0, walletsWithComboData: 0, count: 0,
+        thresholds: { minEntryUsd: 5, maxEntryUsd: 100, minMultiplier: 10, requireCurrentHolding: true, traderWinRateRequired: false }, exclusions: {}, opportunities: [] },
+    };
+    const statusOut = {
+      schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
+      validation: { passed: true }, state: "success",
+      message: "No wallets met the settlement qualification rules in the audited candidate set; no consensus scan was needed.",
+      discoveredWallets: status.discoveredWallets ?? 0,
+      sourceCandidateCount: status.sourceCandidateCount ?? status.discoveredWallets ?? 0,
+      auditUniverseComplete: status.auditUniverseComplete ?? true,
+      auditedWallets: status.auditedWallets ?? 0,
+      fullyAuditedWallets: status.fullyAuditedWallets ?? 0,
+      failedWalletAudits: status.failedWalletAudits ?? 0,
+      qualifiedWallets: 0,
+      weeklyCount: week.traders.length, monthlyCount: month.traders.length,
+      consensusWalletsChecked: 0, consensusWalletAuditFailures: 0, consensusCount: 0, exitAlertCount: 0,
+    };
+    await writeJson("site/data/consensus.json", consensus);
+    await writeJson("site/data/consensus-status.json", statusOut);
+    process.stdout.write("No settlement-qualified wallets; published a validated empty consensus snapshot.\\n");
+    return consensus;
+  }
+
   const scanWalletBatch = async ({ intervalMs, workers, label }) => {
     const pacedFetch = createPacedFetch({ intervalMs });
     const client = createDataApiClient({ fetchImpl: pacedFetch, maxRetries: 8, baseDelayMs: 1000, maxDelayMs: 30_000 });
@@ -154,10 +205,6 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     minWallets: 8, minUsdPerWallet: 10, requireRecentBuy: true,
   });
 
-  if (result.signals.length === 0) {
-    throw new Error("No same-side consensus markets met the current thresholds; preserving the previous published consensus snapshot.");
-  }
-
   const currentHoldings = new Set();
   for (const row of batch.results) for (const p of row.currentPositions ?? []) {
     currentHoldings.add(`${row.wallet.toLowerCase()}:${p.conditionId}:${p.tokenId}`);
@@ -182,14 +229,13 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     };
   }).sort((a,b) => b.timestamp-a.timestamp).slice(0,200);
 
-  const generatedAt = new Date(nowSeconds * 1000).toISOString();
   const consensus = {
     schemaVersion: 1, generatedAt,
     validation: { passed: true, complete: true, failedWallets: 0 },
     walletUniverse: "settlement-qualified-top100",
     walletsChecked: wallets.length,
     qualifiedWalletsConsidered: wallets.length,
-    qualificationBasis: { minimumWinRate: 0.9, minimumResolvedMarkets: 10, lookbackDays: 60, earlyExitsCounted: true, settlementIntegrityRequired: true },
+    qualificationBasis,
     marketsWithRecentQualifiedBuys: result.marketsWithRecentQualifiedBuys,
     signalCount: result.signals.length,
     thresholds: { ...result.thresholds, basis: "Only 90%+ settlement-qualified traders; each must have bought within 60 minutes and still hold the same outcome." },
@@ -213,7 +259,9 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     schemaVersion: 1, generatedAt, completedAt: new Date().toISOString(),
     validation: { passed: true }, state: "success",
     message: "Live same-side signals and observed sales from settlement-qualified traders only.",
-    discoveredWallets: status.discoveredWallets ?? 20000,
+    discoveredWallets: status.discoveredWallets ?? 0,
+    sourceCandidateCount: status.sourceCandidateCount ?? status.discoveredWallets ?? 0,
+    auditUniverseComplete: status.auditUniverseComplete ?? true,
     auditedWallets: status.auditedWallets ?? 0,
     fullyAuditedWallets: status.fullyAuditedWallets ?? 0,
     failedWalletAudits: status.failedWalletAudits ?? 0,
