@@ -1,12 +1,12 @@
 # Acceptance criteria
 
 ## Trader qualification
-- Initial production run discovers up to 1,000 unique wallets from the overall weekly/monthly leaderboard pages; the configurable ceiling remains 20,000.
+- Discover up to 20,000 unique wallets. The current first-pass audit target is 2,000 candidates; the dashboard must label the sample scope. Full-universe mode remains configurable at 20,000.
 - Use a trailing 60-day verified settlement sample.
 - Require 90%+ win rate and 10+ resolved markets.
 - Include closed positions even when the trader exited before resolution; classify the position using that market’s eventual resolved outcome.
 - Report early exits separately for diagnostics, but include them in wins, losses, the denominator and win rate. Do not impose a separate early-exit-rate threshold.
-- Reject incomplete audits, ambiguous same-second events, missing token facts and unverifiable settlement evidence.
+- Reject incomplete audits, histories truncated by the configured 25-page per-status cap, ambiguous same-second events, missing token facts and unverifiable settlement evidence. Never infer a win or loss from missing evidence.
 - Rank eligible weekly/monthly boards by the matching leaderboard P&L.
 
 ## Consensus
@@ -26,6 +26,6 @@
 
 ## Publication
 - Tests and syntax checks pass.
-- All candidate wallet audits complete.
+- All selected audit-candidate results are terminal; report both the selected audit count and the full discovery-pool count. Do not describe a 2,000-candidate first pass as a full 20,000-wallet scan.
 - Consensus and combo scan coverage is reported independently.
 - The dashboard displays only the exact validated generation. Partial combo coverage must be visibly labeled; it must not be presented as complete.
