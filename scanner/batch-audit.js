@@ -145,7 +145,7 @@ export async function auditCandidatesBatch(candidates, {
     if (samples.length < 12) samples.push({ wallet: "BATCH", stage, message });
     sharedTokenFacts.clear();
     sharedResolutions.clear();
-    for (const item of usable) item.error = { stage, message };
+    for (const item of settlementLookupWallets) item.error = { stage, message };
   }
 
   const results = snapshots.map((item) => {
