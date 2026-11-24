@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
   "generatedAt": "2026-11-24T17:49:43.000Z",
-  "completedAt": null,
+  "completedAt": "2026-11-24T23:20:13.394Z",
   "validation": {
     "passed": false,
-    "complete": false
+    "complete": false,
+    "allAuditsComplete": false
   },
-  "state": "in_progress",
+  "state": "partial",
   "discoveredWallets": 20000,
   "sourceCandidateCount": 20000,
   "auditUniverseComplete": true,
@@ -14,5 +15,5 @@
   "fullyAuditedWallets": 3314,
   "failedWalletAudits": 763,
   "qualifiedWallets": 0,
-  "message": "Checkpoint saved: 4077/20000 wallet audits attempted."
+  "message": "Saved 4077/20000 wallet audits. Next scheduled run resumes from checkpoint; no partial leaderboard is published."
 }
