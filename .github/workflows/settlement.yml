@@ -72,8 +72,8 @@ jobs:
         run: npm run qualify
         env:
           SCANNER_CONCURRENCY: 24
-          SCANNER_AUDIT_LIMIT: 2000
-          # Process at most 1,000 of the 2,000 selected candidates per run.
+          SCANNER_AUDIT_LIMIT: 1000
+          # Run a focused 1,000-wallet proof of concept from the discovered leaderboard pool.
           # The durable checkpoint resumes automatically; 25 pages per positions
           # status keeps very large histories bounded. Truncated wallets are
           # marked incomplete and excluded rather than receiving estimated stats.
