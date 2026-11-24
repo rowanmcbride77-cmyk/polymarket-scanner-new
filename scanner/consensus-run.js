@@ -35,7 +35,7 @@ function validQualificationRules(value) {
   return value?.minimumWinRate === 0.9 &&
     value?.minimumResolvedMarkets === 10 &&
     value?.lookbackDays === 60 &&
-    value?.earlyExitsCounted === false &&
+    value?.earlyExitsCounted === true &&
     value?.settlementIntegrityRequired === true;
 }
 
@@ -67,7 +67,7 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   if (status.schemaVersion !== 1 || status.state !== "success" ||
       status.validation?.passed !== true || status.validation?.complete !== true ||
       status.auditedWallets !== status.discoveredWallets ||
-      status.earlyExitsIncluded !== false || !validQualificationRules(status.qualification) ||
+      status.earlyExitsIncluded !== true || !validQualificationRules(status.qualification) ||
       week.period !== "week" || month.period !== "month" ||
       week.validation?.passed !== true || week.validation?.complete !== true ||
       !validQualificationRules(week.qualification) ||
@@ -189,7 +189,7 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     walletUniverse: "settlement-qualified-top100",
     walletsChecked: wallets.length,
     qualifiedWalletsConsidered: wallets.length,
-    qualificationBasis: { minimumWinRate: 0.9, minimumResolvedMarkets: 10, lookbackDays: 60, earlyExitsCounted: false, settlementIntegrityRequired: true },
+    qualificationBasis: { minimumWinRate: 0.9, minimumResolvedMarkets: 10, lookbackDays: 60, earlyExitsCounted: true, settlementIntegrityRequired: true },
     marketsWithRecentQualifiedBuys: result.marketsWithRecentQualifiedBuys,
     signalCount: result.signals.length,
     thresholds: { ...result.thresholds, basis: "Only 90%+ settlement-qualified traders; each must have bought within 60 minutes and still hold the same outcome." },
