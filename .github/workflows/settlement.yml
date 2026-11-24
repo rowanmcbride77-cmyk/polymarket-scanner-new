@@ -2,8 +2,6 @@ name: Settlement Qualification
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '7 * * * *'
   push:
     branches: [main]
     paths:
@@ -13,7 +11,6 @@ on:
       - "scanner/settlement-evidence.js"
       - "scanner/settlement-evidence.test.js"
       - "scanner/qualify.js"
-      - ".github/workflows/settlement.yml"
   workflow_run:
     workflows: ["Discover Polymarket Wallets"]
     types: [completed]
