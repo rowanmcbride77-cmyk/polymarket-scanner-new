@@ -26,7 +26,7 @@ export function summarizeSettledEvidence({
   function getToken(conditionId, tokenId) {
     const rows = heldAtResolution.get(conditionId) ?? new Map();
     const record = rows.get(tokenId) ?? {
-      tokenId, closedEvidence: false, currentSize: 0, sourceStatusFilters: new Set(),
+      tokenId, closedEvidence: false, earlyExitEvidence: false, currentSize: 0, sourceStatusFilters: new Set(),
     };
     rows.set(tokenId, record);
     heldAtResolution.set(conditionId, rows);
@@ -70,12 +70,6 @@ export function summarizeSettledEvidence({
       continue;
     }
     if (resolution.resolvedAtSeconds < windowStartSeconds) continue;
-    // A CLOSED position whose last economic event predates resolution was exited early.
-    // It is not a settled prediction and must not enter wins, losses, the denominator, or accuracy.
-    if (lastEventAt < resolution.resolvedAtSeconds) {
-      exclude("pre_resolution_exit");
-      continue;
-    }
     if (firstEntryAt === 0) {
       exclude("missing_first_entry_timestamp", conditionId);
       continue;
@@ -87,6 +81,10 @@ export function summarizeSettledEvidence({
     }
     const item = getToken(conditionId, tokenId);
     item.closedEvidence = true;
+    if (lastEventAt < resolution.resolvedAtSeconds) {
+      // Include early exits using the market’s eventual resolved outcome.
+      item.earlyExitEvidence = true;
+    }
   }
 
   for (const record of currentPositions) {
@@ -169,6 +167,7 @@ export function summarizeSettledEvidence({
       resolvedAtSeconds: resolution.resolvedAtSeconds,
       currentShares: evidence.currentSize,
       source: evidence.closedEvidence && evidence.currentSize > 0 ? "closed_and_current"
+        : evidence.earlyExitEvidence ? "closed_before_resolution"
         : evidence.closedEvidence ? "closed_after_resolution"
         : "current_redeemable_position",
     });
@@ -197,6 +196,7 @@ export function summarizeSettledEvidence({
     losses,
     resolvedMarkets: results.length,
     winRate: results.length ? wins / results.length : null,
+    earlyExitsCounted: results.filter((row) => row.source === "closed_before_resolution").length,
     exclusions,
     // Integrity is enforced per market above. Unrelated malformed or unverified
     // positions remain diagnostic exclusions and do not erase valid markets.
