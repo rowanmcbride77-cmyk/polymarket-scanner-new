@@ -52,6 +52,8 @@ jobs:
             q?.settlementIntegrityRequired === true;
           if (status.state !== "success" || status.validation?.passed !== true ||
               status.validation?.complete !== true ||
+              status.auditUniverseComplete !== true ||
+              status.sourceCandidateCount !== status.discoveredWallets ||
               status.auditedWallets !== status.discoveredWallets ||
               status.earlyExitsIncluded !== true || !rules(status.qualification)) {
             throw new Error("A complete 60-day settlement-qualified Top 100 is required before consensus.");
