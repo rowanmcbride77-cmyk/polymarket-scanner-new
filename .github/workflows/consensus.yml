@@ -1,0 +1,127 @@
+name: Qualified Consensus Refresh
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/consensus.yml"
+      - "site/data/qualification-status.json"
+      - "site/data/qualified-week.json"
+      - "site/data/qualified-month.json"
+  workflow_run:
+    workflows: ["Settlement Qualification"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: polymarket-qualified-consensus
+  cancel-in-progress: false
+
+jobs:
+  consensus:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check scanner and dashboard syntax
+        run: npm run check
+      - name: Run scanner unit tests
+        run: npm test
+      - name: Require fresh 60-day settlement-qualified Top 100 data
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const read = (path) => JSON.parse(readFileSync(path, "utf8"));
+          const status = read("site/data/qualification-status.json");
+          const week = read("site/data/qualified-week.json");
+          const month = read("site/data/qualified-month.json");
+          const rules = (q) => q?.minimumWinRate === 0.9 &&
+            q?.minimumResolvedMarkets === 10 &&
+            q?.lookbackDays === 60 &&
+            q?.earlyExitsCounted === true &&
+            q?.settlementIntegrityRequired === true;
+          if (status.state !== "success" || status.validation?.passed !== true ||
+              status.validation?.complete !== true ||
+              status.auditedWallets !== status.discoveredWallets ||
+              status.earlyExitsIncluded !== true || !rules(status.qualification)) {
+            throw new Error("A complete 60-day settlement-qualified Top 100 is required before consensus.");
+          }
+          for (const [period, board] of [["week", week], ["month", month]]) {
+            if (board.period !== period || board.generatedAt !== status.generatedAt ||
+                board.validation?.passed !== true || board.validation?.complete !== true ||
+                !rules(board.qualification) || !Array.isArray(board.traders) ||
+                board.count !== board.traders.length) {
+              throw new Error(period + " qualified board is stale or invalid.");
+            }
+            for (const row of board.traders) {
+              if (!/^0x[a-f0-9]{40}$/i.test(row.wallet ?? "") ||
+                  !Number.isFinite(row.winRate) || row.winRate < 0.9 ||
+                  !Number.isInteger(row.resolvedMarkets) || row.resolvedMarkets < 10 ||
+                  !Number.isInteger(row.wins) || !Number.isInteger(row.losses) ||
+                  row.wins + row.losses !== row.resolvedMarkets ||
+                  Math.abs(row.winRate - row.wins / row.resolvedMarkets) > 1e-9) {
+                throw new Error(period + " board contains an unqualified trader.");
+              }
+            }
+          }
+          console.log("Fresh weekly/monthly Top 100 validated; early exits count by eventual resolution.");
+          NODE
+      - name: Scan recent activity and current holdings for same-side consensus
+        run: npm run consensus
+        env:
+          SCANNER_CONCURRENCY: 16
+          NODE_OPTIONS: --max-old-space-size=4096
+      - name: Validate completed consensus snapshot
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const consensus = JSON.parse(readFileSync("site/data/consensus.json", "utf8"));
+          const status = JSON.parse(readFileSync("site/data/consensus-status.json", "utf8"));
+          if (consensus.schemaVersion !== 1 ||
+              consensus.validation?.passed !== true ||
+              consensus.validation?.complete !== true ||
+              consensus.walletsChecked !== consensus.qualifiedWalletsConsidered ||
+              !Array.isArray(consensus.signals) ||
+              consensus.signalCount !== consensus.signals.length ||
+              status.state !== "success" ||
+              status.validation?.passed !== true ||
+              status.generatedAt !== consensus.generatedAt ||
+              status.consensusCount !== consensus.signals.length ||
+              status.consensusWalletAuditFailures !== 0) {
+            throw new Error("Consensus snapshot failed completion validation.");
+          }
+          const conditions = consensus.signals.map(row => row.conditionId);
+          if (new Set(conditions).size !== conditions.length ||
+              consensus.signals.some(row => !Number.isInteger(row.qualifiedWalletCount) ||
+                row.qualifiedWalletCount < 8 ||
+                !Array.isArray(row.wallets) ||
+                row.wallets.length !== row.qualifiedWalletCount ||
+                new Set(row.wallets.map(wallet => String(wallet.wallet).toLowerCase())).size !== row.wallets.length)) {
+            throw new Error("Consensus signals contain duplicate markets or invalid same-side wallet groups.");
+          }
+          console.log("Validated " + consensus.signals.length + " same-side consensus markets from " +
+            consensus.walletsChecked + " qualified traders.");
+          NODE
+      - name: Publish fresh consensus data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/consensus.json site/data/consensus-status.json
+          if git diff --cached --quiet; then
+            echo "Consensus data is unchanged."
+          else
+            git commit -m "Publish fresh qualified same-side consensus"
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push origin HEAD:main
+          fi
