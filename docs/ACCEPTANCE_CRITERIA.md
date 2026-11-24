@@ -4,8 +4,8 @@
 - Initial production run discovers up to 1,000 unique wallets from the overall weekly/monthly leaderboard pages; the configurable ceiling remains 20,000.
 - Use a trailing 60-day verified settlement sample.
 - Require 90%+ win rate and 10+ resolved markets.
-- Count only positions verifiably held through resolution; early exits are excluded from W/L.
-- Track pre-resolution exits separately as exclusions; never count them in wins, losses, the denominator or settlement accuracy. Do not impose a separate early-exit-rate threshold.
+- Include closed positions even when the trader exited before resolution; classify the position using that market’s eventual resolved outcome.
+- Report early exits separately for diagnostics, but include them in wins, losses, the denominator and win rate. Do not impose a separate early-exit-rate threshold.
 - Reject incomplete audits, ambiguous same-second events, missing token facts and unverifiable settlement evidence.
 - Rank eligible weekly/monthly boards by the matching leaderboard P&L.
 
