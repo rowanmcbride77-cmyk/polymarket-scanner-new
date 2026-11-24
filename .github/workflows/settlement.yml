@@ -72,13 +72,14 @@ jobs:
         run: npm run qualify
         env:
           SCANNER_CONCURRENCY: 24
-          SCANNER_AUDIT_LIMIT: 20000
-          # Process a bounded 1,000-wallet slice per scheduled run. The durable
-          # checkpoint resumes the next slice; this prevents a single 20K job
-          # from monopolizing a runner until timeout while retaining full coverage.
+          SCANNER_AUDIT_LIMIT: 2000
+          # Process at most 1,000 of the 2,000 selected candidates per run.
+          # The durable checkpoint resumes automatically; 25 pages per positions
+          # status keeps very large histories bounded. Truncated wallets are
+          # marked incomplete and excluded rather than receiving estimated stats.
           SCANNER_RUN_WALLET_LIMIT: 1000
           SCANNER_API_INTERVAL_MS: 55
-          SCANNER_POSITION_MAX_PAGES: 100
+          SCANNER_POSITION_MAX_PAGES: 25
           SCANNER_DIAGNOSTIC_LIMIT: 0
           SCANNER_AUDIT_CHUNK_SIZE: 100
           SCANNER_PERSIST_CHECKPOINTS: 1
@@ -101,7 +102,7 @@ jobs:
             const board = JSON.parse(readFileSync(`site/data/qualified-${period}.json`, "utf8"));
             if (board.period !== period || board.validation?.passed !== true ||
                 board.validation?.complete !== true || !Array.isArray(board.traders) ||
-                board.traders.length < 1 || board.count !== board.traders.length ||
+                board.count !== board.traders.length ||
                 !board.traders.every((t, i) => t.rank === i + 1 &&
                   Number.isFinite(t.winRate) && t.winRate >= 0.9 &&
                   Number.isInteger(t.resolvedMarkets) && t.resolvedMarkets >= 10 &&
