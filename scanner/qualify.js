@@ -192,8 +192,13 @@ export async function runQualification({
         saved.results.length === saved.nextOffset &&
         savedWallets.every((wallet) => /^0x[a-f0-9]{40}$/.test(wallet)) &&
         new Set(savedWallets).size === savedWallets.length;
+      const savedAuditLimit = Number(saved.auditLimit ?? saved.candidateCount);
+      const checkpointCoversSelectedAudit = Number.isInteger(savedAuditLimit) &&
+        savedAuditLimit >= candidates.length &&
+        saved.candidateCount === savedAuditLimit &&
+        saved.results.length >= candidates.length;
       if (saved.schemaVersion === 3 &&
-          saved.candidateCount === discovery.candidates.length &&
+          checkpointCoversSelectedAudit &&
           savedResultsValid &&
           Number.isInteger(saved.nowSeconds)) {
         checkpoint = saved;
