@@ -119,20 +119,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          node --input-type=module <<'NODE'
+          queue_next=$(node --input-type=module <<'NODE'
           import { readFileSync } from "node:fs";
           const status = JSON.parse(readFileSync("site/data/qualification-status.json", "utf8"));
-          if (status.state === "partial" && status.auditUniverseComplete === true &&
-              status.auditedWallets < status.discoveredWallets) {
-            console.log(`Queueing next batch: ${status.auditedWallets}/${status.discoveredWallets}`);
-            process.exit(10);
-          }
+          console.log(status.state === "partial" && status.auditUniverseComplete === true &&
+            status.auditedWallets < status.discoveredWallets ? "true" : "false");
           NODE
-          result=$?
-          if [ "$result" -eq 10 ]; then
+          )
+          if [ "$queue_next" = "true" ]; then
             gh workflow run settlement.yml --repo "$GITHUB_REPOSITORY" --ref main
-          elif [ "$result" -ne 0 ]; then
-            exit "$result"
           fi
       - name: Commit qualified data for the fast Pages deploy
         run: |
