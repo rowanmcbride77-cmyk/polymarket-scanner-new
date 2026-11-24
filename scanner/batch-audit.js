@@ -94,9 +94,22 @@ export async function auditCandidatesBatch(candidates, {
   });
 
   const usable = snapshots.filter((item) => !item.error);
+
+  // A wallet with fewer than the required number of distinct candidate markets
+  // cannot qualify, regardless of the eventual token outcomes. Do not spend
+  // token/resolution API calls enriching those wallets.
+  const settlementLookupWallets = usable.filter((item) => {
+    const possibleMarkets = new Set([
+      ...item.redeemable.records.map((record) => String(record.position.condition_id ?? "").toLowerCase()),
+      ...item.closed.records.map((record) => String(record.position.condition_id ?? "").toLowerCase()),
+    ].filter(Boolean));
+    item.possibleMarketCount = possibleMarkets.size;
+    return possibleMarkets.size >= minimumResolvedMarkets;
+  });
+
   const tokenIds = new Set();
   const conditionIds = new Set();
-  for (const item of usable) {
+  for (const item of settlementLookupWallets) {
     for (const record of item.redeemable.records) {
       tokenIds.add(String(record.position.token_id));
       conditionIds.add(String(record.position.condition_id).toLowerCase());
@@ -110,7 +123,8 @@ export async function auditCandidatesBatch(candidates, {
   const missingTokenIds = [...tokenIds].filter((id) => !sharedTokenFacts.has(id));
   const missingConditionIds = [...conditionIds].filter((id) => !sharedResolutions.has(id));
   try {
-    const [newTokenFacts, newResolutions] = await Promise.all([
+    const [newTokenFacts, newResolutions] = settlementLookupWallets.length
+      ? await Promise.all([
       fetchTokenFacts(client, missingTokenIds, {
         concurrency: 8,
         onProgress: (progress) => onProgress?.({ ...progress, failed: [...failures.values()].reduce((sum, count) => sum + count, 0) }),
@@ -119,7 +133,8 @@ export async function auditCandidatesBatch(candidates, {
         concurrency: 8,
         onProgress: (progress) => onProgress?.({ ...progress, failed: [...failures.values()].reduce((sum, count) => sum + count, 0) }),
       }),
-    ]);
+    ])
+      : [new Map(), new Map()];
     for (const [id, fact] of newTokenFacts) sharedTokenFacts.set(id, fact);
     for (const [id, fact] of newResolutions) sharedResolutions.set(id, fact);
   } catch (error) {
@@ -142,6 +157,32 @@ export async function auditCandidatesBatch(candidates, {
         qualification: { qualified: false, reason: "audit_error" },
         auditStage: item.error.stage,
         error: item.error.message,
+      };
+    }
+    if (item.possibleMarketCount < minimumResolvedMarkets) {
+      const summary = {
+        wins: 0,
+        losses: 0,
+        resolvedMarkets: 0,
+        winRate: null,
+        earlyExitsCounted: 0,
+        exclusions: { prefilter_insufficient_possible_markets: 1 },
+        integrityPassed: true,
+        integrityFailures: [],
+        complete: true,
+        windowStartSeconds,
+      };
+      const audit = { wallet: item.candidate.wallet, complete: true, summary };
+      return {
+        wallet: item.candidate.wallet,
+        username: item.candidate.username,
+        complete: true,
+        qualification: qualifyWalletAudit(audit, { minimumResolvedMarkets, minimumWinRate }),
+        summary,
+        coverage: "60_DAY_CLOSED_POSITIONS_PLUS_REDEEMABLE_WINS_AND_LOSSES",
+        recentBuys: [],
+        currentPositions: [],
+        comboRows: [],
       };
     }
     const summary = summarizeSettledEvidence({
@@ -190,6 +231,8 @@ export async function auditCandidatesBatch(candidates, {
     sharedResolutionFacts: sharedResolutions.size,
     uniqueTokens: tokenIds.size,
     uniqueMarkets: conditionIds.size,
+    prefilteredWallets: snapshots.filter((item) => !item.error && item.possibleMarketCount < minimumResolvedMarkets).length,
+    settlementLookupWallets: settlementLookupWallets.length,
     tokenFactsCache: sharedTokenFacts,
     resolutionsCache: sharedResolutions,
   };
