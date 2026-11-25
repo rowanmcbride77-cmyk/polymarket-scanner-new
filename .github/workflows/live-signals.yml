@@ -43,7 +43,7 @@ jobs:
             status.state === "success" &&
             status.validation?.passed === true &&
             status.validation?.complete === true &&
-            status.auditedWallets === status.discoveredWallets;
+            status.auditedWallets === status.discoveredWallets &&\n            status.discoveredWallets === 1000 && status.sourceCandidateCount === 1000 &&\n            status.earlyExitsIncluded === false && status.qualification?.earlyExitsCounted === false;
           if (!ready) {
             console.log("Settlement audit is not complete (" +
               (status.auditedWallets ?? 0) + "/" +
@@ -60,7 +60,7 @@ jobs:
                 !Array.isArray(board.traders) ||
                 !board.traders.every((trader, index) =>
                   trader.rank === index + 1 && trader.winRate >= 0.9 &&
-                  trader.resolvedMarkets >= 10)) {
+                  trader.resolvedMarkets >= 10 && trader.earlyExitsCounted === 0)) {
               throw new Error(period + " settlement-qualified board failed validation");
             }
           }
