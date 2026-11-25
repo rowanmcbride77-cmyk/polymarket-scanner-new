@@ -121,6 +121,7 @@ export function buildQualifiedLeaderboards(discovery, auditBatch, { topN = 100 }
         resolvedMarkets: audit.summary.resolvedMarkets,
         wins: audit.summary.wins,
         losses: audit.summary.losses,
+        earlyExitsCounted: audit.summary.earlyExitsCounted ?? 0,
       });
     }
     rows.sort((a, b) =>
