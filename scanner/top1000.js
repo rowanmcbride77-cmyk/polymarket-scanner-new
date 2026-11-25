@@ -29,8 +29,7 @@ export async function fetchTop1000(period, { client = createDataApiClient() } = 
     if (!WALLET_RE.test(wallet) || !Number.isFinite(pnl)) continue;
     if (!unique.has(wallet)) unique.set(wallet, {
       wallet, username: row.user_name ?? row.username ?? "Polymarket Trader",
-      verified: row.verified === true,
-      appearances: [],
+      verified: row.verified === true, appearances: [],
     });
     unique.get(wallet).appearances.push({
       category: "overall", timePeriod: period,
@@ -46,6 +45,33 @@ export async function fetchTop1000(period, { client = createDataApiClient() } = 
   return traders;
 }
 
+export function buildTop1000AuditUniverse(weekly, monthly) {
+  if (!Array.isArray(weekly) || !Array.isArray(monthly) || weekly.length !== 1000 || monthly.length !== 1000) {
+    throw new Error("Weekly and monthly source leaderboards must each contain exactly 1,000 traders");
+  }
+  const byWallet = new Map();
+  for (const trader of [...weekly, ...monthly]) {
+    const wallet = String(trader?.wallet ?? "").toLowerCase();
+    if (!WALLET_RE.test(wallet) || !Array.isArray(trader.appearances) || trader.appearances.length === 0) {
+      throw new Error("Leaderboard source contains an invalid trader row");
+    }
+    const current = byWallet.get(wallet) ?? {
+      wallet, username: trader.username, verified: trader.verified === true, appearances: [],
+    };
+    current.appearances.push(...trader.appearances);
+    byWallet.set(wallet, current);
+  }
+  const candidates = [...byWallet.values()].map((row) => {
+    const ranks = row.appearances.map((a) => a.rank);
+    return { ...row, bestRank: Math.min(...ranks), averageRank: ranks.reduce((a, b) => a + b, 0) / ranks.length };
+  }).sort((a, b) => a.bestRank - b.bestRank || a.averageRank - b.averageRank)
+    .slice(0, 1000).map(({ bestRank, averageRank, ...row }) => row);
+  if (candidates.length !== 1000 || new Set(candidates.map((x) => x.wallet)).size !== 1000) {
+    throw new Error(`Expected exactly 1,000 unique combined leaderboard wallets; got ${candidates.length}`);
+  }
+  return candidates;
+}
+
 async function writeJson(path, value) {
   const target = resolve(path);
   await mkdir(dirname(target), { recursive: true });
@@ -55,31 +81,6 @@ async function writeJson(path, value) {
 export async function runTop1000() {
   const startedAt = new Date().toISOString();
   const [weekly, monthly] = await Promise.all([fetchTop1000("week"), fetchTop1000("month")]);
-export function buildTop1000AuditUniverse(weekly, monthly) {
-  if (!Array.isArray(weekly) || !Array.isArray(monthly) || weekly.length !== 1000 || monthly.length !== 1000) {
-    throw new Error("Weekly and monthly source leaderboards must each contain exactly 1,000 traders");
-  }
-  const byWallet = new Map();
-  for (const trader of [...weekly, ...monthly]) {
-    const wallet = String(trader?.wallet ?? "").toLowerCase();
-    if (!WALLET_RE.test(wallet)) throw new Error("Leaderboard source contains an invalid wallet");
-    const current = byWallet.get(wallet) ?? {
-      wallet, username: trader.username, verified: trader.verified === true, appearances: [],
-    };
-    current.appearances.push(...trader.appearances);
-    byWallet.set(wallet, current);
-  }
-  const candidates = [...byWallet.values()].map((row) => {
-    const ranks = row.appearances.map((a) => a.rank);
-    return { ...row, bestRank: Math.min(...ranks), averageRank: ranks.reduce((a,b) => a+b,0) / ranks.length };
-  }).sort((a,b) => a.bestRank - b.bestRank || a.averageRank - b.averageRank)
-    .slice(0, 1000).map(({ bestRank, averageRank, ...row }) => row);
-  if (candidates.length !== 1000 || new Set(candidates.map((x) => x.wallet)).size !== 1000) {
-    throw new Error(`Expected exactly 1,000 unique combined leaderboard wallets; got ${candidates.length}`);
-  }
-  return candidates;
-}
-
   const candidates = buildTop1000AuditUniverse(weekly, monthly);
   const generatedAt = new Date().toISOString();
   await writeJson("data/audit-universe.json", {
@@ -93,7 +94,7 @@ export function buildTop1000AuditUniverse(weekly, monthly) {
     weeklySourceCount: weekly.length, monthlySourceCount: monthly.length,
     uniqueWallets: 1000, validation: { passed: true, complete: true },
   });
-  process.stdout.write(`Prepared exactly 1,000 unique Polymarket leaderboard wallets from weekly/monthly sources.\n`);
+  process.stdout.write("Prepared exactly 1,000 unique Polymarket leaderboard wallets from weekly/monthly sources.\n");
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
