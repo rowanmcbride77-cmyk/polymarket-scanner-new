@@ -26,7 +26,7 @@ export function summarizeSettledEvidence({
   function getToken(conditionId, tokenId) {
     const rows = heldAtResolution.get(conditionId) ?? new Map();
     const record = rows.get(tokenId) ?? {
-      tokenId, closedEvidence: false, earlyExitEvidence: false, currentSize: 0, sourceStatusFilters: new Set(),
+      tokenId, closedEvidence: false, currentSize: 0, sourceStatusFilters: new Set(),
     };
     rows.set(tokenId, record);
     heldAtResolution.set(conditionId, rows);
@@ -79,12 +79,14 @@ export function summarizeSettledEvidence({
         ? "same_second_entry_resolution_ambiguous" : "post_resolution_acquisition_excluded", conditionId);
       continue;
     }
+    if (lastEventAt < resolution.resolvedAtSeconds) {
+      // A position sold before market resolution is not a settlement result.
+      // Exclude this market from wins, losses, and the resolved-market denominator.
+      exclude("early_exit_before_resolution", conditionId);
+      continue;
+    }
     const item = getToken(conditionId, tokenId);
     item.closedEvidence = true;
-    if (lastEventAt < resolution.resolvedAtSeconds) {
-      // Include early exits using the market’s eventual resolved outcome.
-      item.earlyExitEvidence = true;
-    }
   }
 
   for (const record of currentPositions) {
@@ -167,7 +169,6 @@ export function summarizeSettledEvidence({
       resolvedAtSeconds: resolution.resolvedAtSeconds,
       currentShares: evidence.currentSize,
       source: evidence.closedEvidence && evidence.currentSize > 0 ? "closed_and_current"
-        : evidence.earlyExitEvidence ? "closed_before_resolution"
         : evidence.closedEvidence ? "closed_after_resolution"
         : "current_redeemable_position",
     });
@@ -196,7 +197,7 @@ export function summarizeSettledEvidence({
     losses,
     resolvedMarkets: results.length,
     winRate: results.length ? wins / results.length : null,
-    earlyExitsCounted: results.filter((row) => row.source === "closed_before_resolution").length,
+    earlyExitsCounted: 0,
     exclusions,
     // Integrity is enforced per market above. Unrelated malformed or unverified
     // positions remain diagnostic exclusions and do not erase valid markets.
