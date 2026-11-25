@@ -43,7 +43,9 @@ jobs:
             status.state === "success" &&
             status.validation?.passed === true &&
             status.validation?.complete === true &&
-            status.auditedWallets === status.discoveredWallets &&\n            status.discoveredWallets === 1000 && status.sourceCandidateCount === 1000 &&\n            status.earlyExitsIncluded === false && status.qualification?.earlyExitsCounted === false;
+            status.auditedWallets === status.discoveredWallets &&
+            status.discoveredWallets === 1000 && status.sourceCandidateCount === 1000 &&
+            status.earlyExitsIncluded === false && status.qualification?.earlyExitsCounted === false;
           if (!ready) {
             console.log("Settlement audit is not complete (" +
               (status.auditedWallets ?? 0) + "/" +
