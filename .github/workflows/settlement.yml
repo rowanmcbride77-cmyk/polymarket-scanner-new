@@ -69,14 +69,14 @@ jobs:
       - name: Qualify candidates using 60-day closed-market results
         run: npm run qualify
         env:
-          SCANNER_CONCURRENCY: 24
+          SCANNER_CONCURRENCY: 32
           SCANNER_AUDIT_LIMIT: 1000
            # Audit the fixed 1,000-wallet official leaderboard universe in one run.
           SCANNER_RUN_WALLET_LIMIT: 1000
-          SCANNER_API_INTERVAL_MS: 55
-          SCANNER_POSITION_MAX_PAGES: 25
+          SCANNER_API_INTERVAL_MS: 52
+          SCANNER_POSITION_MAX_PAGES: 10
           SCANNER_DIAGNOSTIC_LIMIT: 0
-          SCANNER_AUDIT_CHUNK_SIZE: 100
+          SCANNER_AUDIT_CHUNK_SIZE: 20
           SCANNER_PERSIST_CHECKPOINTS: 1
           NODE_OPTIONS: --max-old-space-size=6144 --expose-gc
       - name: Validate settlement-qualified dashboard data
