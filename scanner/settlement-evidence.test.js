@@ -32,17 +32,17 @@ test("counts a closed position whose last economic event occurred after resoluti
   assert.equal(result.integrityPassed,true);
 });
 
-test("counts a closed position sold before resolution using its eventual market outcome", () => {
+test("excludes a position sold before resolution from wins, losses, and denominator", () => {
   const result = summarizeSettledEvidence({
     ...base, closedPositions:[closed("101",1794916700)], currentPositions:[],
     tokenFacts:new Map([["101",token("101",1)]]),
   });
-  assert.equal(result.resolvedMarkets,1);
-  assert.equal(result.wins,1);
+  assert.equal(result.resolvedMarkets,0);
+  assert.equal(result.wins,0);
   assert.equal(result.losses,0);
-  assert.equal(result.winRate,1);
-  assert.equal(result.earlyExitsCounted,1);
-  assert.equal(result.exclusions.pre_resolution_exit,undefined);
+  assert.equal(result.winRate,null);
+  assert.equal(result.earlyExitsCounted,0);
+  assert.equal(result.exclusions.early_exit_before_resolution,1);
   assert.equal(result.integrityPassed,true);
 });
 
