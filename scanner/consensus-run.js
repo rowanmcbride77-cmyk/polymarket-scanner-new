@@ -35,7 +35,7 @@ function validQualificationRules(value) {
   return value?.minimumWinRate === 0.9 &&
     value?.minimumResolvedMarkets === 10 &&
     value?.lookbackDays === 60 &&
-    value?.earlyExitsCounted === true &&
+    value?.earlyExitsCounted === false &&
     value?.settlementIntegrityRequired === true;
 }
 
@@ -67,9 +67,9 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
   if (status.schemaVersion !== 1 || status.state !== "success" ||
       status.validation?.passed !== true || status.validation?.complete !== true ||
       status.auditUniverseComplete !== true ||
-      status.sourceCandidateCount !== status.discoveredWallets ||
+      status.sourceCandidateCount !== status.discoveredWallets || status.discoveredWallets !== 1000 ||
       status.auditedWallets !== status.discoveredWallets ||
-      status.earlyExitsIncluded !== true || !validQualificationRules(status.qualification) ||
+      status.earlyExitsIncluded !== false || !validQualificationRules(status.qualification) ||
       week.period !== "week" || month.period !== "month" ||
       week.validation?.passed !== true || week.validation?.complete !== true ||
       !validQualificationRules(week.qualification) ||
@@ -87,7 +87,7 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     minimumWinRate: 0.9,
     minimumResolvedMarkets: 10,
     lookbackDays: 60,
-    earlyExitsCounted: true,
+    earlyExitsCounted: false,
     settlementIntegrityRequired: true,
     auditedCandidateCount: status.auditedWallets,
     discoveredCandidateCount: status.sourceCandidateCount ?? status.discoveredWallets,
@@ -97,7 +97,7 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
     const consensus = {
       schemaVersion: 1, generatedAt,
       validation: { passed: true, complete: true, failedWallets: 0 },
-      walletUniverse: "settlement-qualified-top100",
+      walletUniverse: "settlement-qualified-top1000",
       walletsChecked: 0,
       qualifiedWalletsConsidered: 0,
       qualificationBasis,
