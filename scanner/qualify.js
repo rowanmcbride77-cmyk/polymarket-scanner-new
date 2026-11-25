@@ -28,9 +28,10 @@ export function isReusableCheckpoint(checkpoint, candidateCount, universeGenerat
     ? results.map((row) => String(row?.wallet ?? "").toLowerCase())
     : [];
   const savedAuditLimit = Number(checkpoint?.auditLimit ?? checkpoint?.candidateCount);
-  return checkpoint?.schemaVersion === 3 &&
+  return checkpoint?.schemaVersion === 4 &&
+    checkpoint?.auditUniverseGeneratedAt === universeGeneratedAt &&
     Number.isInteger(savedAuditLimit) &&
-    savedAuditLimit >= candidateCount &&
+    savedAuditLimit === candidateCount &&
     checkpoint?.candidateCount === savedAuditLimit &&
     Array.isArray(results) &&
     results.length <= candidateCount &&
@@ -288,7 +289,8 @@ export async function runQualification({
       if (global.gc) global.gc();
       if (persistCheckpoints) {
         const saved = {
-          schemaVersion: 3,
+          schemaVersion: 4,
+          auditUniverseGeneratedAt: discovery.generatedAt,
           discoveryGeneratedAt: discovery.generatedAt,
           candidateCount: candidates.length,
           auditLimit,
