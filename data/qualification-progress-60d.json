@@ -6,7 +6,7 @@
   "auditLimit": 1000,
   "nowSeconds": 1795567282,
   "positionMaxPages": 10,
-  "nextOffset": 920,
+  "nextOffset": 940,
   "results": [
     {
       "wallet": "0xad5353afe30c2da57709e2704ef3ccdcf67eef24",
@@ -22289,11 +22289,528 @@
       },
       "auditStage": "shared_settlement_facts",
       "error": "internal server error"
+    },
+    {
+      "wallet": "0x60089ea3162461da70d4f9d813634d46cc20f931",
+      "username": "6m1",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "early_exit_before_resolution": 7,
+          "redeemable_status_payout_mismatch": 12
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x6d11cd749eb59c8ffa6d38be80ad0ad0a255c449",
+      "username": "1xx2",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 1,
+        "losses": 0,
+        "resolvedMarkets": 1,
+        "winRate": 1,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "early_exit_before_resolution": 112,
+          "missing_resolution_timestamp": 226,
+          "same_second_as_resolution_ambiguous": 2,
+          "redeemable_status_payout_mismatch": 87
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xf2c146d213cb004f1bc895539b651e91a4cfc593",
+      "username": "Shooter.eth",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "prefilter_insufficient_possible_markets": 1
+        },
+        "integrityPassed": true,
+        "integrityFailures": [],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xe5d17badb17107aa1c5cdb0446e898776d74a9d7",
+      "username": "imthegoat.",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 1,
+        "losses": 1,
+        "resolvedMarkets": 2,
+        "winRate": 0.5,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "early_exit_before_resolution": 159
+        },
+        "integrityPassed": true,
+        "integrityFailures": [],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x1b5ae95018a01be282443dfe48f4ba5535d93eaf",
+      "username": "hufadjsl",
+      "complete": true,
+      "qualification": {
+        "qualified": true,
+        "reason": "all_thresholds_met"
+      },
+      "summary": {
+        "wins": 25,
+        "losses": 0,
+        "resolvedMarkets": 25,
+        "winRate": 1,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 120,
+          "redeemable_status_payout_mismatch": 12
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x7321aa7cb31e253e23ae6137031d0a2d886b537a",
+      "username": "TheBestAccount12",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 54
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x92e53057ef2872722a53fe807245bd387e1defee",
+      "username": "GrokEnjoyer",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 2,
+        "resolvedMarkets": 2,
+        "winRate": 0,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 142,
+          "early_exit_before_resolution": 6,
+          "same_second_as_resolution_ambiguous": 1,
+          "redeemable_status_payout_mismatch": 1
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xeb4cf4969b2fba11e832255ec5f4d7b87c9b7232",
+      "username": "Danny8273",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 2,
+        "losses": 0,
+        "resolvedMarkets": 2,
+        "winRate": 1,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 12,
+          "early_exit_before_resolution": 95,
+          "redeemable_status_payout_mismatch": 8
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x819dfea4ffa9c4d3ef27f00e2dbac7e9e93507f1",
+      "username": "JokerTheClown",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 4,
+        "losses": 4,
+        "resolvedMarkets": 8,
+        "winRate": 0.5,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 2603,
+          "early_exit_before_resolution": 107,
+          "same_second_as_resolution_ambiguous": 3,
+          "redeemable_status_payout_mismatch": 87
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x8afa03dd6974e44d00c4d14dcccb00c0ddf6adb6",
+      "username": "stupid22",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 244,
+          "early_exit_before_resolution": 2
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xe5a2d793d3a9139d80e36663b1db2fa8cbde5384",
+      "username": "DLGC",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 6
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xde5868f5b8b7d9cb6c5f91fb92c3c736738af55c",
+      "username": "faceverification",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 28
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xb21eff8e0ef828c86cf344d04c2143a316c5e619",
+      "username": "0xb21EFf8e0EF828C86cf344D04c2143a316c5E619-1779219788989",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 4,
+        "losses": 0,
+        "resolvedMarkets": 4,
+        "winRate": 1,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "early_exit_before_resolution": 84,
+          "redeemable_status_payout_mismatch": 108,
+          "missing_resolution_timestamp": 4
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch",
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x6c439f2c136efab50b08cd8a52de3dfb070dfb9b",
+      "username": "BlueBase-568",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "win_rate_below_threshold"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 26,
+        "resolvedMarkets": 26,
+        "winRate": 0,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 203,
+          "early_exit_before_resolution": 76,
+          "same_second_as_resolution_ambiguous": 1,
+          "redeemable_status_payout_mismatch": 21
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xa16a1302ca05463f30faebeb5c045767fde233a1",
+      "username": "pvc975",
+      "complete": false,
+      "qualification": {
+        "qualified": false,
+        "reason": "audit_error"
+      },
+      "auditStage": "position_snapshots",
+      "error": "Pagination page limit reached; history is incomplete"
+    },
+    {
+      "wallet": "0x224f67d24c7f894cd8aea7ede6612dcb005fef71",
+      "username": "aksdsdl",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "win_rate_below_threshold"
+      },
+      "summary": {
+        "wins": 217,
+        "losses": 78,
+        "resolvedMarkets": 295,
+        "winRate": 0.735593220338983,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 414,
+          "early_exit_before_resolution": 2,
+          "redeemable_status_payout_mismatch": 44,
+          "multiple_outcomes_held_in_same_market": 43
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp",
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x323c8cff3b1dac53a2801f0b7236d71078a1873e",
+      "username": "nehaip",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 31
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xe0e0155a37ce17b15b880e93e145e1008009489c",
+      "username": "fossildiamond577",
+      "complete": true,
+      "qualification": {
+        "qualified": true,
+        "reason": "all_thresholds_met"
+      },
+      "summary": {
+        "wins": 24,
+        "losses": 0,
+        "resolvedMarkets": 24,
+        "winRate": 1,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "same_second_as_resolution_ambiguous": 5,
+          "early_exit_before_resolution": 1,
+          "redeemable_status_payout_mismatch": 22,
+          "multiple_outcomes_held_in_same_market": 1
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "redeemable_status_payout_mismatch"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0xc6a2910714d2febe8730f8386277641f7c1fc9b7",
+      "username": "trx1",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 1509,
+          "early_exit_before_resolution": 1
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
+    },
+    {
+      "wallet": "0x40604cb1f958c03bea0b18aa43e4cb0d62f33ec3",
+      "username": "C03B",
+      "complete": true,
+      "qualification": {
+        "qualified": false,
+        "reason": "insufficient_resolved_markets"
+      },
+      "summary": {
+        "wins": 0,
+        "losses": 0,
+        "resolvedMarkets": 0,
+        "winRate": null,
+        "earlyExitsCounted": 0,
+        "exclusions": {
+          "missing_resolution_timestamp": 344,
+          "early_exit_before_resolution": 7
+        },
+        "integrityPassed": true,
+        "integrityFailures": [
+          "missing_resolution_timestamp"
+        ],
+        "complete": true,
+        "windowStartSeconds": 1790383282
+      }
     }
   ],
-  "failed": 137,
+  "failed": 138,
   "errorCounts": {
-    "position_snapshots: Pagination page limit reached; history is incomplete": 88,
+    "position_snapshots: Pagination page limit reached; history is incomplete": 89,
     "shared_settlement_facts: internal server error": 49
   },
   "errorSamples": [
