@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Gate consensus on a complete 20K audit universe
+      - name: Gate consensus on the complete 1,000-wallet audit universe
         id: gate
         run: |
           node --input-type=module <<'NODE'
@@ -42,14 +42,14 @@ jobs:
           const ready = status.state === "success" && status.validation?.passed === true &&
             status.validation?.complete === true && status.auditUniverseComplete === true &&
             status.sourceCandidateCount === status.discoveredWallets &&
-            status.auditedWallets === status.discoveredWallets;
+            status.auditedWallets === status.discoveredWallets && status.discoveredWallets === 1000 && status.earlyExitsIncluded === false;
           console.log("ready=" + ready);
           NODE
-          if grep -q "ready=true" <<< "$(node --input-type=module -e 'import {readFileSync} from "node:fs";const s=JSON.parse(readFileSync("site/data/qualification-status.json","utf8"));console.log("ready="+(s.state==="success"&&s.validation?.passed===true&&s.validation?.complete===true&&s.auditUniverseComplete===true&&s.sourceCandidateCount===s.discoveredWallets&&s.auditedWallets===s.discoveredWallets))')"; then
+          if grep -q "ready=true" <<< "$(node --input-type=module -e 'import {readFileSync} from "node:fs";const s=JSON.parse(readFileSync("site/data/qualification-status.json","utf8"));console.log("ready="+(s.state==="success"&&s.validation?.passed===true&&s.validation?.complete===true&&s.auditUniverseComplete===true&&s.sourceCandidateCount===s.discoveredWallets&&s.auditedWallets===s.discoveredWallets&&s.discoveredWallets===1000&&s.earlyExitsIncluded===false))')"; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping consensus: the complete 20K audit is not ready yet."
+            echo "Skipping consensus: the complete Top 1,000 audit is not ready yet."
           fi
       - name: Check scanner and dashboard syntax
         if: steps.gate.outputs.ready == 'true'
@@ -69,15 +69,15 @@ jobs:
           const rules = (q) => q?.minimumWinRate === 0.9 &&
             q?.minimumResolvedMarkets === 10 &&
             q?.lookbackDays === 60 &&
-            q?.earlyExitsCounted === true &&
+            q?.earlyExitsCounted === false &&
             q?.settlementIntegrityRequired === true;
           if (status.state !== "success" || status.validation?.passed !== true ||
               status.validation?.complete !== true ||
               status.auditUniverseComplete !== true ||
               status.sourceCandidateCount !== status.discoveredWallets ||
               status.auditedWallets !== status.discoveredWallets ||
-              status.earlyExitsIncluded !== true || !rules(status.qualification)) {
-            throw new Error("A complete 60-day settlement-qualified Top 100 is required before consensus.");
+              status.earlyExitsIncluded !== false || !rules(status.qualification)) {
+            throw new Error("A complete 60-day settlement-qualified Top 1,000 audit is required before consensus.");
           }
           for (const [period, board] of [["week", week], ["month", month]]) {
             if (board.period !== period || board.generatedAt !== status.generatedAt ||
@@ -91,13 +91,13 @@ jobs:
                   !Number.isFinite(row.winRate) || row.winRate < 0.9 ||
                   !Number.isInteger(row.resolvedMarkets) || row.resolvedMarkets < 10 ||
                   !Number.isInteger(row.wins) || !Number.isInteger(row.losses) ||
-                  row.wins + row.losses !== row.resolvedMarkets ||
+                  row.wins + row.losses !== row.resolvedMarkets || row.earlyExitsCounted !== 0 ||
                   Math.abs(row.winRate - row.wins / row.resolvedMarkets) > 1e-9) {
                 throw new Error(period + " board contains an unqualified trader.");
               }
             }
           }
-          console.log("Fresh weekly/monthly Top 100 validated; early exits count by eventual resolution.");
+          console.log("Fresh weekly/monthly boards validated from the Top 1,000 audit universe; early exits are excluded.");
           NODE
       - name: Scan recent activity and current holdings for same-side consensus
         if: steps.gate.outputs.ready == 'true'
