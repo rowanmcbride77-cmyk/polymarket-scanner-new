@@ -365,7 +365,8 @@ export async function runQualification({
     if (global.gc) global.gc();
     if (persistCheckpoints) {
       const saved = {
-        schemaVersion: 3,
+        schemaVersion: 4,
+        auditUniverseGeneratedAt: discovery.generatedAt,
         discoveryGeneratedAt: discovery.generatedAt,
         candidateCount: candidates.length,
         auditLimit,
