@@ -1,61 +1,49 @@
-name: Discover Polymarket Wallets
+name: Fetch Polymarket Top 1,000
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - "scanner/**"
-      - "!scanner/qualify.js"
-      - "!scanner/wallet-positions.js"
-      - "!scanner/batch-audit.js"
-      - "!scanner/audit-wallet.js"
-      - "!scanner/settlement-evidence.js"
-      - "!scanner/settlement-evidence.test.js"
-      - "!scanner/**.test.js"
-      - "!scanner/consensus-run.js"
-      - "!scanner/consensus.js"
-      - "!scanner/qualification-runner.js"
-      - "!.github/workflows/qualified.yml"
+      - "scanner/top1000.js"
+      - "scanner/data-api.js"
+      - "package.json"
+      - ".github/workflows/qualified.yml"
   schedule:
     - cron: "47 */6 * * *"
 
 permissions:
   contents: write
-  actions: write
 
 concurrency:
-  group: polymarket-pipeline
+  group: polymarket-leaderboard-universe
   cancel-in-progress: false
 
 jobs:
-  discover-and-publish:
+  fetch-leaderboard-universe:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Check scanner and dashboard syntax
-        run: npm run check
-      - name: Run scanner unit tests
-        run: npm test
-      - name: Discover candidate wallets from Polymarket
-        run: npm run scan
+      - name: Check scanner syntax and tests
+        run: |
+          npm run check
+          npm test
+      - name: Fetch and validate exactly 1,000 official leaderboard wallets
+        run: npm run top1000
         env:
-          SCANNER_MAX_CANDIDATES: 20000
-          NODE_OPTIONS: --max-old-space-size=6144
-      - name: Publish validated wallet discovery snapshot
+          NODE_OPTIONS: --max-old-space-size=2048
+      - name: Publish validated 1,000-wallet audit universe
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/discovery.json
-          if git diff --cached --quiet; then
-            echo "Discovery snapshot unchanged."
-          else
-            git commit -m "Publish validated 20K wallet discovery snapshot"
-            git fetch origin main
-            git rebase -X theirs origin/main
-            git push origin HEAD:main
-          fi
+          git add data/audit-universe.json site/data/audit-universe-status.json
+          git commit -m "Publish official Polymarket Top 1,000 audit universe"
+          git fetch origin main
+          git rebase -X theirs origin/main
+          git push origin HEAD:main
