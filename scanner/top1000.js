@@ -55,13 +55,19 @@ async function writeJson(path, value) {
 export async function runTop1000() {
   const startedAt = new Date().toISOString();
   const [weekly, monthly] = await Promise.all([fetchTop1000("week"), fetchTop1000("month")]);
+export function buildTop1000AuditUniverse(weekly, monthly) {
+  if (!Array.isArray(weekly) || !Array.isArray(monthly) || weekly.length !== 1000 || monthly.length !== 1000) {
+    throw new Error("Weekly and monthly source leaderboards must each contain exactly 1,000 traders");
+  }
   const byWallet = new Map();
   for (const trader of [...weekly, ...monthly]) {
-    const current = byWallet.get(trader.wallet) ?? {
-      wallet: trader.wallet, username: trader.username, verified: trader.verified, appearances: [],
+    const wallet = String(trader?.wallet ?? "").toLowerCase();
+    if (!WALLET_RE.test(wallet)) throw new Error("Leaderboard source contains an invalid wallet");
+    const current = byWallet.get(wallet) ?? {
+      wallet, username: trader.username, verified: trader.verified === true, appearances: [],
     };
     current.appearances.push(...trader.appearances);
-    byWallet.set(trader.wallet, current);
+    byWallet.set(wallet, current);
   }
   const candidates = [...byWallet.values()].map((row) => {
     const ranks = row.appearances.map((a) => a.rank);
@@ -71,6 +77,10 @@ export async function runTop1000() {
   if (candidates.length !== 1000 || new Set(candidates.map((x) => x.wallet)).size !== 1000) {
     throw new Error(`Expected exactly 1,000 unique combined leaderboard wallets; got ${candidates.length}`);
   }
+  return candidates;
+}
+
+  const candidates = buildTop1000AuditUniverse(weekly, monthly);
   const generatedAt = new Date().toISOString();
   await writeJson("data/audit-universe.json", {
     schemaVersion: 1, generatedAt, source: "Polymarket official overall PNL leaderboard v2",
