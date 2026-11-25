@@ -12,7 +12,7 @@ export async function fetchTop1000(period, { client = createDataApiClient() } = 
   const seenCursors = new Set();
   for (let pageNumber = 0; pageNumber < 20 && rows.length < 1000; pageNumber += 1) {
     const page = await client.getPage("/v2/leaderboard", {
-      category: "overall", time_period: period, sort_by: "PNL", limit: 1000,
+      category: "overall", time_period: period, sort_by: "PNL", limit: 50,
     }, cursor);
     rows.push(...page.rows);
     if (!page.hasMore) break;
