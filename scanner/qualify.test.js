@@ -90,31 +90,31 @@ test("a 429 on one endpoint does not block a different endpoint", async () => {
   assert.equal(calls, 2);
 });
 
-test("a 1K checkpoint from a 20K audit is reusable by the next batch", () => {
-  const checkpoint = {
-    schemaVersion: 3,
-    candidateCount: 20000,
-    auditLimit: 20000,
-    nowSeconds: 1795545600,
-    nextOffset: 1000,
+test("legacy 20K checkpoints cannot be reused for the Top 1,000 audit", () => {
+  const legacy = {
+    schemaVersion: 3, candidateCount: 20000, auditLimit: 20000,
+    nowSeconds: 1795545600, nextOffset: 1000,
     results: Array.from({ length: 1000 }, (_, index) => ({
-      wallet: "0x" + index.toString(16).padStart(40, "0"),
-      complete: true,
+      wallet: "0x" + index.toString(16).padStart(40, "0"), complete: true,
     })),
   };
-  assert.equal(isReusableCheckpoint(checkpoint, 20000), true);
-  assert.equal(checkpointResumeOffset(checkpoint), 1000);
+  assert.equal(isReusableCheckpoint(legacy, 1000, "leaderboard-snapshot-1"), false);
 });
 
-test("checkpoint validation rejects malformed or oversized progress", () => {
+test("Top 1,000 checkpoints resume only for the exact same source snapshot", () => {
+  const snapshot = "2026-11-24T12:00:00.000Z";
   const base = {
-    schemaVersion: 3, candidateCount: 20000, auditLimit: 20000,
+    schemaVersion: 4, auditUniverseGeneratedAt: snapshot,
+    candidateCount: 1000, auditLimit: 1000,
     nowSeconds: 1795545600, nextOffset: 1,
     results: [{ wallet: "0x" + "1".repeat(40), complete: true }],
   };
-  assert.equal(isReusableCheckpoint(base, 20000), true);
-  assert.equal(isReusableCheckpoint({ ...base, nextOffset: 0 }, 20000), false);
-  assert.equal(isReusableCheckpoint({ ...base, results: [{ wallet: "bad" }] }, 20000), false);
-  assert.equal(isReusableCheckpoint({ ...base, results: [base.results[0], base.results[0]], nextOffset: 2 }, 20000), false);
-  assert.equal(isReusableCheckpoint({ ...base, results: Array(20001).fill(base.results[0]), nextOffset: 20001 }, 20000), false);
+  assert.equal(isReusableCheckpoint(base, 1000, snapshot), true);
+  assert.equal(isReusableCheckpoint(base, 1000, "different-snapshot"), false);
+  assert.equal(isReusableCheckpoint({ ...base, nextOffset: 0 }, 1000, snapshot), false);
+  assert.equal(isReusableCheckpoint({ ...base, results: [{ wallet: "bad" }] }, 1000, snapshot), false);
+  assert.equal(isReusableCheckpoint({
+    ...base, results: [base.results[0], base.results[0]], nextOffset: 2,
+  }, 1000, snapshot), false);
+  assert.equal(isReusableCheckpoint({ ...base, auditLimit: 20000 }, 1000, snapshot), false);
 });
