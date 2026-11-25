@@ -21,7 +21,7 @@ export function checkpointResumeOffset(checkpoint) {
  * equal candidateCount here defeats batching: the first 1K of a 20K audit
  * must be accepted so the next run can continue with the remaining 19K.
  */
-export function isReusableCheckpoint(checkpoint, candidateCount) {
+export function isReusableCheckpoint(checkpoint, candidateCount, universeGeneratedAt) {
   if (!Number.isInteger(candidateCount) || candidateCount < 1) return false;
   const results = checkpoint?.results;
   const wallets = Array.isArray(results)
@@ -162,7 +162,7 @@ function compactCheckpointResult(row) {
 }
 
 export async function runQualification({
-  discoveryPath = "data/discovery.json",
+  discoveryPath = "data/audit-universe.json",
   outputPath = "site/data/qualification.json",
   concurrency = Number(process.env.SCANNER_CONCURRENCY ?? 16),
   nowSeconds = Math.floor(Date.now() / 1000),
@@ -170,8 +170,8 @@ export async function runQualification({
   const discovery = JSON.parse(await readFile(resolve(discoveryPath), "utf8"));
   if (discovery.schemaVersion !== 1 || discovery.validation?.passed !== true ||
       !Array.isArray(discovery.candidates) ||
-      discovery.validation.candidateCount !== discovery.candidates.length) {
-    throw new Error("Candidate discovery input failed validation");
+      discovery.validation.candidateCount !== discovery.candidates.length || discovery.candidates.length !== 1000) {
+    throw new Error("Official Top 1,000 leaderboard audit universe failed validation");
   }
 
   let effectiveNowSeconds = nowSeconds;
@@ -210,7 +210,7 @@ export async function runQualification({
   if (persistCheckpoints) {
     try {
       const saved = JSON.parse(await readFile(resolve(checkpointPath), "utf8"));
-      if (isReusableCheckpoint(saved, candidates.length)) {
+      if (isReusableCheckpoint(saved, candidates.length, discovery.generatedAt)) {
         checkpoint = saved;
         // Do not block the 20K scan by replaying failed wallets before new work.\n        // Incomplete audits remain safely excluded from ranking; retries are opt-in\n        // after the full discovery set has received a terminal audit result.\n        retryIncompleteIndexes = process.env.SCANNER_RETRY_INCOMPLETE === "1"\n          ? incompleteCheckpointIndexesForExpandedHistory(saved, currentPositionMaxPages)\n          : [];
         effectiveNowSeconds = saved.nowSeconds;
@@ -480,7 +480,7 @@ export async function runQualification({
   }
 
   const qualificationDiscovery = { ...discovery, candidates };
-  const boards = buildQualifiedLeaderboards(qualificationDiscovery, batch, { topN: 100 });
+  const boards = buildQualifiedLeaderboards(qualificationDiscovery, batch, { topN: 1000 });
   const disqualificationReasons = {};
   for (const row of batch.results) {
     if (!row.qualification.qualified) {
@@ -502,7 +502,7 @@ export async function runQualification({
       minimumWinRate: 0.9,
       maximumEarlyExitRate: null,
       lookbackDays: 60,
-      earlyExitsCounted: true,
+      earlyExitsCounted: false,
       settlementIntegrityRequired: true,
     },
     auditSummary: {
@@ -510,7 +510,7 @@ export async function runQualification({
       incompleteWalletAudits: batch.failed,
       incompleteAuditErrors: batch.errorCounts,
       disqualificationReasons,
-      earlyExitsIncluded: true,
+      earlyExitsIncluded: false,
     },
     validation: {
       passed: true,
