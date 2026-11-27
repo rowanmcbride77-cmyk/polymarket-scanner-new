@@ -3,12 +3,12 @@
 A static dashboard for trader performance, same-side consensus and low-cost high-multiplier combo opportunities.
 
 ## Trader qualification
-- Discovers up to **20,000** unique wallets from the overall weekly and monthly leaderboard pages. The current first pass audits the first **1,000** candidates in the validated discovery ordering and labels that scope on the dashboard; set `SCANNER_AUDIT_LIMIT=20000` for a full-universe run. The audit resumes from durable checkpoints, and the current proof-of-concept is limited to 1,000 wallets.
-- Audit the trailing **60 days** of closed-market results.
-- Require **90%+ win rate** and at least **10 closed markets**.
-- Count every verifiable closed market in the 60-day window, including positions exited before resolution. For an early exit, use the market’s eventual resolved outcome (YES/NO final result) to classify the trader’s position as a win or loss.
-- Track early exits as a separate diagnostic count, but include their eventual market outcomes in wins, losses, the denominator and win rate.
-- Exclude incomplete wallet audits and histories truncated by the **25-page per-status cap** from qualification and ranking; missing evidence is not counted as a win or loss. Incomplete audits are reported separately.
+- The current proof-of-concept discovers and audits exactly **1,000 unique wallets** from Polymarket's weekly/monthly overall P&L leaderboards. The planned next expansion is a **5,000-wallet, category-balanced candidate pool**; it will not be enabled until this 1,000-wallet pipeline completes and passes validation.
+- Audit the trailing **60 days** of resolved-market settlement evidence.
+- Require **90%+ settlement win rate** and at least **10 resolved markets**.
+- **Exclude every position exited before the market actually resolves** from wins, losses, resolved-market denominator and win rate. Early exits are recorded only as an exclusion diagnostic; the market's eventual result is not credited to the trader.
+- Require complete position snapshots and resolution evidence for each counted result. Missing or conflicting evidence is excluded, never guessed. Incomplete wallet audits and histories truncated by the configured pagination cap are excluded from qualification and reported separately.
+- Position history is currently capped at **25 pages per status**. If a checkpoint was created with a lower cap, the next run retries previously incomplete wallets using the expanded cap before final qualification.
 
 The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket leaderboard P&L, but eligibility is based on the same verified settlement criteria. A board can contain fewer than 100 traders if fewer pass.
 
@@ -29,11 +29,11 @@ The weekly/monthly Top 100 boards are ranked by the corresponding Polymarket lea
 - Label potential payout/profit as estimates, never realized returns.
 
 ## Pipeline
-1. Discover up to 20,000 overall weekly/monthly leaderboard wallets.
-2. Audit the first 1,000 candidates from the 20,000-wallet discovery pool using 60-day closed-market results and build the first-pass weekly/monthly Top 100. Full-universe auditing is configurable.
-3. Check qualified wallets' last-hour BUY activity and current holdings.
-4. Verify Gamma market state, outcome token, category and 24-hour resolution window.
-5. Fetch combo positions and calculate verified entry/potential payout multiples.
-6. Validate output schemas and publish only after every selected audit candidate has a terminal result. The dashboard explicitly shows whether the audit universe is a 2,000-wallet first pass or the complete 20,000-wallet discovery pool. Any incomplete individual audit is excluded from ranking and reported.
+1. Discover exactly 1,000 unique wallets from the official weekly/monthly overall leaderboard pages.
+2. Audit the full 1,000-wallet candidate set with 60-day settlement evidence. Every displayed trader must pass 90%+ and 10+ resolved markets; early exits do not count.
+3. Retry previously incomplete wallet histories when a larger pagination cap is configured; never turn an incomplete audit into a qualified result.
+4. Check only settlement-qualified wallets for last-hour BUY activity and current holdings.
+5. Verify Gamma market state, exact outcome token, allowed category and 24-hour resolution window.
+6. Validate output schemas and publish only after the full candidate set has terminal audit results and all displayed traders pass qualification.
 
-A zero-signal result is valid if no market meets the filters. It must not be replaced with fabricated signals. The dashboard publishes only after the full candidate batch and consensus scan finish and pass output validation. Wallets with incomplete individual audits are excluded and counted explicitly; their partial data is never used to qualify or rank them.
+A zero-signal result is valid if no market meets the filters. It must not be replaced with fabricated signals. Consensus counts include **only** traders who independently passed the same 90% / 10 resolved-market settlement qualification. A signal's YES/NO counts represent verified current holdings and recent buys by those qualified traders only. The 5,000-wallet expansion is a later phase, not an already-running feature.
