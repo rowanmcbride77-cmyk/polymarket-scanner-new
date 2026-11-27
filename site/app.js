@@ -22,9 +22,9 @@ function render(rows){
 async function start(){
  try{
   const status=await json("./data/qualification-status.json");
-  const validQualification=q=>q?.minimumWinRate===0.9&&q?.minimumResolvedMarkets===10&&q?.lookbackDays===60&&q?.earlyExitsCounted===true;
+  const validQualification=q=>q?.minimumWinRate===0.9&&q?.minimumResolvedMarkets===10&&q?.lookbackDays===60&&q?.earlyExitsCounted===false;
   if(status.schemaVersion!==1||status.state!=="success"||status.validation?.passed!==true||status.validation?.complete!==true||
-     status.earlyExitsIncluded!==true||!validQualification(status.qualification)||!Number.isFinite(Date.parse(status.completedAt||""))) {
+     status.earlyExitsIncluded!==false||!validQualification(status.qualification)||!Number.isFinite(Date.parse(status.completedAt||""))) {
    throw new Error("The latest scan is still running or has not passed validation. The previous results are hidden until a complete scan is published.");
   }
   const [week,month]=await Promise.all([json("./data/qualified-week.json"),json("./data/qualified-month.json")]);
@@ -48,7 +48,7 @@ async function start(){
    ? checked.toLocaleString()+" of "+total.toLocaleString()+" discovered wallets checked so far."
    : "The full discovered wallet list was checked.";
   const failed=Number(status.failedWalletAudits||0);
-  set("#status-detail","Showing traders with at least 90% wins across 10 or more resolved markets in the last 60 days. Early exits are scored by the market's final result. "+coverage+(failed?" "+failed+" wallet histories could not be fully checked and were excluded.":""));
+  set("#status-detail","Showing traders with at least 90% wins across 10 or more resolved markets in the last 60 days. Early exits are excluded from wins, losses, and the resolved-market count. "+coverage+(failed?" "+failed+" wallet histories could not be fully checked and were excluded.":""));
   set("#last-scan",new Date(status.completedAt||status.generatedAt).toLocaleString());
  }catch(error){
   const panel=$(".status");if(panel)panel.classList.remove("status-success");
