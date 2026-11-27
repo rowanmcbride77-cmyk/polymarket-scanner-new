@@ -39,15 +39,30 @@ function validQualificationRules(value) {
     value?.settlementIntegrityRequired === true;
 }
 
-function qualifiedWalletsFromBoards(week, month) {
-  const byWallet = new Map();
-  for (const row of [...(week.traders ?? []), ...(month.traders ?? [])]) {
+export function validateQualifiedBoard(board, period, generatedAt) {
+  const rules = validQualificationRules(board?.qualification);
+  if (board?.period !== period || board?.generatedAt !== generatedAt ||
+      board?.validation?.passed !== true || board?.validation?.complete !== true ||
+      !rules || !Array.isArray(board?.traders) || board.count !== board.traders.length) {
+    throw new Error(`The ${period} settlement-qualified board is stale or incomplete`);
+  }
+  for (const [index, row] of board.traders.entries()) {
     if (!/^0x[a-f0-9]{40}$/i.test(row.wallet ?? "") ||
         !Number.isFinite(row.winRate) || row.winRate < 0.9 ||
         !Number.isInteger(row.resolvedMarkets) || row.resolvedMarkets < 10 ||
         !Number.isInteger(row.wins) || !Number.isInteger(row.losses) ||
         row.wins + row.losses !== row.resolvedMarkets ||
-        Math.abs(row.winRate - row.wins / row.resolvedMarkets) > 1e-9) continue;
+        row.earlyExitsCounted !== 0 ||
+        Math.abs(row.winRate - row.wins / row.resolvedMarkets) > 1e-9) {
+      throw new Error(`The ${period} board contains a non-qualified trader at row ${index + 1}`);
+    }
+  }
+  return board.traders;
+}
+
+export function qualifiedWalletsFromBoards(week, month) {
+  const byWallet = new Map();
+  for (const row of [...week.traders, ...month.traders]) {
     byWallet.set(row.wallet.toLowerCase(), {
       wallet: row.wallet.toLowerCase(),
       username: row.username ?? null,
@@ -77,6 +92,8 @@ export async function runConsensus({ nowSeconds = Math.floor(Date.now() / 1000),
       !validQualificationRules(month.qualification)) {
     throw new Error("Fresh validated 90% settlement-qualified trader boards are required before consensus scanning");
   }
+  validateQualifiedBoard(week, "week", status.generatedAt);
+  validateQualifiedBoard(month, "month", status.generatedAt);
   const wallets = qualifiedWalletsFromBoards(week, month);
   const windowMinutes = 60;
   const startSeconds = nowSeconds - windowMinutes * 60;
