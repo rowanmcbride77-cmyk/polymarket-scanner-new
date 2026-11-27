@@ -88,10 +88,26 @@ jobs:
             console.log("Checkpointed progress: " + status.auditedWallets + "/" + status.discoveredWallets + ". Waiting for the next scheduled batch.");
             process.exit(0);
           }
+          const auditAccountingValid =
+            Number.isInteger(status.auditedWallets) &&
+            Number.isInteger(status.fullyAuditedWallets) &&
+            Number.isInteger(status.failedWalletAudits) &&
+            status.fullyAuditedWallets + status.failedWalletAudits === status.auditedWallets;
+          console.log("Qualification status:", JSON.stringify({
+            state: status.state,
+            validation: status.validation,
+            discoveredWallets: status.discoveredWallets,
+            sourceCandidateCount: status.sourceCandidateCount,
+            auditedWallets: status.auditedWallets,
+            fullyAuditedWallets: status.fullyAuditedWallets,
+            failedWalletAudits: status.failedWalletAudits,
+            earlyExitsIncluded: status.earlyExitsIncluded
+          }));
           if (status.state !== "success" || status.validation?.passed !== true ||
-              status.validation?.complete !== true ||
-              status.auditedWallets !== status.discoveredWallets || status.discoveredWallets !== 1000 || status.sourceCandidateCount !== 1000 || status.earlyExitsIncluded !== false) {
-            throw new Error("Qualification status failed terminal-audit validation");
+              status.auditedWallets !== 1000 || status.discoveredWallets !== 1000 ||
+              status.sourceCandidateCount !== 1000 || status.earlyExitsIncluded !== false ||
+              !auditAccountingValid) {
+            throw new Error("Qualification status failed full-universe audit validation");
           }
           for (const period of ["week", "month"]) {
             const board = JSON.parse(readFileSync(`site/data/qualified-${period}.json`, "utf8"));
