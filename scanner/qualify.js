@@ -569,7 +569,7 @@ export async function runQualification({
     fullyAuditedWallets: batch.completed - batch.failed,
     failedWalletAudits: batch.failed,
     qualifiedWallets: boards.qualifiedWalletCount,
-    earlyExitsIncluded: true,
+    earlyExitsIncluded: false,
     weeklyCount: boards.weekly.length,
     monthlyCount: boards.monthly.length,
     qualification: payload.qualification,
