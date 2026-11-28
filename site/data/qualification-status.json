@@ -1,18 +1,29 @@
 {
   "schemaVersion": 1,
   "generatedAt": "2026-11-28T08:28:11.000Z",
-  "completedAt": null,
+  "completedAt": "2026-11-28T09:28:31.646Z",
   "validation": {
-    "passed": false,
-    "complete": false
+    "passed": true,
+    "complete": true,
+    "allAuditsComplete": false
   },
-  "state": "in_progress",
+  "state": "success",
   "discoveredWallets": 1000,
   "sourceCandidateCount": 1000,
   "auditUniverseComplete": true,
   "auditedWallets": 1000,
   "fullyAuditedWallets": 942,
   "failedWalletAudits": 58,
-  "qualifiedWallets": 0,
-  "message": "Checkpoint saved: 1000/1000 wallet audits attempted."
+  "qualifiedWallets": 101,
+  "earlyExitsIncluded": false,
+  "weeklyCount": 69,
+  "monthlyCount": 82,
+  "qualification": {
+    "minimumResolvedMarkets": 10,
+    "minimumWinRate": 0.9,
+    "maximumEarlyExitRate": null,
+    "lookbackDays": 60,
+    "earlyExitsCounted": false,
+    "settlementIntegrityRequired": true
+  }
 }
